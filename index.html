@@ -28,7 +28,10 @@
     </select>
   </p>
   <p>
-    Search: <input type="text" id="searchBox" placeholder="Type object name..." oninput="computeTargets(currentLat,currentLon)">
+    Search: 
+    <input type="text" id="searchBox" placeholder="Type object name..." oninput="computeTargets(currentLat,currentLon)">
+    <br>
+    <label><input type="checkbox" id="searchAll" onchange="computeTargets(currentLat,currentLon)"> Search across all catalogs</label>
   </p>
   <p id="status">Fetching location and calculating...</p>
   <div id="results"></div>
@@ -39,7 +42,6 @@
   <script src="brightngc.js"></script>
 
   <script>
-  let activeCatalog = catalog; // default Messier
   let currentLat = 40, currentLon = 0;
 
   function toRadians(deg){return deg*Math.PI/180;}
@@ -66,12 +68,31 @@
     return (LST%360+360)%360;
   }
 
+  function getActiveCatalog(){
+    const choice=document.getElementById("catalogChoice").value;
+    if(choice==="messier") return catalog;
+    if(choice==="caldwell") return caldwell;
+    if(choice==="ngc") return brightngc;
+    if(choice==="all") return [...catalog,...caldwell,...brightngc];
+    if(choice==="pro"){ 
+      alert("🚀 Pro Mode coming soon! Extended catalogs will be added.");
+      return [...catalog,...caldwell,...brightngc];
+    }
+    return catalog;
+  }
+
   function computeTargets(lat, lon){
     const now=new Date();
-    let visible=[];
     const query = document.getElementById("searchBox").value.toLowerCase();
+    const searchAll = document.getElementById("searchAll").checked;
 
-    activeCatalog.forEach(obj=>{
+    // catalog selection
+    let allCatalog = searchAll 
+      ? [...catalog, ...caldwell, ...brightngc] 
+      : getActiveCatalog();
+
+    let visible=[];
+    allCatalog.forEach(obj=>{
       const alt=radecToAlt(obj.ra,obj.dec,lat,lon,now);
       if(alt>30 && obj.mag<11){
         if(query==="" || obj.name.toLowerCase().includes(query)){
@@ -97,24 +118,16 @@
   }
 
   function updateCatalog(){
-    const choice=document.getElementById("catalogChoice").value;
-    if(choice==="messier") activeCatalog=catalog;
-    else if(choice==="caldwell") activeCatalog=caldwell;
-    else if(choice==="ngc") activeCatalog=brightngc;
-    else if(choice==="all") activeCatalog=[...catalog,...caldwell,...brightngc];
-    else if(choice==="pro"){
-      alert("🚀 Pro Mode coming soon! Extended catalogs will be added.");
-      activeCatalog=[...catalog,...caldwell,...brightngc];
-    }
     computeTargets(currentLat,currentLon);
   }
 
+  // Get location
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       currentLat=pos.coords.latitude;
       currentLon=pos.coords.longitude;
       document.getElementById("status").innerText="Location detected ✅";
-      updateCatalog(); // fix: run once after location
+      updateCatalog();
     },err=>{
       document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
       updateCatalog();
