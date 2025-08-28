@@ -7,16 +7,18 @@
   <style>
     body { background:#0b0c10; color:#fff; font-family:Arial, sans-serif; padding:15px; }
     h1 { color:#66fcf1; text-align:center; }
-    select { margin:10px; padding:5px; font-size:16px; }
+    select, input { margin:10px; padding:5px; font-size:16px; }
     .card {
       background:#1f2833; border:1px solid #45a29e; border-radius:8px;
       padding:12px; margin:10px 0;
     }
+    img { max-width:100%; border-radius:5px; margin-top:5px; }
   </style>
 </head>
 <body>
   <h1>🔭 AstroTarget</h1>
-  <p>Choose catalog: 
+  <p>
+    Catalog: 
     <select id="catalogChoice" onchange="updateCatalog()">
       <option value="messier">Messier</option>
       <option value="caldwell">Caldwell</option>
@@ -24,6 +26,9 @@
       <option value="all">All</option>
       <option value="pro">Pro Mode</option>
     </select>
+  </p>
+  <p>
+    Search: <input type="text" id="searchBox" placeholder="Type object name..." oninput="computeTargets(currentLat,currentLon)">
   </p>
   <p id="status">Fetching location and calculating...</p>
   <div id="results"></div>
@@ -34,27 +39,24 @@
   <script src="brightngc.js"></script>
 
   <script>
-  let activeCatalog = catalog; // default = Messier
+  let activeCatalog = catalog; // default Messier
   let currentLat = 40, currentLon = 0;
 
   function toRadians(deg){return deg*Math.PI/180;}
   function toDegrees(rad){return rad*180/Math.PI;}
 
-  // Convert RA/Dec → Altitude given lat, lon, time
   function radecToAlt(raHours, decDeg, lat, lon, date) {
-    const ra = raHours * 15; // hours → degrees
-    const lst = getLST(lon, date); // local sidereal time
-    const ha = (lst - ra + 360) % 360; // hour angle
+    const ra = raHours * 15;
+    const lst = getLST(lon, date);
+    const ha = (lst - ra + 360) % 360;
     const haRad = toRadians(ha);
     const decRad = toRadians(decDeg);
     const latRad = toRadians(lat);
-
     const sinAlt = Math.sin(decRad) * Math.sin(latRad) +
                    Math.cos(decRad) * Math.cos(latRad) * Math.cos(haRad);
     return toDegrees(Math.asin(sinAlt));
   }
 
-  // Local Sidereal Time
   function getLST(lon, date){
     const JD = (date.getTime()/86400000)+2440587.5;
     const D = JD-2451545.0;
@@ -64,32 +66,36 @@
     return (LST%360+360)%360;
   }
 
-  // Compute visible targets
   function computeTargets(lat, lon){
     const now=new Date();
     let visible=[];
+    const query = document.getElementById("searchBox").value.toLowerCase();
+
     activeCatalog.forEach(obj=>{
       const alt=radecToAlt(obj.ra,obj.dec,lat,lon,now);
       if(alt>30 && obj.mag<11){
-        visible.push({...obj,alt:alt.toFixed(1)});
+        if(query==="" || obj.name.toLowerCase().includes(query)){
+          visible.push({...obj,alt:alt.toFixed(1)});
+        }
       }
     });
     visible.sort((a,b)=>b.alt-a.alt);
 
     let out="";
-    if(visible.length===0) out="<p>No objects above 30° right now.</p>";
+    if(visible.length===0) out="<p>No objects match your filters.</p>";
     else visible.forEach(obj=>{
+      const img = obj.img ? `<img src="${obj.img}" alt="${obj.name}">` : "";
       out+=`<div class="card">
         <h2>${obj.name}</h2>
         <p>Type: ${obj.type}<br>
         Mag: ${obj.mag} | Size: ${obj.size}<br>
         Altitude now: ${obj.alt}°</p>
+        ${img}
       </div>`;
     });
     document.getElementById("results").innerHTML=out;
   }
 
-  // Catalog switching
   function updateCatalog(){
     const choice=document.getElementById("catalogChoice").value;
     if(choice==="messier") activeCatalog=catalog;
@@ -97,26 +103,25 @@
     else if(choice==="ngc") activeCatalog=brightngc;
     else if(choice==="all") activeCatalog=[...catalog,...caldwell,...brightngc];
     else if(choice==="pro"){
-      alert("🚀 Pro Mode coming soon! Will include extended NGC/IC/Sharpless catalogs.");
+      alert("🚀 Pro Mode coming soon! Extended catalogs will be added.");
       activeCatalog=[...catalog,...caldwell,...brightngc];
     }
     computeTargets(currentLat,currentLon);
   }
 
-  // Get location
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       currentLat=pos.coords.latitude;
       currentLon=pos.coords.longitude;
       document.getElementById("status").innerText="Location detected ✅";
-      computeTargets(currentLat,currentLon);
+      updateCatalog(); // fix: run once after location
     },err=>{
       document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
-      computeTargets(currentLat,currentLon);
+      updateCatalog();
     });
   } else {
     document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
-    computeTargets(currentLat,currentLon);
+    updateCatalog();
   }
   </script>
 </body>
