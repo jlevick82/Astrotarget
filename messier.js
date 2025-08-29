@@ -19,7 +19,7 @@ const messier = [
   {name:"M18 – Open Cluster", ra:18.34, dec:-17.13, mag:7.5, size:"9", type:"Open Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/0/0f/Messier18_-_ESO_-_Potw1804a.jpg"},
   {name:"M19 – Globular Cluster", ra:17.05, dec:-26.27, mag:7.2, size:"13", type:"Globular Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/3/39/Messier19_-_HST_-_Potw1734a.jpg"},
   {name:"M20 – Trifid Nebula", ra:18.04, dec:-23.02, mag:6.3, size:"28", type:"Emission/Reflection Nebula", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0910h.jpg"}
-catalog.push(
+messier.push(
   {name:"M21 – Open Cluster", ra:18.06, dec:-22.5, mag:6.5, size:"13", type:"Open Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Messier21_-_ESO_-_Potw1805a.jpg"},
   {name:"M22 – Globular Cluster", ra:18.60, dec:-23.9, mag:5.1, size:"32", type:"Globular Cluster", img:"https://cdn.spacetelescope.org/archives/images/screen/heic1605a.jpg"},
   {name:"M23 – Open Cluster", ra:17.95, dec:-19.0, mag:5.5, size:"27", type:"Open Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/6/64/Messier23_-_ESO_-_Potw1806a.jpg"},
@@ -41,7 +41,7 @@ catalog.push(
   {name:"M39 – Open Cluster", ra:21.53, dec:48.3, mag:5.2, size:"32", type:"Open Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/f/f4/Messier39_-_ESO_-_Potw1816a.jpg"},
   {name:"M40 – Double Star", ra:12.37, dec:58.1, mag:9.0, size:"-", type:"Double Star", img:"https://upload.wikimedia.org/wikipedia/commons/8/8f/Messier40_-_Potw1817a.jpg"}
 );
-catalog.push(
+messier.push(
   {name:"M41 – Open Cluster", ra:6.77, dec:-20.8, mag:4.5, size:"38", type:"Open Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/4/4d/Messier41_-_ESO_-_Potw1818a.jpg"},
   {name:"M42 – Orion Nebula", ra:5.58, dec:-5.45, mag:4.0, size:"65x60", type:"Emission Nebula", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0601a.jpg"},
   {name:"M43 – De Mairan’s Nebula", ra:5.62, dec:-5.27, mag:9.0, size:"20", type:"H II Region", img:"https://cdn.spacetelescope.org/archives/images/screen/opo0328b.jpg"},
@@ -63,7 +63,7 @@ catalog.push(
   {name:"M59 – Elliptical Galaxy", ra:12.70, dec:11.6, mag:9.8, size:"5.4x4.6", type:"Galaxy", img:"https://upload.wikimedia.org/wikipedia/commons/8/84/Messier59_-_ESO_-_Potw1826a.jpg"},
   {name:"M60 – Elliptical Galaxy", ra:12.73, dec:11.6, mag:8.8, size:"7x6", type:"Galaxy", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0810c.jpg"}
 );
-catalog.push(
+messier.push(
   {name:"M61 – Spiral Galaxy", ra:12.30, dec:4.5, mag:9.7, size:"6x5", type:"Galaxy", img:"https://upload.wikimedia.org/wikipedia/commons/0/0a/Messier61_-_ESO_-_Potw1827a.jpg"},
   {name:"M62 – Globular Cluster", ra:17.02, dec:-30.1, mag:6.6, size:"15", type:"Globular Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/d/d4/Messier62_-_HST_-_Potw1729a.jpg"},
   {name:"M63 – Sunflower Galaxy", ra:13.25, dec:42.0, mag:8.6, size:"12x7", type:"Galaxy", img:"https://cdn.spacetelescope.org/archives/images/screen/heic1011a.jpg"},
@@ -85,7 +85,7 @@ catalog.push(
   {name:"M79 – Globular Cluster", ra:5.40, dec:-24.6, mag:8.0, size:"9", type:"Globular Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/6/61/Messier79_-_HST_-_Potw1744a.jpg"},
   {name:"M80 – Globular Cluster", ra:16.28, dec:-22.98, mag:7.3, size:"8", type:"Globular Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/0/05/Messier80_-_HST_-_Potw1745a.jpg"}
 );
-catalog.push(
+messier.push(
   {name:"M81 – Bode’s Galaxy", ra:9.93, dec:69.1, mag:6.9, size:"21x10", type:"Galaxy", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0604a.jpg"},
   {name:"M82 – Cigar Galaxy", ra:9.93, dec:69.7, mag:8.4, size:"11x4", type:"Galaxy", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0606b.jpg"},
   {name:"M83 – Southern Pinwheel", ra:13.62, dec:-29.9, mag:7.6, size:"12x11", type:"Galaxy", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0817a.jpg"},
