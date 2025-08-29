@@ -7,43 +7,87 @@
   <style>
     body { background:#0b0c10; color:#fff; font-family:Arial, sans-serif; padding:15px; }
     h1 { color:#66fcf1; text-align:center; }
-    select, input { margin:10px; padding:5px; font-size:16px; }
+    select, input, button { margin:8px; padding:6px; font-size:15px; }
     .card {
       background:#1f2833; border:1px solid #45a29e; border-radius:8px;
       padding:12px; margin:10px 0;
     }
     img { max-width:100%; border-radius:5px; margin-top:5px; }
+    #controls { background:#1b1f24; padding:10px; border-radius:6px; margin-bottom:12px; }
+    #moonCard { background:#0e1a22; border:1px solid #ffcc00; padding:10px; margin-bottom:10px; border-radius:8px; }
+    .modal {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.8); justify-content:center; align-items:center;
+    }
+    .modal-content {
+      background:#1f2833; padding:20px; border-radius:8px; max-width:90%; max-height:90%; overflow-y:auto;
+    }
   </style>
 </head>
 <body>
   <h1>🔭 AstroTarget</h1>
-  <p>
-    Catalog: 
-    <select id="catalogChoice" onchange="updateCatalog()">
-      <option value="messier">Messier</option>
-      <option value="caldwell">Caldwell</option>
-      <option value="ngc">Bright NGC</option>
-      <option value="all">All</option>
-      <option value="pro">Pro Mode</option>
-    </select>
-  </p>
-  <p>
-    Search: 
-    <input type="text" id="searchBox" placeholder="Type object name..." oninput="computeTargets(currentLat,currentLon)">
-    <br>
-    <label><input type="checkbox" id="searchAll" onchange="computeTargets(currentLat,currentLon)"> Search across all catalogs</label>
-  </p>
+
+  <!-- Moon Info -->
+  <div id="moonCard">🌙 Loading Moon data...</div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <p>
+      Catalog: 
+      <select id="catalogChoice" onchange="updateCatalog()">
+        <option value="messier">Messier</option>
+        <option value="caldwell">Caldwell</option>
+        <option value="ngc">Bright NGC</option>
+        <option value="all">All</option>
+        <option value="pro">Pro Mode</option>
+      </select>
+      <button onclick="computeTargets(currentLat,currentLon)">🔄 Refresh</button>
+    </p>
+    <p>
+      Search: 
+      <input type="text" id="searchBox" placeholder="Type object name..." oninput="computeTargets(currentLat,currentLon)">
+      <br>
+      <label><input type="checkbox" id="searchAll" onchange="computeTargets(currentLat,currentLon)"> Search across all catalogs</label>
+    </p>
+    <p>
+      Min Altitude: <input type="range" id="minAlt" min="0" max="60" step="5" value="30" oninput="document.getElementById('minAltVal').innerText=this.value"> <span id="minAltVal">30</span>° <br>
+      Max Magnitude: <input type="range" id="maxMag" min="5" max="15" step="0.5" value="11" oninput="document.getElementById('maxMagVal').innerText=this.value"> <span id="maxMagVal">11</span>
+    </p>
+    <p>
+      Show Types: 
+      <label><input type="checkbox" id="showGalaxies" checked> Galaxies</label>
+      <label><input type="checkbox" id="showClusters" checked> Clusters</label>
+      <label><input type="checkbox" id="showNebulae" checked> Nebulae</label>
+      <label><input type="checkbox" id="showStars" checked> Stars</label>
+    </p>
+    <p>
+      Telescope FL (mm): <input type="number" id="focalLength" value="800" style="width:70px;"> 
+      Camera Sensor (mm): <input type="number" id="sensorSize" value="22" style="width:60px;">
+    </p>
+    <p>
+      Plan for date/time: 
+      <input type="datetime-local" id="planTime" onchange="computeTargets(currentLat,currentLon)">
+    </p>
+  </div>
+
   <p id="status">Fetching location and calculating...</p>
   <div id="results"></div>
+
+  <!-- Modal for object details -->
+  <div id="detailModal" class="modal" onclick="this.style.display='none'">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
 
   <!-- Catalogs -->
   <script src="messier.js"></script>
   <script src="caldwell.js"></script>
   <script src="brightngc.js"></script>
-
   <script>
   let currentLat = 40, currentLon = 0;
 
+  // =====================
+  // Math utilities
+  // =====================
   function toRadians(deg){return deg*Math.PI/180;}
   function toDegrees(rad){return rad*180/Math.PI;}
 
@@ -68,6 +112,62 @@
     return (LST%360+360)%360;
   }
 
+  // =====================
+  // Moon calculations
+  // =====================
+  function getMoonInfo(date, lat, lon){
+    const lp = (218.316 + 13.176396* ((date/86400000)+2440587.5 -2451545.0)) % 360;
+    const m = (357.529 + 0.98560028*((date/86400000)+2440587.5 -2451545.0)) % 360;
+    const mp = (134.963 + 13.064993*((date/86400000)+2440587.5 -2451545.0)) % 360;
+    const d = (297.850 + 12.190749*((date/86400000)+2440587.5 -2451545.0)) % 360;
+    const phase = (1 - Math.cos(toRadians(m - mp)))/2; // rough illumination %
+    const alt = radecToAlt((lp/15), 5, lat, lon, new Date(date)); // crude approx
+    return {phase:(phase*100).toFixed(1)+"%", alt:alt.toFixed(1)};
+  }
+
+  function updateMoon(){
+    const now = new Date();
+    const moon = getMoonInfo(now.getTime(), currentLat, currentLon);
+    document.getElementById("moonCard").innerHTML =
+      `🌙 Moon Phase: ${moon.phase}<br>Altitude: ${moon.alt}°`;
+  }
+
+  // =====================
+  // Filters & Suitability
+  // =====================
+  function passesFilters(obj, alt, mag){
+    const minAlt = parseFloat(document.getElementById("minAlt").value);
+    const maxMag = parseFloat(document.getElementById("maxMag").value);
+    const type = obj.type.toLowerCase();
+
+    if(alt < minAlt) return false;
+    if(mag > maxMag) return false;
+
+    if(type.includes("galaxy") && !document.getElementById("showGalaxies").checked) return false;
+    if((type.includes("cluster")||type.includes("globular")) && !document.getElementById("showClusters").checked) return false;
+    if(type.includes("nebula") && !document.getElementById("showNebulae").checked) return false;
+    if(type.includes("star") && !document.getElementById("showStars").checked) return false;
+
+    return true;
+  }
+
+  function fovCheck(objSize){
+    const fl = parseFloat(document.getElementById("focalLength").value);
+    const sensor = parseFloat(document.getElementById("sensorSize").value);
+    if(isNaN(fl) || isNaN(sensor)) return "";
+
+    // FOV in arcminutes (approx)
+    const fov = (sensor / fl) * (57.3*60);
+    const sizeVal = parseFloat(objSize);
+    if(isNaN(sizeVal)) return "";
+
+    if(sizeVal < fov*0.2) return "❌ Too small";
+    if(sizeVal > fov*1.5) return "⚠️ Too big";
+    return "✅ Fits";
+  }
+  // =====================
+  // Catalog selection
+  // =====================
   function getActiveCatalog(){
     const choice=document.getElementById("catalogChoice").value;
     if(choice==="messier") return catalog;
@@ -81,47 +181,99 @@
     return catalog;
   }
 
+  // =====================
+  // Main compute function
+  // =====================
   function computeTargets(lat, lon){
-    const now=new Date();
+    const nowInput = document.getElementById("planTime").value;
+    const now = nowInput ? new Date(nowInput) : new Date();
+    updateMoon();
+
     const query = document.getElementById("searchBox").value.toLowerCase();
     const searchAll = document.getElementById("searchAll").checked;
 
-    // catalog selection
-    let allCatalog = searchAll 
+    let activeCatalog = searchAll 
       ? [...catalog, ...caldwell, ...brightngc] 
       : getActiveCatalog();
 
-    let visible=[];
+    // 🌟 Top Picks (always from ALL catalogs)
+    let allCatalog = [...catalog, ...caldwell, ...brightngc];
+    let topPicks=[];
     allCatalog.forEach(obj=>{
       const alt=radecToAlt(obj.ra,obj.dec,lat,lon,now);
-      if(alt>30 && obj.mag<11){
+      if(passesFilters(obj,alt,obj.mag)){
+        topPicks.push({...obj,alt:alt.toFixed(1)});
+      }
+    });
+    topPicks.sort((a,b)=>{
+      if(b.alt !== a.alt) return b.alt - a.alt;
+      return a.mag - b.mag;
+    });
+
+    let out="";
+
+    if(topPicks.length>0){
+      out += `<div class="card" style="background:#0e1a22;border:2px solid #ffcc00;">
+        <h2>🌟 Tonight’s Top ${Math.min(5,topPicks.length)} Targets (All Catalogs)</h2>`;
+      topPicks.slice(0,5).forEach(obj=>{
+        out += `<p><b>${obj.name}</b> (${obj.type}) – Mag ${obj.mag}, Alt ${obj.alt}°</p>`;
+      });
+      out += `</div>`;
+    }
+
+    // 📄 Full list (filtered by dropdown & search)
+    let visible=[];
+    activeCatalog.forEach(obj=>{
+      const alt=radecToAlt(obj.ra,obj.dec,lat,lon,now);
+      if(passesFilters(obj,alt,obj.mag)){
         if(query==="" || obj.name.toLowerCase().includes(query)){
           visible.push({...obj,alt:alt.toFixed(1)});
         }
       }
     });
-    visible.sort((a,b)=>b.alt-a.alt);
 
-    let out="";
-    if(visible.length===0) out="<p>No objects match your filters.</p>";
+    visible.sort((a,b)=>{
+      if(b.alt !== a.alt) return b.alt - a.alt;
+      return a.mag - b.mag;
+    });
+
+    if(visible.length===0) out+="<p>No objects match your filters.</p>";
     else visible.forEach(obj=>{
       const img = obj.img ? `<img src="${obj.img}" alt="${obj.name}">` : "";
-      out+=`<div class="card">
+      out+=`<div class="card" onclick="showDetails('${obj.name}', '${obj.type}', ${obj.ra}, ${obj.dec}, ${obj.mag}, '${obj.size}')">
         <h2>${obj.name}</h2>
         <p>Type: ${obj.type}<br>
         Mag: ${obj.mag} | Size: ${obj.size}<br>
-        Altitude now: ${obj.alt}°</p>
+        Altitude now: ${obj.alt}°<br>
+        FOV Check: ${fovCheck(obj.size)}</p>
         ${img}
       </div>`;
     });
+
     document.getElementById("results").innerHTML=out;
   }
 
+  // =====================
+  // Popup details
+  // =====================
+  function showDetails(name,type,ra,dec,mag,size){
+    const modal=document.getElementById("detailModal");
+    const c=document.getElementById("modalContent");
+    c.innerHTML=`<h2>${name}</h2>
+      <p>Type: ${type}<br>
+      RA: ${ra.toFixed(2)}h | Dec: ${dec.toFixed(2)}° (J2000)<br>
+      Mag: ${mag} | Size: ${size}<br>
+      <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(name.split("–")[0].trim())}" target="_blank">📖 Wikipedia</a></p>`;
+    modal.style.display="flex";
+  }
+
+  // =====================
+  // Location handling
+  // =====================
   function updateCatalog(){
     computeTargets(currentLat,currentLon);
   }
 
-  // Get location
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       currentLat=pos.coords.latitude;
@@ -136,7 +288,6 @@
     document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
     updateCatalog();
   }
-  console.log("Messier:", catalog.length, "Caldwell:", caldwell.length, "Bright NGC:", brightngc.length);
   </script>
 </body>
 </html>
