@@ -30,7 +30,7 @@ const brightngc = [
   { name:"NGC 4027 – Galaxy", type:"Galaxy", ra:11.967, dec:-19.967, mag:10.3, size:"3.2′×2.5′" },
   { name:"NGC 4038/4039 – Antennae Galaxies", type:"Interacting Galaxies", ra:12.300, dec:-18.867, mag:10.0, size:"5.2′×3.1′" },
   { name:"NGC 4214 – Galaxy", type:"Galaxy", ra:12.283, dec:36.333, mag:9.8, size:"8.5′×6.5′" },
-  { name:"NGC 4244 – Silver Needle Galaxy", type:"Galaxy", ra:12.300, dec:37.817, mag:10.2, size:"16′×2′" }
+  { name:"NGC 4244 – Silver Needle Galaxy", type:"Galaxy", ra:12.300, dec:37.817, mag:10.2, size:"16′×2′" },
   { name:"NGC 4372 – Globular Cluster", type:"Globular Cluster", ra:12.283, dec:-72.650, mag:7.8, size:"18′" },
   { name:"NGC 4449 – Irregular Galaxy", type:"Galaxy", ra:12.450, dec:44.083, mag:9.4, size:"6.2′×4.4′" },
   { name:"NGC 4565 – Needle Galaxy", type:"Galaxy", ra:12.617, dec:25.983, mag:9.6, size:"15′×2′" },
@@ -64,9 +64,9 @@ const brightngc = [
   { name:"NGC 6822 – Barnard’s Galaxy", type:"Irregular Galaxy", ra:19.750, dec:-14.800, mag:9.3, size:"15′×13′" },
   { name:"NGC 6888 – Crescent Nebula", type:"Emission Nebula", ra:20.200, dec:38.367, mag:7.4, size:"20′" },
   { name:"NGC 6946 – Fireworks Galaxy", type:"Galaxy", ra:20.583, dec:60.150, mag:9.6, size:"11′×10′" },
-  { name:"NGC 6992 – Eastern Veil Nebula", type:"Supernova Remnant", ra:20.917, dec:31.033, mag:7.0, size:"60′" },
   { name:"NGC 6960 – Western Veil Nebula", type:"Supernova Remnant", ra:20.867, dec:30.717, mag:7.0, size:"70′" },
-  { name:"NGC 7000 – North America Nebula", type:"Emission Nebula", ra:20.967, dec:44.333, mag:4.0, size:"120′×100′" }
+  { name:"NGC 6992 – Eastern Veil Nebula", type:"Supernova Remnant", ra:20.917, dec:31.033, mag:7.0, size:"60′" },
+  { name:"NGC 7000 – North America Nebula", type:"Emission Nebula", ra:20.967, dec:44.333, mag:4.0, size:"120′×100′" },
   { name:"NGC 7006 – Globular Cluster", type:"Globular Cluster", ra:21.100, dec:16.183, mag:10.6, size:"2.8′" },
   { name:"NGC 7023 – Iris Nebula", type:"Reflection Nebula", ra:21.000, dec:68.167, mag:6.8, size:"18′" },
   { name:"NGC 7089 – M2 Globular Cluster", type:"Globular Cluster", ra:21.550, dec:-0.817, mag:6.3, size:"12′" },
@@ -84,9 +84,7 @@ const brightngc = [
   { name:"NGC 3628 – Leo Triplet Galaxy (Hamburger)", type:"Galaxy", ra:11.317, dec:13.583, mag:9.5, size:"15′×3′" },
   { name:"NGC 4636 – Elliptical Galaxy in Virgo", type:"Galaxy", ra:12.633, dec:2.967, mag:9.5, size:"6.7′×5.4′" },
   { name:"NGC 5122 – Galaxy", type:"Galaxy", ra:13.400, dec:9.700, mag:10.0, size:"5.2′×4.3′" },
-  { name:"NGC 6744 – Spiral Galaxy", type:"Galaxy", ra:19.400, dec:-63.850, mag:8.3, size:"20′×12′" },
   { name:"NGC 6818 – Little Gem Nebula", type:"Planetary Nebula", ra:19.917, dec:-14.133, mag:10.0, size:"22″" },
-  { name:"NGC 6946 – Fireworks Galaxy", type:"Galaxy", ra:20.583, dec:60.150, mag:9.6, size:"11′×10′" },
   { name:"NGC 7009 – Saturn Nebula", type:"Planetary Nebula", ra:21.050, dec:-11.367, mag:8.0, size:"44″" },
   { name:"NGC 7723 – Spiral Galaxy in Aquarius", type:"Galaxy", ra:23.700, dec:-12.250, mag:10.0, size:"5.4′×4.3′" },
   { name:"NGC 7727 – Spiral Galaxy in Aquarius", type:"Galaxy", ra:23.767, dec:-12.300, mag:10.2, size:"5.5′×4.8′" }
