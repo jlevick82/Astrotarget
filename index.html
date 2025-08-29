@@ -102,34 +102,110 @@
   <script>
     let currentLat = 40, currentLon = 0;
 
-    // ... (keep all the JS logic from Part 2 + Part 3 we built earlier)
-    // Make sure you have startClock() called unconditionally near the bottom:
-
-    function updateCatalog(){
-      computeTargets(currentLat,currentLon);
+    // ========== Math ==========
+    function toRadians(d){return d*Math.PI/180;}
+    function toDegrees(r){return r*180/Math.PI;}
+    function getLST(lon, date){
+      const JD=(date.getTime()/86400000)+2440587.5, D=JD-2451545.0;
+      let GMST=280.46061837+360.98564736629*D; GMST=(GMST%360+360)%360;
+      return (GMST+lon)%360;
+    }
+    function radecToAlt(raH,dec,lat,lon,date){
+      const ra=raH*15,lst=getLST(lon,date),ha=(lst-ra+360)%360;
+      const sinAlt=Math.sin(toRadians(dec))*Math.sin(toRadians(lat))+Math.cos(toRadians(dec))*Math.cos(toRadians(lat))*Math.cos(toRadians(ha));
+      return toDegrees(Math.asin(sinAlt));
     }
 
-    startClock(); // Always run clock, even if GPS blocked
+    // ========== Moon ==========
+    function getMoonInfo(date,lat,lon){
+      const JD=(date/86400000)+2440587.5,D=JD-2451545.0;
+      const lp=(218.316+13.176396*D)%360,m=(357.529+0.98560028*D)%360,mp=(134.963+13.064993*D)%360;
+      const phase=(1-Math.cos(toRadians(m-mp)))/2;
+      const alt=radecToAlt(lp/15,5,lat,lon,new Date(date));
+      return {phase:(phase*100).toFixed(1)+"%",alt:alt.toFixed(1)};
+    }
+    function updateMoon(){
+      const now=new Date(),moon=getMoonInfo(now.getTime(),currentLat,currentLon);
+      const illum=parseFloat(moon.phase);
+      let rating="🌑 Excellent"; if(illum>50) rating="🌓 Fair"; if(illum>80) rating="🌕 Poor";
+      document.getElementById("moonCard").innerHTML=`🌙 Moon Phase: ${moon.phase}<br>Altitude: ${moon.alt}°<br>Dark Sky: ${rating}`;
+    }
 
+    // ========== Clock ==========
+    function startClock(){
+      setInterval(()=>{
+        const now=new Date(),h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
+        document.getElementById("clockCard").innerText=`⏰ GPS Time: ${h}:${m}:${s}`;
+      },1000);
+    }
+
+    // ========== Constellation (basic) ==========
+    function getConstellation(ra){const h=ra;if(h<2)return"Pisces";if(h<4)return"Aries/Taurus";if(h<6)return"Orion";if(h<8)return"Gemini";if(h<10)return"Leo";if(h<12)return"Virgo";if(h<14)return"Bootes";if(h<16)return"Hercules";if(h<18)return"Lyra/Cygnus";if(h<20)return"Aquila";if(h<22)return"Pegasus";return"Andromeda";}
+
+    // ========== Weather + LP ==========
+    function updateWeather(){
+      if(!navigator.onLine){document.getElementById("weatherCard").innerText="🌤 Weather: Not available offline";return;}
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&hourly=cloudcover`).then(r=>r.json()).then(d=>{
+        const clouds=d.hourly.cloudcover[0];let msg="Clear";if(clouds>50)msg="Cloudy";else if(clouds>20)msg="Partly cloudy";
+        document.getElementById("weatherCard").innerText=`🌤 Weather: ${msg} (${clouds}% clouds)`;
+      }).catch(()=>{document.getElementById("weatherCard").innerText="🌤 Weather: Not available";});
+    }
+    function updateLightPollution(){
+      if(!navigator.onLine){document.getElementById("lpCard").innerText="🌌 Light Pollution: Not available offline";return;}
+      document.getElementById("lpCard").innerText="🌌 Light Pollution: Bortle ~5 (estimate)";
+    }
+
+    // ========== Filters ==========
+    function passesFilters(obj,alt,mag){
+      const minAlt=parseFloat(document.getElementById("minAlt").value),maxMag=parseFloat(document.getElementById("maxMag").value),type=obj.type.toLowerCase();
+      if(alt<minAlt||mag>maxMag)return false;
+      if(type.includes("galaxy")&&!document.getElementById("showGalaxies").checked)return false;
+      if((type.includes("cluster")||type.includes("globular"))&&!document.getElementById("showClusters").checked)return false;
+      if(type.includes("nebula")&&!document.getElementById("showNebulae").checked)return false;
+      if(type.includes("star")&&!document.getElementById("showStars").checked)return false;
+      return true;
+    }
+    function fovCheck(size){
+      const fl=parseFloat(document.getElementById("focalLength").value),sensor=parseFloat(document.getElementById("sensorSize").value);
+      if(isNaN(fl)||isNaN(sensor))return"";const fov=(sensor/fl)*(57.3*60),sz=parseFloat(size);if(isNaN(sz))return"";
+      if(sz<fov*0.2)return"❌ Too small";if(sz>fov*1.5)return"⚠️ Too big";return"✅ Fits";
+    }
+    function scopeApplied(){const c=document.getElementById("scopeConfirm");c.style.display="inline";setTimeout(()=>{c.style.display="none";},2000);computeTargets(currentLat,currentLon);}
+
+    // ========== Dedup ==========
+    function mergeCatalogs(...cats){const unique=[],seen=new Set();cats.flat().forEach(o=>{const key=`${Math.round(o.ra*10)/10},${Math.round(o.dec*10)/10}`;if(!seen.has(key)){seen.add(key);unique.push(o);}});return unique;}
+
+    // ========== Main compute ==========
+    function getActiveCatalog(){const c=document.getElementById("catalogChoice").value;
+      if(c==="messier")return messier;if(c==="caldwell")return caldwell;if(c==="ngc")return brightngc;if(c==="all")return mergeCatalogs(messier,caldwell,brightngc);if(c==="pro"){alert("🚀 Pro Mode coming soon!");return mergeCatalogs(messier,caldwell,brightngc);}return messier;}
+    function computeTargets(lat,lon){
+      const nowI=document.getElementById("planTime").value,now=nowI?new Date(nowI):new Date();
+      updateMoon();updateWeather();updateLightPollution();
+      const q=document.getElementById("searchBox").value.toLowerCase(),searchAll=document.getElementById("searchAll").checked;
+      let active=searchAll?mergeCatalogs(messier,caldwell,brightngc):getActiveCatalog();
+      let all=mergeCatalogs(messier,caldwell,brightngc),topP=[];
+      all.forEach(o=>{const alt=radecToAlt(o.ra,o.dec,lat,lon,now);if(passesFilters(o,alt,o.mag)){const f=fovCheck(o.size);if(document.getElementById("scopeFilterTop").checked){if(f==="✅ Fits")topP.push({...o,alt:alt.toFixed(1)});}else topP.push({...o,alt:alt.toFixed(1)});}});
+      topP.sort((a,b)=>b.alt-a.alt||a.mag-b.mag);
+      let out="";if(topP.length>0){out+=`<div class="card" style="background:#0e1a22;border:2px solid #ffcc00;"><h2>🌟 Tonight’s Top ${Math.min(5,topP.length)} Targets</h2>`;topP.slice(0,5).forEach(o=>{out+=`<p><b>${o.name}</b> (${o.type}) – Mag ${o.mag}, Alt ${o.alt}°</p>`;});out+=`</div>`;}
+      let vis=[];active.forEach(o=>{const alt=radecToAlt(o.ra,o.dec,lat,lon,now);if(passesFilters(o,alt,o.mag)){if(q===""||o.name.toLowerCase().includes(q))vis.push({...o,alt:alt.toFixed(1)});}});
+      vis.sort((a,b)=>b.alt-a.alt||a.mag-b.mag);out+=`<p><i>Showing ${vis.length} objects</i></p>`;
+      if(vis.length===0)out+="<p>No objects match your filters.</p>";else vis.forEach(o=>{const img=o.img?`<img src="${o.img}" alt="${o.name}">`:"";out+=`<div class="card" onclick="showDetails('${o.name}','${o.type}',${o.ra},${o.dec},${o.mag},'${o.size}')"><h2>${o.name}</h2><p>Type: ${o.type}<br>Mag: ${o.mag} | Size: ${o.size}<br>Alt now: ${o.alt}°<br>Constellation: ${getConstellation(o.ra)}<br>FOV: ${fovCheck(o.size)}</p>${img}</div>`;});
+      document.getElementById("results").innerHTML=out;
+    }
+
+    // ========== Modal ==========
+    function showDetails(n,t,ra,dec,mag,sz){const m=document.getElementById("detailModal"),c=document.getElementById("modalContent");c.innerHTML=`<h2>${n}</h2><p>Type: ${t}<br>RA: ${ra.toFixed(2)}h | Dec: ${dec.toFixed(2)}° (J2000)<br>Mag: ${mag} | Size: ${sz}<br>Constellation: ${getConstellation(ra)}<br><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(n.split("–")[0].trim())}" target="_blank">📖 Wikipedia</a></p>`;m.style.display="flex";}
+
+    // ========== Caching ==========
+    function cacheMyImages(){const box=document.getElementById("cacheImages"),conf=document.getElementById("cacheConfirm");if(!box.checked)return;let urls=[];mergeCatalogs(messier,caldwell,brightngc).forEach(o=>{if(o.img&&fovCheck(o.size)==="✅ Fits")urls.push(o.img);});if('serviceWorker'in navigator&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({action:"cache",files:urls});conf.style.display="inline";setTimeout(()=>{conf.style.display="none";},3000);}}
+
+    // ========== Init ==========
+    function updateCatalog(){computeTargets(currentLat,currentLon);}
+    startClock(); // Always run clock
     if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(pos=>{
-        currentLat=pos.coords.latitude;
-        currentLon=pos.coords.longitude;
-        document.getElementById("status").innerText="Location detected ✅";
-        updateCatalog();
-      },err=>{
-        document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
-        updateCatalog();
-      });
-    } else {
-      document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
-      updateCatalog();
-    }
-
-    // Service Worker
-    if("serviceWorker" in navigator){
-      navigator.serviceWorker.register("service-worker.js");
-    }
+      navigator.geolocation.getCurrentPosition(p=>{currentLat=p.coords.latitude;currentLon=p.coords.longitude;document.getElementById("status").innerText="Location detected ✅";updateCatalog();},e=>{document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";updateCatalog();});
+    }else{document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";updateCatalog();}
+    if("serviceWorker"in navigator){navigator.serviceWorker.register("service-worker.js");}
   </script>
 </body>
 </html>
