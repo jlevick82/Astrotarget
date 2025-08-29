@@ -16,7 +16,7 @@ const brightngc = [
   {name:"NGC 3372 – Eta Carina Nebula", ra:10.75, dec:-59.7, mag:1.0, size:"120x120", type:"Emission Nebula", img:"images/ngc3372.jpg"},
   {name:"NGC 3621 – Spiral Galaxy in Hydra", ra:11.30, dec:-32.8, mag:9.4, size:"12x7", type:"Galaxy", img:"images/ngc3621.jpg"},
   {name:"NGC 3918 – Blue Planetary Nebula", ra:11.91, dec:-57.2, mag:8.0, size:"0.3", type:"Planetary Nebula", img:"images/ngc3918.jpg"},
-  {name:"NGC 4372 – Globular Cluster in Musca", ra:12.33, dec:-72.7, mag:7.8, size:"18", type:"Globular Cluster", img:"images/ngc4372.jpg"}
+  {name:"NGC 4372 – Globular Cluster in Musca", ra:12.33, dec:-72.7, mag:7.8, size:"18", type:"Globular Cluster", img:"images/ngc4372.jpg"},
   {name:"NGC 4590 – Globular Cluster (M68 region)", ra:12.63, dec:-26.7, mag:7.8, size:"12", type:"Globular Cluster", img:"images/ngc4590.jpg"},
   {name:"NGC 4755 – Jewel Box Cluster", ra:12.80, dec:-60.4, mag:4.2, size:"10", type:"Open Cluster", img:"images/ngc4755.jpg"},
   {name:"NGC 4833 – Globular Cluster in Musca", ra:12.98, dec:-70.9, mag:7.6, size:"13", type:"Globular Cluster", img:"images/ngc4833.jpg"},
