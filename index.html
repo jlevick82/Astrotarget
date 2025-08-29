@@ -1,211 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AstroTarget v0.9.0 – Field Ready</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroTarget v1.0</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <style>
-    body { background:#0b0c10; color:#fff; font-family:Arial, sans-serif; padding:15px; }
-    h1 { color:#66fcf1; text-align:center; }
-    #version { text-align:center; font-size:14px; color:#aaa; margin-bottom:10px; }
-    select, input, button { margin:8px; padding:6px; font-size:15px; }
-    .card {
-      background:#1f2833; border:1px solid #45a29e; border-radius:8px;
-      padding:12px; margin:10px 0;
-    }
-    img { max-width:100%; border-radius:5px; margin-top:5px; }
-    #controls { background:#1b1f24; padding:10px; border-radius:6px; margin-bottom:12px; }
-    #moonCard, #clockCard, #weatherCard, #lpCard { background:#0e1a22; border:1px solid #ffcc00; padding:10px; margin-bottom:10px; border-radius:8px; }
-    #scopeConfirm { color:#00ff99; font-size:14px; margin-left:10px; display:none; }
-    #cacheConfirm { color:#00ff99; font-size:14px; margin-left:10px; display:none; }
-    .modal {
-      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.8); justify-content:center; align-items:center;
-    }
-    .modal-content {
-      background:#1f2833; padding:20px; border-radius:8px; max-width:90%; max-height:90%; overflow-y:auto;
-    }
+    body { background-color: #0b0d17; color: #e0e0e0; font-family: Arial, sans-serif; }
+    header { padding: 1rem; text-align: center; border-bottom: 1px solid #222; }
+    .object-card { background: #1a1d29; border-radius: 8px; padding: 10px; margin: 10px; width: 250px; display: inline-block; vertical-align: top; }
+    .object-card img { width: 100%; border-radius: 6px; }
+    .object-card h5 { margin: 0.5rem 0; }
+    #results { display: flex; flex-wrap: wrap; justify-content: center; }
+    footer { text-align: center; padding: 1rem; margin-top: 2rem; font-size: 0.9em; color: #aaa; }
+    .toast-container { position: fixed; bottom: 1rem; right: 1rem; }
   </style>
 </head>
 <body>
-  <h1>🔭 AstroTarget</h1>
-  <div id="version">v0.9.0 – Field Ready</div>
+  <header>
+    <h1>🌌 AstroTarget</h1>
+    <p>Find the best targets for tonight</p>
+    <div id="gpsClock">⌛ Loading time...</div>
+    <div id="lightPollution">💡 Light Pollution Index: Loading...</div>
+  </header>
 
-  <!-- Info cards -->
-  <div id="moonCard">🌙 Loading Moon data...</div>
-  <div id="clockCard">⏰ GPS Time: --:--:--</div>
-  <div id="weatherCard">🌤 Weather: Loading...</div>
-  <div id="lpCard">🌌 Light Pollution: Loading...</div>
+  <!-- Filters -->
+  <section class="container mt-3">
+    <div class="row">
+      <div class="col-md-4">
+        <label>Min Altitude (°):</label>
+        <input id="minAlt" type="number" class="form-control" value="20">
+      </div>
+      <div class="col-md-4">
+        <label>Max Magnitude:</label>
+        <input id="maxMag" type="number" class="form-control" value="9">
+      </div>
+      <div class="col-md-4">
+        <label>Catalog:</label>
+        <select id="catalogSelect" class="form-control">
+          <option value="messier">Messier</option>
+          <option value="caldwell">Caldwell</option>
+          <option value="brightngc">Bright NGC</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col text-center">
+        <button class="btn btn-primary" onclick="applyFilters()">🔭 Apply Filters</button>
+      </div>
+    </div>
+  </section>
 
-  <!-- Controls -->
-  <div id="controls">
-    <p>
-      Catalog: 
-      <select id="catalogChoice" onchange="updateCatalog()">
-        <option value="messier">Messier</option>
-        <option value="caldwell">Caldwell</option>
-        <option value="ngc">Bright NGC</option>
-        <option value="all">All</option>
-        <option value="pro">Pro Mode</option>
-      </select>
-      <button onclick="computeTargets(currentLat,currentLon)">🔄 Refresh</button>
-    </p>
-    <p>
-      Search: 
-      <input type="text" id="searchBox" placeholder="Type object name..." oninput="computeTargets(currentLat,currentLon)">
-      <br>
-      <label><input type="checkbox" id="searchAll" onchange="computeTargets(currentLat,currentLon)"> Search across all catalogs</label>
-    </p>
-    <p>
-      Min Altitude: <input type="range" id="minAlt" min="0" max="60" step="5" value="30" oninput="document.getElementById('minAltVal').innerText=this.value"> <span id="minAltVal">30</span>° <br>
-      Max Magnitude: <input type="range" id="maxMag" min="5" max="15" step="0.5" value="11" oninput="document.getElementById('maxMagVal').innerText=this.value"> <span id="maxMagVal">11</span>
-    </p>
-    <p>
-      Show Types: 
-      <label><input type="checkbox" id="showGalaxies" checked> Galaxies</label>
-      <label><input type="checkbox" id="showClusters" checked> Clusters</label>
-      <label><input type="checkbox" id="showNebulae" checked> Nebulae</label>
-      <label><input type="checkbox" id="showStars" checked> Stars</label>
-    </p>
-    <p>
-      Telescope FL (mm): <input type="number" id="focalLength" value="800" style="width:70px;" onchange="scopeApplied()"> 
-      Camera Sensor (mm): <input type="number" id="sensorSize" value="22" style="width:60px;" onchange="scopeApplied()">
-      <span id="scopeConfirm">Scope settings applied ✅</span>
-    </p>
-    <p>
-      Plan for date/time: 
-      <input type="datetime-local" id="planTime" onchange="computeTargets(currentLat,currentLon)">
-    </p>
-    <p>
-      <label><input type="checkbox" id="scopeFilterTop" checked onchange="computeTargets(currentLat,currentLon)"> Apply scope filter to Top Picks</label>
-    </p>
-    <p>
-      <label><input type="checkbox" id="cacheImages" onchange="cacheMyImages()"> Cache images (scope FOV only)</label>
-      <span id="cacheConfirm">Caching started...</span>
-    </p>
+  <!-- Results -->
+  <section id="results" class="container mt-4"></section>
+
+  <!-- APOD + ISS -->
+  <section class="container mt-5">
+    <h2>🌠 Astronomy Picture of the Day</h2>
+    <iframe src="https://apod.nasa.gov/apod/astropix.html" width="100%" height="400" style="border:none;"></iframe>
+
+    <h2 class="mt-4">🛰 ISS Transit Planner</h2>
+    <iframe src="https://transit-finder.com" width="100%" height="400" style="border:none;"></iframe>
+  </section>
+
+  <!-- Toast Notification -->
+  <div class="toast-container position-fixed">
+    <div id="settingsToast" class="toast bg-success text-white" role="alert">
+      <div class="toast-body">✅ Settings Applied!</div>
+    </div>
   </div>
+  <footer>
+    <p>AstroTarget v1.0 – All catalogs J2000 | <a href="docs/README.md" target="_blank">Docs</a></p>
+  </footer>
 
-  <p id="status">Fetching location and calculating...</p>
-  <div id="results"></div>
-
-  <!-- Modal for object details -->
-  <div id="detailModal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" id="modalContent"></div>
-  </div>
-
-  <!-- Catalog scripts -->
+  <!-- Scripts -->
   <script src="messier.js"></script>
   <script src="caldwell.js"></script>
   <script src="brightngc.js"></script>
-
-  <!-- AstroTarget logic -->
   <script>
-    let currentLat = 40, currentLon = 0;
+    let allCatalogs = { messier, caldwell, brightngc };
 
-    // ========== Math ==========
-    function toRadians(d){return d*Math.PI/180;}
-    function toDegrees(r){return r*180/Math.PI;}
-    function getLST(lon, date){
-      const JD=(date.getTime()/86400000)+2440587.5, D=JD-2451545.0;
-      let GMST=280.46061837+360.98564736629*D; GMST=(GMST%360+360)%360;
-      return (GMST+lon)%360;
-    }
-    function radecToAlt(raH,dec,lat,lon,date){
-      const ra=raH*15,lst=getLST(lon,date),ha=(lst-ra+360)%360;
-      const sinAlt=Math.sin(toRadians(dec))*Math.sin(toRadians(lat))+Math.cos(toRadians(dec))*Math.cos(toRadians(lat))*Math.cos(toRadians(ha));
-      return toDegrees(Math.asin(sinAlt));
-    }
-
-    // ========== Moon ==========
-    function getMoonInfo(date,lat,lon){
-      const JD=(date/86400000)+2440587.5,D=JD-2451545.0;
-      const lp=(218.316+13.176396*D)%360,m=(357.529+0.98560028*D)%360,mp=(134.963+13.064993*D)%360;
-      const phase=(1-Math.cos(toRadians(m-mp)))/2;
-      const alt=radecToAlt(lp/15,5,lat,lon,new Date(date));
-      return {phase:(phase*100).toFixed(1)+"%",alt:alt.toFixed(1)};
-    }
-    function updateMoon(){
-      const now=new Date(),moon=getMoonInfo(now.getTime(),currentLat,currentLon);
-      const illum=parseFloat(moon.phase);
-      let rating="🌑 Excellent"; if(illum>50) rating="🌓 Fair"; if(illum>80) rating="🌕 Poor";
-      document.getElementById("moonCard").innerHTML=`🌙 Moon Phase: ${moon.phase}<br>Altitude: ${moon.alt}°<br>Dark Sky: ${rating}`;
+    // Render function
+    function renderResults(objects) {
+      const container = document.getElementById('results');
+      container.innerHTML = "";
+      if (!objects.length) {
+        container.innerHTML = "<p class='text-center mt-3'>❌ No objects match filters</p>";
+        return;
+      }
+      objects.forEach(obj => {
+        const card = document.createElement("div");
+        card.className = "object-card";
+        card.innerHTML = `
+          <img src="${obj.img}" loading="lazy" onerror="this.src='images/placeholder.jpg'">
+          <h5>${obj.name}</h5>
+          <p>${obj.type}<br>
+          Mag: ${obj.mag} | Size: ${obj.size}</p>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    // ========== Clock ==========
-    function startClock(){
-      setInterval(()=>{
-        const now=new Date(),h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
-        document.getElementById("clockCard").innerText=`⏰ GPS Time: ${h}:${m}:${s}`;
-      },1000);
+    // Apply filters
+    function applyFilters() {
+      const minAlt = parseFloat(document.getElementById("minAlt").value);
+      const maxMag = parseFloat(document.getElementById("maxMag").value);
+      const catalogChoice = document.getElementById("catalogSelect").value;
+
+      let objects = [];
+      if (catalogChoice === "all") {
+        objects = [...messier, ...caldwell, ...brightngc];
+      } else {
+        objects = allCatalogs[catalogChoice] || [];
+      }
+
+      // Placeholder altitude filter (real alt calculation can be added later)
+      let filtered = objects.filter(o => o.mag <= maxMag);
+
+      renderResults(filtered);
+
+      // Show confirmation toast
+      const toast = new bootstrap.Toast(document.getElementById("settingsToast"));
+      toast.show();
     }
 
-    // ========== Constellation (basic) ==========
-    function getConstellation(ra){const h=ra;if(h<2)return"Pisces";if(h<4)return"Aries/Taurus";if(h<6)return"Orion";if(h<8)return"Gemini";if(h<10)return"Leo";if(h<12)return"Virgo";if(h<14)return"Bootes";if(h<16)return"Hercules";if(h<18)return"Lyra/Cygnus";if(h<20)return"Aquila";if(h<22)return"Pegasus";return"Andromeda";}
-
-    // ========== Weather + LP ==========
-    function updateWeather(){
-      if(!navigator.onLine){document.getElementById("weatherCard").innerText="🌤 Weather: Not available offline";return;}
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&hourly=cloudcover`).then(r=>r.json()).then(d=>{
-        const clouds=d.hourly.cloudcover[0];let msg="Clear";if(clouds>50)msg="Cloudy";else if(clouds>20)msg="Partly cloudy";
-        document.getElementById("weatherCard").innerText=`🌤 Weather: ${msg} (${clouds}% clouds)`;
-      }).catch(()=>{document.getElementById("weatherCard").innerText="🌤 Weather: Not available";});
+    // GPS Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("gpsClock").textContent = "🕒 " + now.toLocaleString();
     }
-    function updateLightPollution(){
-      if(!navigator.onLine){document.getElementById("lpCard").innerText="🌌 Light Pollution: Not available offline";return;}
-      document.getElementById("lpCard").innerText="🌌 Light Pollution: Bortle ~5 (estimate)";
-    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // ========== Filters ==========
-    function passesFilters(obj,alt,mag){
-      const minAlt=parseFloat(document.getElementById("minAlt").value),maxMag=parseFloat(document.getElementById("maxMag").value),type=obj.type.toLowerCase();
-      if(alt<minAlt||mag>maxMag)return false;
-      if(type.includes("galaxy")&&!document.getElementById("showGalaxies").checked)return false;
-      if((type.includes("cluster")||type.includes("globular"))&&!document.getElementById("showClusters").checked)return false;
-      if(type.includes("nebula")&&!document.getElementById("showNebulae").checked)return false;
-      if(type.includes("star")&&!document.getElementById("showStars").checked)return false;
-      return true;
-    }
-    function fovCheck(size){
-      const fl=parseFloat(document.getElementById("focalLength").value),sensor=parseFloat(document.getElementById("sensorSize").value);
-      if(isNaN(fl)||isNaN(sensor))return"";const fov=(sensor/fl)*(57.3*60),sz=parseFloat(size);if(isNaN(sz))return"";
-      if(sz<fov*0.2)return"❌ Too small";if(sz>fov*1.5)return"⚠️ Too big";return"✅ Fits";
-    }
-    function scopeApplied(){const c=document.getElementById("scopeConfirm");c.style.display="inline";setTimeout(()=>{c.style.display="none";},2000);computeTargets(currentLat,currentLon);}
+    // Light Pollution (placeholder until API added)
+    document.getElementById("lightPollution").textContent = "💡 Light Pollution Index: Moderate";
 
-    // ========== Dedup ==========
-    function mergeCatalogs(...cats){const unique=[],seen=new Set();cats.flat().forEach(o=>{const key=`${Math.round(o.ra*10)/10},${Math.round(o.dec*10)/10}`;if(!seen.has(key)){seen.add(key);unique.push(o);}});return unique;}
-
-    // ========== Main compute ==========
-    function getActiveCatalog(){const c=document.getElementById("catalogChoice").value;
-      if(c==="messier")return messier;if(c==="caldwell")return caldwell;if(c==="ngc")return brightngc;if(c==="all")return mergeCatalogs(messier,caldwell,brightngc);if(c==="pro"){alert("🚀 Pro Mode coming soon!");return mergeCatalogs(messier,caldwell,brightngc);}return messier;}
-    function computeTargets(lat,lon){
-      const nowI=document.getElementById("planTime").value,now=nowI?new Date(nowI):new Date();
-      updateMoon();updateWeather();updateLightPollution();
-      const q=document.getElementById("searchBox").value.toLowerCase(),searchAll=document.getElementById("searchAll").checked;
-      let active=searchAll?mergeCatalogs(messier,caldwell,brightngc):getActiveCatalog();
-      let all=mergeCatalogs(messier,caldwell,brightngc),topP=[];
-      all.forEach(o=>{const alt=radecToAlt(o.ra,o.dec,lat,lon,now);if(passesFilters(o,alt,o.mag)){const f=fovCheck(o.size);if(document.getElementById("scopeFilterTop").checked){if(f==="✅ Fits")topP.push({...o,alt:alt.toFixed(1)});}else topP.push({...o,alt:alt.toFixed(1)});}});
-      topP.sort((a,b)=>b.alt-a.alt||a.mag-b.mag);
-      let out="";if(topP.length>0){out+=`<div class="card" style="background:#0e1a22;border:2px solid #ffcc00;"><h2>🌟 Tonight’s Top ${Math.min(5,topP.length)} Targets</h2>`;topP.slice(0,5).forEach(o=>{out+=`<p><b>${o.name}</b> (${o.type}) – Mag ${o.mag}, Alt ${o.alt}°</p>`;});out+=`</div>`;}
-      let vis=[];active.forEach(o=>{const alt=radecToAlt(o.ra,o.dec,lat,lon,now);if(passesFilters(o,alt,o.mag)){if(q===""||o.name.toLowerCase().includes(q))vis.push({...o,alt:alt.toFixed(1)});}});
-      vis.sort((a,b)=>b.alt-a.alt||a.mag-b.mag);out+=`<p><i>Showing ${vis.length} objects</i></p>`;
-      if(vis.length===0)out+="<p>No objects match your filters.</p>";else vis.forEach(o=>{const img=o.img?`<img src="${o.img}" alt="${o.name}">`:"";out+=`<div class="card" onclick="showDetails('${o.name}','${o.type}',${o.ra},${o.dec},${o.mag},'${o.size}')"><h2>${o.name}</h2><p>Type: ${o.type}<br>Mag: ${o.mag} | Size: ${o.size}<br>Alt now: ${o.alt}°<br>Constellation: ${getConstellation(o.ra)}<br>FOV: ${fovCheck(o.size)}</p>${img}</div>`;});
-      document.getElementById("results").innerHTML=out;
-    }
-
-    // ========== Modal ==========
-    function showDetails(n,t,ra,dec,mag,sz){const m=document.getElementById("detailModal"),c=document.getElementById("modalContent");c.innerHTML=`<h2>${n}</h2><p>Type: ${t}<br>RA: ${ra.toFixed(2)}h | Dec: ${dec.toFixed(2)}° (J2000)<br>Mag: ${mag} | Size: ${sz}<br>Constellation: ${getConstellation(ra)}<br><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(n.split("–")[0].trim())}" target="_blank">📖 Wikipedia</a></p>`;m.style.display="flex";}
-
-    // ========== Caching ==========
-    function cacheMyImages(){const box=document.getElementById("cacheImages"),conf=document.getElementById("cacheConfirm");if(!box.checked)return;let urls=[];mergeCatalogs(messier,caldwell,brightngc).forEach(o=>{if(o.img&&fovCheck(o.size)==="✅ Fits")urls.push(o.img);});if('serviceWorker'in navigator&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({action:"cache",files:urls});conf.style.display="inline";setTimeout(()=>{conf.style.display="none";},3000);}}
-
-    // ========== Init ==========
-    function updateCatalog(){computeTargets(currentLat,currentLon);}
-    startClock(); // Always run clock
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(p=>{currentLat=p.coords.latitude;currentLon=p.coords.longitude;document.getElementById("status").innerText="Location detected ✅";updateCatalog();},e=>{document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";updateCatalog();});
-    }else{document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";updateCatalog();}
-    if("serviceWorker"in navigator){navigator.serviceWorker.register("service-worker.js");}
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/AstroTarget/service-worker.js")
+      .then(() => console.log("Service Worker registered"))
+      .catch(err => console.error("SW registration failed:", err));
+  }
+</script>
+
 </body>
 </html>
+

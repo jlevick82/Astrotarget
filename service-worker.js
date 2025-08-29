@@ -1,23 +1,46 @@
-const CACHE_NAME = "astrotarget-cache-v0.9.0";
+const CACHE_NAME = "astrotarget-v1.0";
+const ASSETS = [
+  "/",                // root
+  "/index.html",
+  "/messier.js",
+  "/caldwell.js",
+  "/brightngc.js",
+  "/images/placeholder.jpg",
+  "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
+  "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+];
 
-self.addEventListener("install", e=>{
+// Install SW and cache assets
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(ASSETS);
+    })
+  );
   self.skipWaiting();
 });
 
-self.addEventListener("activate", e=>{
-  e.waitUntil(caches.open(CACHE_NAME));
-});
-
-self.addEventListener("fetch", e=>{
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+// Activate SW and remove old caches
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      }))
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener("message", e=>{
-  if(e.data.action==="cache"){
-    caches.open(CACHE_NAME).then(cache=>{
-      e.data.files.forEach(url=>cache.add(url));
-    });
-  }
+// Fetch handler
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request).then(res => {
+      return res || fetch(event.request).catch(() => {
+        if (event.request.destination === "image") {
+          return caches.match("/images/placeholder.jpg");
+        }
+      });
+    })
+  );
 });
