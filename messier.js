@@ -6,7 +6,7 @@ const messier = [
     mag: 8.4,
     size: "6x4",
     type: "Supernova Remnant",
-    img: "https://cdn.spacetelescope.org/archives/images/screen/heic0515a.jpg"
+    img: "https://upload.wikimedia.org/wikipedia/commons/0/00/Crab_Nebula.jpg"
   },
   {
     name: "M31 – Andromeda Galaxy",
@@ -15,7 +15,7 @@ const messier = [
     mag: 3.4,
     size: "190x60",
     type: "Galaxy",
-    img: "https://cdn.spacetelescope.org/archives/images/screen/heic1502a.jpg"
+    img: "https://upload.wikimedia.org/wikipedia/commons/6/6d/Andromeda_Galaxy_(with_h-alpha).jpg"
   },
   {
     name: "M42 – Orion Nebula",
@@ -24,6 +24,6 @@ const messier = [
     mag: 4.0,
     size: "65x60",
     type: "Emission Nebula",
-    img: "https://cdn.spacetelescope.org/archives/images/screen/heic0601a.jpg"
+    img: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg"
   }
 ];
