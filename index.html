@@ -272,10 +272,10 @@
   // =====================
   function getActiveCatalog(){
     const choice=document.getElementById("catalogChoice").value;
-    if(choice==="messier") return catalog;
+    if(choice==="messier") return messier;
     if(choice==="caldwell") return caldwell;
     if(choice==="ngc") return brightngc;
-    if(choice==="all") return mergeCatalogs(catalog, caldwell, brightngc);
+    if(choice==="all") return mergeCatalogs(,essier, caldwell, brightngc);
     if(choice==="pro"){ 
       alert("🚀 Pro Mode coming soon! Extended catalogs will be added.");
       return mergeCatalogs(catalog, caldwell, brightngc);
