@@ -275,7 +275,7 @@
     if(choice==="messier") return messier;
     if(choice==="caldwell") return caldwell;
     if(choice==="ngc") return brightngc;
-    if(choice==="all") return mergeCatalogs(,essier, caldwell, brightngc);
+    if(choice==="all") return mergeCatalogs(messier, caldwell, brightngc);
     if(choice==="pro"){ 
       alert("🚀 Pro Mode coming soon! Extended catalogs will be added.");
       return mergeCatalogs(catalog, caldwell, brightngc);
@@ -403,29 +403,30 @@
   }
 
   // =====================
-  // Location handling + init
-  // =====================
-  function updateCatalog(){
-    computeTargets(currentLat,currentLon);
-  }
+// =====================
+// Location handling + init
+// =====================
+function updateCatalog(){
+  computeTargets(currentLat,currentLon);
+}
 
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-      currentLat=pos.coords.latitude;
-      currentLon=pos.coords.longitude;
-      document.getElementById("status").innerText="Location detected ✅";
-      updateCatalog();
-      startClock();
-    },err=>{
-      document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
-      updateCatalog();
-      startClock();
-    });
-  } else {
-    document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
+startClock();  // <-- add this so the clock always runs
+
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    currentLat=pos.coords.latitude;
+    currentLon=pos.coords.longitude;
+    document.getElementById("status").innerText="Location detected ✅";
     updateCatalog();
-    startClock();
-  }
+  },err=>{
+    document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
+    updateCatalog();
+  });
+} else {
+  document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
+  updateCatalog();
+}
+
 
   // Register Service Worker
   if("serviceWorker" in navigator){
