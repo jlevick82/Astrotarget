@@ -91,7 +91,3 @@ const brightngc = [
   { name:"NGC 7723 – Spiral Galaxy in Aquarius", type:"Galaxy", ra:23.700, dec:-12.250, mag:10.0, size:"5.4′×4.3′" },
   { name:"NGC 7727 – Spiral Galaxy in Aquarius", type:"Galaxy", ra:23.767, dec:-12.300, mag:10.2, size:"5.5′×4.8′" }
 ];
-
-];
-
-];
