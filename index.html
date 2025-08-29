@@ -93,345 +93,43 @@
     <div class="modal-content" id="modalContent"></div>
   </div>
 
-  <!-- Catalogs -->
+  <!-- Catalog scripts -->
   <script src="messier.js"></script>
   <script src="caldwell.js"></script>
   <script src="brightngc.js"></script>
+
+  <!-- AstroTarget logic -->
   <script>
-  let currentLat = 40, currentLon = 0;
+    let currentLat = 40, currentLon = 0;
 
-  // =====================
-  // Math utilities
-  // =====================
-  function toRadians(deg){return deg*Math.PI/180;}
-  function toDegrees(rad){return rad*180/Math.PI;}
+    // ... (keep all the JS logic from Part 2 + Part 3 we built earlier)
+    // Make sure you have startClock() called unconditionally near the bottom:
 
-  function radecToAlt(raHours, decDeg, lat, lon, date) {
-    const ra = raHours * 15;
-    const lst = getLST(lon, date);
-    const ha = (lst - ra + 360) % 360;
-    const haRad = toRadians(ha);
-    const decRad = toRadians(decDeg);
-    const latRad = toRadians(lat);
-    const sinAlt = Math.sin(decRad) * Math.sin(latRad) +
-                   Math.cos(decRad) * Math.cos(latRad) * Math.cos(haRad);
-    return toDegrees(Math.asin(sinAlt));
-  }
-
-  function getLST(lon, date){
-    const JD = (date.getTime()/86400000)+2440587.5;
-    const D = JD-2451545.0;
-    let GMST = 280.46061837 + 360.98564736629*D;
-    GMST=(GMST%360+360)%360;
-    const LST=GMST+lon;
-    return (LST%360+360)%360;
-  }
-
-  // =====================
-  // Moon calculations
-  // =====================
-  function getMoonInfo(date, lat, lon){
-    const lp = (218.316 + 13.176396* ((date/86400000)+2440587.5 -2451545.0)) % 360;
-    const m = (357.529 + 0.98560028*((date/86400000)+2440587.5 -2451545.0)) % 360;
-    const mp = (134.963 + 13.064993*((date/86400000)+2440587.5 -2451545.0)) % 360;
-    const phase = (1 - Math.cos(toRadians(m - mp)))/2;
-    const alt = radecToAlt((lp/15), 5, lat, lon, new Date(date));
-    return {phase:(phase*100).toFixed(1)+"%", alt:alt.toFixed(1)};
-  }
-
-  function updateMoon(){
-    const now = new Date();
-    const moon = getMoonInfo(now.getTime(), currentLat, currentLon);
-    let rating="🌑 Excellent";
-    const illum=parseFloat(moon.phase);
-    if(illum>50) rating="🌓 Fair";
-    if(illum>80) rating="🌕 Poor";
-    document.getElementById("moonCard").innerHTML =
-      `🌙 Moon Phase: ${moon.phase}<br>Altitude: ${moon.alt}°<br>Dark Sky: ${rating}`;
-  }
-
-  // =====================
-  // GPS Clock
-  // =====================
-  function startClock(){
-    setInterval(()=>{
-      const now=new Date();
-      const h=String(now.getHours()).padStart(2,'0');
-      const m=String(now.getMinutes()).padStart(2,'0');
-      const s=String(now.getSeconds()).padStart(2,'0');
-      document.getElementById("clockCard").innerText=`⏰ GPS Time: ${h}:${m}:${s}`;
-    },1000);
-  }
-
-  // =====================
-  // Constellation lookup (simple)
-  // =====================
-  function getConstellation(ra){
-    const h = ra; 
-    if(h<2) return "Pisces";
-    if(h<4) return "Aries/Taurus";
-    if(h<6) return "Orion";
-    if(h<8) return "Gemini";
-    if(h<10) return "Leo";
-    if(h<12) return "Virgo";
-    if(h<14) return "Bootes";
-    if(h<16) return "Hercules";
-    if(h<18) return "Lyra/Cygnus";
-    if(h<20) return "Aquila";
-    if(h<22) return "Pegasus";
-    return "Andromeda";
-  }
-
-  // =====================
-  // Weather + Light Pollution
-  // =====================
-  function updateWeather(){
-    if(!navigator.onLine){
-      document.getElementById("weatherCard").innerText="🌤 Weather: Not available offline";
-      return;
+    function updateCatalog(){
+      computeTargets(currentLat,currentLon);
     }
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&hourly=cloudcover`)
-      .then(r=>r.json())
-      .then(data=>{
-        const clouds=data.hourly.cloudcover[0];
-        let msg="Clear";
-        if(clouds>50) msg="Cloudy";
-        if(clouds>20 && clouds<=50) msg="Partly cloudy";
-        document.getElementById("weatherCard").innerText=`🌤 Weather: ${msg} (${clouds}% clouds)`;
-      }).catch(()=>{
-        document.getElementById("weatherCard").innerText="🌤 Weather: Not available";
+
+    startClock(); // Always run clock, even if GPS blocked
+
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(pos=>{
+        currentLat=pos.coords.latitude;
+        currentLon=pos.coords.longitude;
+        document.getElementById("status").innerText="Location detected ✅";
+        updateCatalog();
+      },err=>{
+        document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
+        updateCatalog();
       });
-  }
-
-  function updateLightPollution(){
-    if(!navigator.onLine){
-      document.getElementById("lpCard").innerText="🌌 Light Pollution: Not available offline";
-      return;
-    }
-    // Placeholder: show fixed message (API hook can be added later)
-    document.getElementById("lpCard").innerText="🌌 Light Pollution: Bortle ~5 (estimate)";
-  }
-
-  // =====================
-  // Filters & Suitability
-  // =====================
-  function passesFilters(obj, alt, mag){
-    const minAlt = parseFloat(document.getElementById("minAlt").value);
-    const maxMag = parseFloat(document.getElementById("maxMag").value);
-    const type = obj.type.toLowerCase();
-
-    if(alt < minAlt) return false;
-    if(mag > maxMag) return false;
-
-    if(type.includes("galaxy") && !document.getElementById("showGalaxies").checked) return false;
-    if((type.includes("cluster")||type.includes("globular")) && !document.getElementById("showClusters").checked) return false;
-    if(type.includes("nebula") && !document.getElementById("showNebulae").checked) return false;
-    if(type.includes("star") && !document.getElementById("showStars").checked) return false;
-
-    return true;
-  }
-
-  function fovCheck(objSize){
-    const fl = parseFloat(document.getElementById("focalLength").value);
-    const sensor = parseFloat(document.getElementById("sensorSize").value);
-    if(isNaN(fl) || isNaN(sensor)) return "";
-
-    const fov = (sensor / fl) * (57.3*60);
-    const sizeVal = parseFloat(objSize);
-    if(isNaN(sizeVal)) return "";
-
-    if(sizeVal < fov*0.2) return "❌ Too small";
-    if(sizeVal > fov*1.5) return "⚠️ Too big";
-    return "✅ Fits";
-  }
-
-  function scopeApplied(){
-    const c=document.getElementById("scopeConfirm");
-    c.style.display="inline";
-    setTimeout(()=>{c.style.display="none";},2000);
-    computeTargets(currentLat,currentLon);
-  }
-
-  // =====================
-  // Deduplicate catalogs
-  // =====================
-  function mergeCatalogs(...cats){
-    const unique = [];
-    const seen = new Set();
-    cats.flat().forEach(obj=>{
-      const key = `${Math.round(obj.ra*10)/10},${Math.round(obj.dec*10)/10}`;
-      if(!seen.has(key)){
-        seen.add(key);
-        unique.push(obj);
-      }
-    });
-    return unique;
-  }
-  // =====================
-  // Catalog selection
-  // =====================
-  function getActiveCatalog(){
-    const choice=document.getElementById("catalogChoice").value;
-    if(choice==="messier") return messier;
-    if(choice==="caldwell") return caldwell;
-    if(choice==="ngc") return brightngc;
-    if(choice==="all") return mergeCatalogs(messier, caldwell, brightngc);
-    if(choice==="pro"){ 
-      alert("🚀 Pro Mode coming soon! Extended catalogs will be added.");
-      return mergeCatalogs(catalog, caldwell, brightngc);
-    }
-    return catalog;
-  }
-
-  // =====================
-  // Main compute function
-  // =====================
-  function computeTargets(lat, lon){
-    const nowInput = document.getElementById("planTime").value;
-    const now = nowInput ? new Date(nowInput) : new Date();
-    updateMoon();
-    updateWeather();
-    updateLightPollution();
-
-    const query = document.getElementById("searchBox").value.toLowerCase();
-    const searchAll = document.getElementById("searchAll").checked;
-
-    let activeCatalog = searchAll 
-      ? mergeCatalogs(catalog, caldwell, brightngc)
-      : getActiveCatalog();
-
-    // 🌟 Top Picks (with optional scope filter)
-    let allCatalog = mergeCatalogs(catalog, caldwell, brightngc);
-    let topPicks=[];
-    allCatalog.forEach(obj=>{
-      const alt=radecToAlt(obj.ra,obj.dec,lat,lon,now);
-      if(passesFilters(obj,alt,obj.mag)){
-        const fov=fovCheck(obj.size);
-        if(document.getElementById("scopeFilterTop").checked){
-          if(fov==="✅ Fits") topPicks.push({...obj,alt:alt.toFixed(1)});
-        } else {
-          topPicks.push({...obj,alt:alt.toFixed(1)});
-        }
-      }
-    });
-    topPicks.sort((a,b)=>{
-      if(b.alt !== a.alt) return b.alt - a.alt;
-      return a.mag - b.mag;
-    });
-
-    let out="";
-
-    if(topPicks.length>0){
-      out += `<div class="card" style="background:#0e1a22;border:2px solid #ffcc00;">
-        <h2>🌟 Tonight’s Top ${Math.min(5,topPicks.length)} Targets</h2>`;
-      topPicks.slice(0,5).forEach(obj=>{
-        out += `<p><b>${obj.name}</b> (${obj.type}) – Mag ${obj.mag}, Alt ${obj.alt}°</p>`;
-      });
-      out += `</div>`;
+    } else {
+      document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
+      updateCatalog();
     }
 
-    // 📄 Full list
-    let visible=[];
-    activeCatalog.forEach(obj=>{
-      const alt=radecToAlt(obj.ra,obj.dec,lat,lon,now);
-      if(passesFilters(obj,alt,obj.mag)){
-        if(query==="" || obj.name.toLowerCase().includes(query)){
-          visible.push({...obj,alt:alt.toFixed(1)});
-        }
-      }
-    });
-
-    visible.sort((a,b)=>{
-      if(b.alt !== a.alt) return b.alt - a.alt;
-      return a.mag - b.mag;
-    });
-
-    out += `<p><i>Showing ${visible.length} objects from selected catalog</i></p>`;
-
-    if(visible.length===0) out+="<p>No objects match your filters.</p>";
-    else visible.forEach(obj=>{
-      const img = obj.img ? `<img src="${obj.img}" alt="${obj.name}">` : "";
-      out+=`<div class="card" onclick="showDetails('${obj.name}', '${obj.type}', ${obj.ra}, ${obj.dec}, ${obj.mag}, '${obj.size}')">
-        <h2>${obj.name}</h2>
-        <p>Type: ${obj.type}<br>
-        Mag: ${obj.mag} | Size: ${obj.size}<br>
-        Altitude now: ${obj.alt}°<br>
-        Constellation: ${getConstellation(obj.ra)}<br>
-        FOV Check: ${fovCheck(obj.size)}</p>
-        ${img}
-      </div>`;
-    });
-
-    document.getElementById("results").innerHTML=out;
-  }
-
-  // =====================
-  // Popup details
-  // =====================
-  function showDetails(name,type,ra,dec,mag,size){
-    const modal=document.getElementById("detailModal");
-    const c=document.getElementById("modalContent");
-    c.innerHTML=`<h2>${name}</h2>
-      <p>Type: ${type}<br>
-      RA: ${ra.toFixed(2)}h | Dec: ${dec.toFixed(2)}° (J2000)<br>
-      Mag: ${mag} | Size: ${size}<br>
-      Constellation: ${getConstellation(ra)}<br>
-      <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(name.split("–")[0].trim())}" target="_blank">📖 Wikipedia</a></p>`;
-    modal.style.display="flex";
-  }
-
-  // =====================
-  // Image caching
-  // =====================
-  function cacheMyImages(){
-    const box=document.getElementById("cacheImages");
-    const confirm=document.getElementById("cacheConfirm");
-    if(!box.checked) return;
-
-    let urls=[];
-    mergeCatalogs(catalog, caldwell, brightngc).forEach(obj=>{
-      if(obj.img && fovCheck(obj.size)==="✅ Fits"){
-        urls.push(obj.img);
-      }
-    });
-
-    if('serviceWorker' in navigator && navigator.serviceWorker.controller){
-      navigator.serviceWorker.controller.postMessage({action:"cache", files:urls});
-      confirm.style.display="inline";
-      setTimeout(()=>{confirm.style.display="none";},3000);
+    // Service Worker
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.register("service-worker.js");
     }
-  }
-
-  // =====================
-// =====================
-// Location handling + init
-// =====================
-function updateCatalog(){
-  computeTargets(currentLat,currentLon);
-}
-
-startClock();  // <-- add this so the clock always runs
-
-if(navigator.geolocation){
-  navigator.geolocation.getCurrentPosition(pos=>{
-    currentLat=pos.coords.latitude;
-    currentLon=pos.coords.longitude;
-    document.getElementById("status").innerText="Location detected ✅";
-    updateCatalog();
-  },err=>{
-    document.getElementById("status").innerText="⚠️ Location denied. Using default (40°N,0°E).";
-    updateCatalog();
-  });
-} else {
-  document.getElementById("status").innerText="⚠️ GPS not available. Using default (40°N,0°E).";
-  updateCatalog();
-}
-
-
-  // Register Service Worker
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("service-worker.js");
-  }
   </script>
 </body>
 </html>
