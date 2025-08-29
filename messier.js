@@ -1,4 +1,4 @@
-var catalog = [
+var messier = [
   {name:"M1 – Crab Nebula", ra:5.575, dec:22.0, mag:8.4, size:"6x4", type:"Supernova Remnant", img:"https://cdn.spacetelescope.org/archives/images/screen/heic0515a.jpg"},
   {name:"M2 – Globular Cluster", ra:21.55, dec:-0.82, mag:6.5, size:"12", type:"Globular Cluster", img:"https://upload.wikimedia.org/wikipedia/commons/1/19/M2_Hubble.jpg"},
   {name:"M3 – Globular Cluster", ra:13.70, dec:28.38, mag:6.2, size:"18", type:"Globular Cluster", img:"https://cdn.spacetelescope.org/archives/images/screen/heic1511a.jpg"},
