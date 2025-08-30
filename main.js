@@ -1,222 +1,316 @@
-let allCatalogs = [...messierCatalog, ...caldwellCatalog, ...brightNGCCatalog];
+// === AstroTarget v1.0 Main Logic ===
 
-// RA/Dec → Alt/Az
-function radecToAltAz(ra, dec, lat, lon, date) {
-  const rad = Math.PI / 180;
-  const raRad = ra * rad * 15; // RA hours → radians
-  const decRad = dec * rad;
-  const latRad = lat * rad;
+// Globals
+let selectedCatalog = "Messier";
+let currentResults = [];
+let currentIndex = 0;
+let debugEnabled = false;
+let minAltitude = 20;
 
-  // Julian date
-  const JD = (date.getTime() / 86400000) + 2440587.5;
-  const D = JD - 2451545.0;
-  const GMST = 18.697374558 + 24.06570982441908 * D;
-  const LST = (GMST + lon / 15) % 24;
-  const lstRad = LST * 15 * rad;
-
-  const HA = lstRad - raRad;
-  const sinAlt = Math.sin(decRad) * Math.sin(latRad) + Math.cos(decRad) * Math.cos(latRad) * Math.cos(HA);
-  return Math.asin(sinAlt) / rad; // degrees
-}
-
-// Results
-function renderResults(objects) {
-  const results = document.getElementById('results');
-  results.innerHTML = '';
-  if (objects.length === 0) {
-    results.innerHTML = `<p class="text-center text-muted">No objects match your filters.</p>`;
-    return;
-  }
-  objects.forEach(obj => {
-    results.innerHTML += `
-      <div class="col-md-4">
-        <div class="card bg-secondary text-light h-100">
-          <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
-               onerror="this.src='images/placeholder.jpg';">
-          <div class="card-body">
-            <h5 class="card-title">${obj.id} – ${obj.name}</h5>
-            <p>${obj.type}<br>Mag: ${obj.mag} | Size: ${obj.size}</p>
-            <button class="btn btn-outline-light btn-sm" onclick="openFOVModal('${obj.image}', '${obj.id}')">🔭 FOV Preview</button>
-          </div>
-        </div>
-      </div>`;
-  });
-}
-
-// Filters
-function applyFilters() {
-  let filtered = [...allCatalogs];
-  const catalogFilter = document.getElementById('catalog-filter').value;
-  if (catalogFilter !== 'all') {
-    filtered = filtered.filter(obj => obj.id.toLowerCase().startsWith(catalogFilter[0]));
-  }
-  const magLimit = parseFloat(document.getElementById('magnitude-filter').value);
-  if (!isNaN(magLimit)) filtered = filtered.filter(obj => obj.mag <= magLimit);
-  const searchTerm = document.getElementById('search-box').value.toLowerCase();
-  if (searchTerm) {
-    filtered = filtered.filter(obj =>
-      obj.id.toLowerCase().includes(searchTerm) ||
-      obj.name.toLowerCase().includes(searchTerm));
-  }
-  renderResults(filtered);
-  renderTopSuggestions(filtered);
-}
-
-// Scope settings
-function saveScopeSettings() {
-  const aperture = document.getElementById('aperture').value;
-  const focalLength = document.getElementById('focal-length').value;
-  const reducer = document.getElementById('reducer').value || 1;
-  const sensor = document.getElementById('sensor').value;
-  localStorage.setItem('scopeSettings', JSON.stringify({ aperture, focalLength, reducer, sensor }));
-  document.getElementById('scope-confirm').textContent = "✅ Scope settings applied.";
-  setTimeout(() => { document.getElementById('scope-confirm').textContent = ""; }, 3000);
-}
-function loadScopeSettings() {
-  const saved = JSON.parse(localStorage.getItem('scopeSettings'));
-  if (saved) {
-    document.getElementById('aperture').value = saved.aperture || "";
-    document.getElementById('focal-length').value = saved.focalLength || "";
-    document.getElementById('reducer').value = saved.reducer || 1;
-    document.getElementById('sensor').value = saved.sensor || "";
+// Debug logger
+function logDebug(msg) {
+  console.log(msg);
+  if (debugEnabled) {
+    const panel = document.getElementById("debugMessages");
+    const line = document.createElement("div");
+    line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    panel.appendChild(line);
+    panel.scrollTop = panel.scrollHeight;
   }
 }
-function resetScopeSettings() {
-  localStorage.removeItem('scopeSettings');
-  document.getElementById('aperture').value = "";
-  document.getElementById('focal-length').value = "";
-  document.getElementById('reducer').value = "";
-  document.getElementById('sensor').value = "";
-  document.getElementById('scope-confirm').textContent = "🔄 Scope settings reset.";
-  setTimeout(() => { document.getElementById('scope-confirm').textContent = ""; }, 3000);
+
+// Timestamp
+function updateTimestamp() {
+  const now = new Date();
+  document.getElementById("lastUpdated").innerText =
+    "Last updated: " + now.toLocaleString();
 }
 
-// FOV Preview
-function openFOVModal(image, id) {
-  const canvas = document.getElementById('fov-canvas');
-  const ctx = canvas.getContext('2d');
-  const saved = JSON.parse(localStorage.getItem('scopeSettings'));
-  const img = new Image();
-  img.src = image;
-  img.onload = () => {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-    if (saved && saved.focalLength && saved.sensor) {
-      const parts = saved.sensor.toLowerCase().split('x');
-      if (parts.length === 2) {
-        const sensorW = parseFloat(parts[0]);
-        const sensorH = parseFloat(parts[1]);
-        const focal = parseFloat(saved.focalLength) * parseFloat(saved.reducer || 1);
-        const fovX = (57.3 * sensorW) / focal;
-        const fovY = (57.3 * sensorH) / focal;
-        const scaleX = canvas.width * (fovX / 5);
-        const scaleY = canvas.height * (fovY / 5);
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(
-          canvas.width / 2 - scaleX / 2,
-          canvas.height / 2 - scaleY / 2,
-          scaleX,
-          scaleY
-        );
-        ctx.fillStyle = "yellow";
-        ctx.font = "20px Arial";
-        ctx.fillText(`${fovX.toFixed(2)}° × ${fovY.toFixed(2)}°`, 20, 30);
-      }
-    }
-  };
-  new bootstrap.Modal(document.getElementById('fovModal')).show();
+// Spinner + empty states
+function showSpinner() {
+  document.getElementById("loadingSpinner").classList.remove("hidden");
+  document.getElementById("emptyState").classList.add("hidden");
+  document.getElementById("results").innerHTML = "";
+}
+function hideSpinner() { document.getElementById("loadingSpinner").classList.add("hidden"); }
+function showEmptyState() {
+  hideSpinner();
+  document.getElementById("emptyState").classList.remove("hidden");
 }
 
-// Top 5 Tonight
-function renderTopSuggestions(list = allCatalogs) {
-  const container = document.getElementById('top-suggestions');
+// Render results
+function renderResults(results) {
+  hideSpinner();
+  let container = document.getElementById("results");
   container.innerHTML = "";
 
-  if (!navigator.geolocation) {
-    container.innerHTML = "<p class='text-warning'>Location not available. Showing brightest only.</p>";
-    list.sort((a, b) => a.mag - b.mag).slice(0, 5).forEach(obj => {
-      container.innerHTML += `
-        <div class="col-md-4">
-          <div class="card bg-dark text-light h-100 border border-info">
-            <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
-                 onerror="this.src='images/placeholder.jpg';">
-            <div class="card-body"><h6>${obj.id} – ${obj.name}</h6><p>${obj.type}<br>Mag: ${obj.mag}</p></div>
-          </div>
-        </div>`;
-    });
+  if (results.length === 0) {
+    showEmptyState();
     return;
   }
+  document.getElementById("emptyState").classList.add("hidden");
+  currentResults = results;
 
-  navigator.geolocation.getCurrentPosition(pos => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    const now = new Date();
+  results.forEach((obj, i) => {
+    let card = document.createElement("div");
+    card.className = "result-card";
+    card.style.position = "relative";
 
-    let ranked = list.map(obj => {
-      if (!obj.ra || !obj.dec) return { ...obj, alt: -90 };
-      let alt = radecToAltAz(obj.ra, obj.dec, lat, lon, now);
-      return { ...obj, alt };
-    });
+    let imgSrc = obj.image && obj.image.length > 0 ? obj.image : "images/full/placeholder.jpg";
 
-    ranked = ranked.filter(o => o.alt > 30);
-    ranked.sort((a, b) => (a.mag - b.mag) || (b.alt - a.alt));
+    card.innerHTML = `
+      <img src="${imgSrc}" alt="${obj.name}" onerror="this.src='images/full/placeholder.jpg'">
+      <h3>${obj.id} — ${obj.name}</h3>
+      <p><strong>Type:</strong> ${obj.type}</p>
+      <p><strong>Mag:</strong> ${obj.mag}</p>
+      <p><strong>Size:</strong> ${obj.size}</p>
+      <p>${obj.desc}</p>
+    `;
 
-    ranked.slice(0, 5).forEach(obj => {
-      container.innerHTML += `
-        <div class="col-md-4">
-          <div class="card bg-dark text-light h-100 border border-info">
-            <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
-                 onerror="this.src='images/placeholder.jpg';">
-            <div class="card-body">
-              <h6>${obj.id} – ${obj.name}</h6>
-              <p>${obj.type}<br>Mag: ${obj.mag}<br>Alt: ${obj.alt.toFixed(1)}°</p>
-            </div>
-          </div>
-        </div>`;
-    });
+    if (obj.topPick) card.classList.add("top-pick");
+    card.addEventListener("click", () => openModal(i, results));
+    container.appendChild(card);
+  });
+}
 
-    if (ranked.length === 0) {
-      container.innerHTML = "<p class='text-muted'>No targets above 30° right now.</p>";
+// Modal
+function openModal(index, results) {
+  currentIndex = index;
+  let obj = results[index];
+  let imgSrc = obj.image && obj.image.length > 0 ? obj.image : "images/full/placeholder.jpg";
+
+  document.getElementById("modalImage").src = imgSrc;
+  document.getElementById("modalTitle").innerText = `${obj.id} — ${obj.name}`;
+  document.getElementById("modalType").innerText = `Type: ${obj.type}`;
+  document.getElementById("modalMag").innerText = `Magnitude: ${obj.mag}`;
+  document.getElementById("modalSize").innerText = `Size: ${obj.size}`;
+  document.getElementById("modalDesc").innerText = obj.desc;
+
+  document.getElementById("objectModal").style.display = "flex";
+}
+function showNext() { currentIndex = (currentIndex + 1) % currentResults.length; openModal(currentIndex, currentResults); }
+function showPrev() { currentIndex = (currentIndex - 1 + currentResults.length) % currentResults.length; openModal(currentIndex, currentResults); }
+
+// Catalog handling
+function setCatalog(name) {
+  selectedCatalog = name;
+  document.getElementById("catalogName").innerText = name;
+  showSpinner();
+  setTimeout(() => {
+    renderResults(catalogs[name]);
+    updateTimestamp();
+    trackUsage("Catalog Switch");
+  }, 300);
+}
+function searchObjects(query) {
+  showSpinner();
+  let q = query.toLowerCase();
+  let results = [];
+  Object.keys(catalogs).forEach(cat => {
+    results = results.concat(catalogs[cat].filter(obj =>
+      obj.id.toLowerCase().includes(q) || obj.name.toLowerCase().includes(q)
+    ));
+  });
+  setTimeout(() => {
+    renderResults(results);
+    updateTimestamp();
+    trackUsage("Search");
+  }, 300);
+}
+function top5Tonight() {
+  showSpinner();
+  getUserLocation((lat, lon) => {
+    let now = new Date();
+    let visible = [];
+    let all = catalogs[selectedCatalog];
+
+    if (lat === 0 && lon === 0) {
+      logDebug("⚠️ Using default location (0°,0°). Results may be inaccurate.");
+      document.getElementById("results").innerHTML =
+        `<p>⚠️ Using default location (0°,0°). Results may be inaccurate.</p>`;
+    }
+
+    try {
+      all.forEach(obj => {
+        let pos = raDecToAltAz(obj.ra, obj.dec, lat, lon, now);
+        if (pos.alt > minAltitude) visible.push({ ...obj, alt: pos.alt });
+      });
+      visible.sort((a,b) => b.alt - a.alt);
+      setTimeout(() => {
+        renderResults(visible.slice(0,5).map(o => ({ ...o, topPick: true })));
+        updateTimestamp();
+        trackUsage("Top 5 Tonight");
+      }, 500);
+    } catch (err) {
+      logDebug("❌ Error calculating Top 5 Tonight: " + err.message);
+      document.getElementById("results").innerHTML =
+        `<p>⚠️ Unable to calculate Top 5 Tonight. Try again later.</p>`;
     }
   });
 }
 
-// APOD
-async function loadAPOD() {
-  const apodBox = document.getElementById('apod-box');
-  apodBox.textContent = "Loading APOD...";
-  try {
-    const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=WJVm2WSCEtWe2Reb4kqDOB69tp5fcy3Z86ZthcS3");
-    const data = await res.json();
-    apodBox.innerHTML = `<h5>${data.title}</h5>
-      <img src="${data.url}" class="img-fluid mb-2" alt="APOD"><p>${data.explanation}</p>`;
-  } catch (err) {
-    console.error(err);
-    apodBox.textContent = "Failed to load APOD.";
+// GPS + Clock
+function getUserLocation(callback) {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => callback(pos.coords.latitude, pos.coords.longitude),
+      err => {
+        logDebug("❌ Geolocation error: " + err.message);
+        document.getElementById("gpsLocation").innerText =
+          "📍 Location unavailable (using default 0°, 0°)";
+        callback(0, 0);
+      }
+    );
+  } else {
+    logDebug("❌ Geolocation not supported by this browser.");
+    document.getElementById("gpsLocation").innerText =
+      "📍 GPS not supported (using default 0°, 0°)";
+    callback(0, 0);
+  }
+}
+function updateClock(lat, lon) {
+  const now = new Date();
+  document.getElementById("utcTime").innerText = now.toUTCString().split(" ")[4];
+  document.getElementById("localTime").innerText = now.toLocaleTimeString();
+  if (lat && lon && (lat !== 0 || lon !== 0)) {
+    document.getElementById("gpsLocation").innerText =
+      `📍 Location: ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+  } else {
+    document.getElementById("gpsLocation").innerText =
+      "📍 Location unavailable (using default 0°, 0°)";
   }
 }
 
-// ISS
-async function loadISS() {
-  const issBox = document.getElementById('iss-box');
-  issBox.textContent = "Loading ISS transits...";
-  if (!navigator.geolocation) {
-    issBox.textContent = "Geolocation not supported.";
-    return;
+// Usage tracking
+function trackUsage(feature) {
+  let stats = JSON.parse(localStorage.getItem("usageStats")) || {};
+  stats[feature] = (stats[feature] || 0) + 1;
+  localStorage.setItem("usageStats", JSON.stringify(stats));
+  logDebug(`📊 Usage tracked: ${feature}`);
+}
+
+// Init
+document.addEventListener("DOMContentLoaded", () => {
+  // Catalog switch
+  document.getElementById("catalogSelect").addEventListener("change", e => setCatalog(e.target.value));
+  // Search
+  document.getElementById("searchBox").addEventListener("input", e => searchObjects(e.target.value));
+  // Top 5
+  document.getElementById("topTonightBtn").addEventListener("click", top5Tonight);
+
+  // Modal controls
+  const modal = document.getElementById("objectModal");
+  const closeBtn = document.querySelector(".close-btn");
+  const leftBtn = document.querySelector(".left-btn");
+  const rightBtn = document.querySelector(".right-btn");
+  const fullscreenBtn = document.querySelector(".fullscreen-btn");
+  const modalImage = document.getElementById("modalImage");
+
+  closeBtn.onclick = () => modal.style.display = "none";
+  leftBtn.onclick = () => showPrev();
+  rightBtn.onclick = () => showNext();
+  fullscreenBtn.onclick = () => {
+    if (modalImage.requestFullscreen) modalImage.requestFullscreen();
+    else if (modalImage.webkitRequestFullscreen) modalImage.webkitRequestFullscreen();
+  };
+  window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+
+  // Keyboard nav
+  window.addEventListener("keydown", e => {
+    if (modal.style.display === "flex") {
+      if (e.key === "ArrowRight") showNext();
+      else if (e.key === "ArrowLeft") showPrev();
+      else if (e.key === "Escape") modal.style.display = "none";
+    }
+  });
+  // Swipe nav
+  let touchStartX = 0, touchEndX = 0;
+  modal.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; });
+  modal.addEventListener("touchend", e => { touchEndX = e.changedTouches[0].screenX; if (Math.abs(touchEndX - touchStartX) > 50) { (touchEndX > touchStartX) ? showPrev() : showNext(); } });
+
+  // GPS Clock
+  setInterval(() => {
+    if (window.userLat && window.userLon) updateClock(window.userLat, window.userLon);
+    else updateClock();
+  }, 1000);
+  getUserLocation((lat, lon) => { window.userLat = lat; window.userLon = lon; updateClock(lat, lon); });
+  document.getElementById("syncBtn").addEventListener("click", () => getUserLocation((lat, lon) => { window.userLat = lat; window.userLon = lon; updateClock(lat, lon); alert("✅ Location synced successfully."); }));
+
+  // Settings: toggle advanced
+  const toggleSettingsBtn = document.getElementById("toggleSettingsBtn");
+  const advancedSettings = document.getElementById("advancedSettings");
+  toggleSettingsBtn.addEventListener("click", () => {
+    advancedSettings.classList.toggle("hidden");
+    toggleSettingsBtn.innerText = advancedSettings.classList.contains("hidden")
+      ? "Show Advanced Settings ▼"
+      : "Hide Advanced Settings ▲";
+  });
+
+  // Cache toggle
+  const cacheToggle = document.getElementById("cacheToggle");
+  const cacheStatus = document.getElementById("cacheStatus");
+  const clearCacheBtn = document.getElementById("clearCacheBtn");
+  function updateCacheStatus() {
+    if (cacheToggle.checked) {
+      cacheStatus.innerText = "✅ Images cached for offline use";
+      cacheStatus.className = "status-text cached";
+      clearCacheBtn.classList.remove("hidden");
+    } else {
+      cacheStatus.innerText = "🌐 Online-only mode (images load when needed)";
+      cacheStatus.className = "status-text online-only";
+      clearCacheBtn.classList.add("hidden");
+    }
   }
-  navigator.geolocation.getCurrentPosition(async pos => {
-    const lat = pos.coords.latitude.toFixed(2);
-    const lon = pos.coords.longitude.toFixed(2);
-    const alt = 0;
-    const apiKey = "YOUR_N2YO_KEY";
-    try {
-      const url = `https://api.n2yo.com/rest/v1/satellite/visualpasses/25544/${lat}/${lon}/${alt}/2/300/&apiKey=${apiKey}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (!data.passes || data.passes.length === 0) {
-        issBox.textContent = "No ISS transits in the next 48h.";
-        return;
-      }
-      issBox.innerHTML = data.passes.map(pass => `
+  cacheToggle.checked = localStorage.getItem("cacheImages") === "true";
+  updateCacheStatus();
+  cacheToggle.addEventListener("change", () => {
+    localStorage.setItem("cacheImages", cacheToggle.checked);
+    updateCacheStatus();
+  });
+  clearCacheBtn.addEventListener("click", async () => {
+    if (confirm("Clear all cached images?")) {
+      const names = await caches.keys(); for (const n of names) await caches.delete(n);
+      alert("🗑️ Cache cleared.");
+    }
+  });
+
+  // Red Light Mode
+  const redModeToggle = document.getElementById("redModeToggle");
+  let redModeEnabled = localStorage.getItem("redMode") === "true";
+  if (redModeEnabled) document.body.classList.add("red-mode");
+  redModeToggle.checked = redModeEnabled;
+  redModeToggle.addEventListener("change", () => {
+    if (redModeToggle.checked) { document.body.classList.add("red-mode"); localStorage.setItem("redMode", "true"); }
+    else { document.body.classList.remove("red-mode"); localStorage.setItem("redMode", "false"); }
+  });
+
+  // Altitude slider
+  const altSlider = document.getElementById("altSlider");
+  const altValue = document.getElementById("altValue");
+  minAltitude = localStorage.getItem("minAltitude") || 20;
+  altSlider.value = minAltitude;
+  altValue.innerText = `${minAltitude}°`;
+  altSlider.addEventListener("input", () => {
+    minAltitude = altSlider.value;
+    altValue.innerText = `${minAltitude}°`;
+    localStorage.setItem("minAltitude", minAltitude);
+  });
+
+  // Debug panel
+  const debugToggle = document.getElementById("debugToggle");
+  const debugPanel = document.getElementById("debugPanel");
+  const clearDebugBtn = document.getElementById("clearDebugBtn");
+  debugEnabled = localStorage.getItem("debugEnabled") === "true";
+  debugToggle.checked = debugEnabled;
+  if (debugEnabled) debugPanel.classList.remove("hidden");
+  debugToggle.addEventListener("change", () => {
+    debugEnabled = debugToggle.checked;
+    localStorage.setItem("debugEnabled", debugEnabled);
+    if (debugEnabled) { debugPanel.classList.remove("hidden"); logDebug("✅ Debug enabled"); }
+    else { debugPanel.classList.add("hidden"); }
+  });
+  clearDebugBtn.addEventListener("click", () => { document.getElementById("debugMessages").innerHTML = ""; logDebug("🗑️ Debug log cleared"); });
+
+  // Init first catalog
+  setCatalog("Messier");
+});
