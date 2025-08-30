@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroTarget v1.0</title>
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="manifest" href="manifest.json">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -19,15 +21,9 @@
 
   <!-- Tabs -->
   <ul class="nav nav-tabs nav-fill bg-dark border-bottom border-secondary">
-    <li class="nav-item">
-      <a class="nav-link active" data-bs-toggle="tab" href="#catalogs">⭐ Catalogs</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="tab" href="#apod">🌠 APOD</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="tab" href="#iss">🛰 ISS</a>
-    </li>
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#catalogs">⭐ Catalogs</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#apod">🌠 APOD</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#iss">🛰 ISS</a></li>
   </ul>
 
   <!-- Tab Content -->
@@ -37,7 +33,7 @@
     <div class="tab-pane fade show active" id="catalogs">
       <div class="container my-3">
         <div class="row g-2">
-          <div class="col-md-3">
+          <div class="col-md-2">
             <select id="catalog-filter" class="form-select">
               <option value="all">All Catalogs</option>
               <option value="messier">Messier</option>
@@ -45,17 +41,39 @@
               <option value="brightngc">Bright NGC</option>
             </select>
           </div>
+          <div class="col-md-2"><input id="magnitude-filter" type="number" class="form-control" placeholder="Max Mag (e.g. 10)"></div>
+          <div class="col-md-2"><input id="altitude-filter" type="number" class="form-control" placeholder="Min Alt (deg)"></div>
+          <div class="col-md-3"><input id="search-box" type="text" class="form-control" placeholder="Search by Name or ID"></div>
           <div class="col-md-3">
-            <input id="magnitude-filter" type="number" class="form-control" placeholder="Max Magnitude (e.g. 10)">
-          </div>
-          <div class="col-md-3">
-            <input id="altitude-filter" type="number" class="form-control" placeholder="Min Altitude (deg)">
-          </div>
-          <div class="col-md-3">
-            <input id="search-box" type="text" class="form-control" placeholder="Search by Name or ID">
+            <button class="btn btn-outline-info w-100" data-bs-toggle="collapse" data-bs-target="#scope-settings">⚙️ Scope Settings</button>
           </div>
         </div>
       </div>
+
+      <!-- Scope Settings -->
+      <div id="scope-settings" class="collapse container mb-3">
+        <div class="card card-body bg-secondary text-light">
+          <div class="row g-2">
+            <div class="col-md-3"><input id="aperture" type="number" class="form-control" placeholder="Aperture (mm)"></div>
+            <div class="col-md-3"><input id="focal-length" type="number" class="form-control" placeholder="Focal Length (mm)"></div>
+            <div class="col-md-3"><input id="reducer" type="number" step="0.1" class="form-control" placeholder="Reducer/Barlow (e.g. 0.8)"></div>
+            <div class="col-md-3"><input id="sensor" type="text" class="form-control" placeholder="Sensor (WxH mm)"></div>
+          </div>
+          <div class="mt-2">
+            <button class="btn btn-success" onclick="saveScopeSettings()">Apply</button>
+            <button class="btn btn-outline-warning ms-2" onclick="resetScopeSettings()">Reset</button>
+            <span id="scope-confirm" class="text-success ms-2"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Suggestions -->
+      <div class="container my-3">
+        <h5>🎯 Tonight’s Top Suggestions</h5>
+        <div id="top-suggestions" class="row g-3"></div>
+      </div>
+
+      <!-- Results -->
       <div class="container">
         <div id="results" class="row g-3"></div>
       </div>
@@ -87,11 +105,18 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body text-center">
-          <img id="fov-image" class="img-fluid" alt="FOV Preview">
+          <canvas id="fov-canvas" class="img-fluid"></canvas>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Credits -->
+  <footer class="text-center small text-muted mt-5 mb-2">
+    <p>Images: <a href="https://www.ipac.caltech.edu/2mass/gallery/messiercat.html" target="_blank">2MASS (NASA/IPAC)</a>.  
+    APOD via <a href="https://api.nasa.gov/" target="_blank">NASA Open API</a>.  
+    ISS passes via <a href="https://www.n2yo.com/api/" target="_blank">N2YO API</a>.</p>
+  </footer>
 
   <!-- Scripts -->
   <script src="messier.js"></script>
@@ -101,14 +126,12 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // GPS clock (UTC for now)
     function updateClock() {
       const now = new Date();
       document.getElementById('gps-clock').textContent = now.toUTCString();
     }
     setInterval(updateClock, 1000);
 
-    // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('Service Worker Registered'));
