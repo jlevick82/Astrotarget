@@ -1,4 +1,4 @@
-const caldwell = [
+const caldwellCatalog = [
   {name:"C1 – NGC 188 (Open Cluster)", ra:0.85, dec:85.3, mag:8.1, size:"15", type:"Open Cluster", img:"images/c1.jpg"},
   {name:"C2 – NGC 40 (Bow-Tie Nebula)", ra:0.23, dec:72.5, mag:10.7, size:"1", type:"Planetary Nebula", img:"images/c2.jpg"},
   {name:"C3 – NGC 4236 (Barred Spiral Galaxy)", ra:12.33, dec:69.5, mag:9.6, size:"21x7", type:"Galaxy", img:"images/c3.jpg"},
