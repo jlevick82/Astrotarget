@@ -2,7 +2,7 @@
 // AstroTarget v1.0 Main Script
 // ===========================
 
-// Combine catalogs
+// Merge catalogs
 let allCatalogs = [...messierCatalog, ...caldwellCatalog, ...brightNGCCatalog];
 
 // ===========================
@@ -48,7 +48,7 @@ function applyFilters() {
   const catalogFilter = document.getElementById('catalog-filter').value;
   if (catalogFilter !== 'all') {
     filtered = filtered.filter(obj =>
-      obj.id.toLowerCase().startsWith(catalogFilter[0]) // m, c, ngc
+      obj.id.toLowerCase().startsWith(catalogFilter[0]) // m, c, n
     );
   }
 
@@ -58,7 +58,7 @@ function applyFilters() {
     filtered = filtered.filter(obj => obj.mag <= magLimit);
   }
 
-  // Altitude filter (placeholder, real calc v1.1+)
+  // Altitude filter placeholder
   const altLimit = parseFloat(document.getElementById('altitude-filter').value);
   if (!isNaN(altLimit)) {
     console.warn("Altitude filter placeholder – needs real sky calc v1.1+");
@@ -86,6 +86,72 @@ function openFOVModal(image) {
 }
 
 // ===========================
+// APOD (NASA API)
+// ===========================
+async function loadAPOD() {
+  const apodBox = document.getElementById('apod-box');
+  apodBox.textContent = "Loading APOD...";
+
+  try {
+    const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY");
+    const data = await res.json();
+    apodBox.innerHTML = `
+      <h5>${data.title}</h5>
+      <img src="${data.url}" class="img-fluid mb-2" alt="APOD">
+      <p>${data.explanation}</p>
+    `;
+  } catch (err) {
+    console.error(err);
+    apodBox.textContent = "Failed to load APOD.";
+  }
+}
+
+// ===========================
+// ISS Passes (N2YO API)
+// ===========================
+async function loadISS() {
+  const issBox = document.getElementById('iss-box');
+  issBox.textContent = "Loading ISS transits...";
+
+  if (!navigator.geolocation) {
+    issBox.textContent = "Geolocation not supported.";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = pos.coords.latitude.toFixed(2);
+    const lon = pos.coords.longitude.toFixed(2);
+    const alt = 0; // assume sea level for now
+    const apiKey = "DEMO_KEY"; // 🔑 replace with your N2YO API key
+
+    try {
+      const url = `https://api.n2yo.com/rest/v1/satellite/visualpasses/25544/${lat}/${lon}/${alt}/2/300/&apiKey=${apiKey}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.passes || data.passes.length === 0) {
+        issBox.textContent = "No ISS transits in the next 48h.";
+        return;
+      }
+
+      issBox.innerHTML = data.passes.map(pass => `
+        <div class="card bg-secondary text-light p-2 mb-2">
+          <strong>${new Date(pass.startUTC * 1000).toUTCString()}</strong><br>
+          Duration: ${pass.duration} sec<br>
+          Max Elevation: ${pass.maxEl}°<br>
+          Mag: ${pass.mag}
+        </div>
+      `).join("");
+    } catch (err) {
+      console.error(err);
+      issBox.textContent = "Failed to load ISS data.";
+    }
+  }, () => {
+    issBox.textContent = "Location permission denied.";
+  });
+}
+
+// ===========================
 // Event Listeners
 // ===========================
 document.getElementById('catalog-filter').addEventListener('change', applyFilters);
@@ -94,26 +160,10 @@ document.getElementById('altitude-filter').addEventListener('input', applyFilter
 document.getElementById('search-box').addEventListener('input', applyFilters);
 
 // ===========================
-// Astronomy Picture of the Day
-// ===========================
-async function loadAPOD() {
-  try {
-    const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY");
-    const data = await res.json();
-    document.getElementById('apod').innerHTML = `
-      <h5>${data.title}</h5>
-      <img src="${data.url}" class="img-fluid mb-2" alt="APOD">
-      <p>${data.explanation}</p>
-    `;
-  } catch (err) {
-    document.getElementById('apod').textContent = "Failed to load APOD.";
-  }
-}
-
-// ===========================
 // Init
 // ===========================
 document.addEventListener('DOMContentLoaded', () => {
-  applyFilters(); // initial render
-  loadAPOD();
+  applyFilters();   // Catalogs tab
+  loadAPOD();       // APOD tab
+  loadISS();        // ISS tab
 });
