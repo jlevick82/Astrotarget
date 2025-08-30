@@ -4,139 +4,116 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AstroTarget v1.0</title>
-  <meta name="theme-color" content="#0b0b0b">
-  <link rel="manifest" href="manifest.json">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-dark text-light">
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-dark bg-black">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">🌌 AstroTarget v1.0</a>
-      <span id="gps-clock" class="text-info">Loading GPS time...</span>
+<body>
+  <header>
+    <h1>🌌 AstroTarget v1.0</h1>
+    <p>Select a catalog, search objects, or find tonight’s top picks.</p>
+    <div id="gpsClock">
+      <p>🕒 UTC: <span id="utcTime">--:--:--</span> | Local: <span id="localTime">--:--:--</span></p>
+      <p id="gpsLocation">📍 Location: --</p>
+      <button id="syncBtn">🔄 Sync Now</button>
     </div>
-  </nav>
+  </header>
 
-  <!-- Tabs -->
-  <ul class="nav nav-tabs nav-fill bg-dark border-bottom border-secondary">
-    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#catalogs">⭐ Catalogs</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#apod">🌠 APOD</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#iss">🛰 ISS</a></li>
-  </ul>
+  <!-- Top Bar -->
+  <section id="topBar">
+    <select id="catalogSelect">
+      <option value="Messier" selected>Messier</option>
+      <option value="Caldwell">Caldwell</option>
+      <option value="BrightNGC">Bright NGC</option>
+    </select>
+    <input type="text" id="searchBox" placeholder="🔍 Search objects...">
+    <button id="topTonightBtn">⭐ Top 5 Tonight</button>
+    <button id="apodBtn">📅 APOD</button>
+  </section>
 
-  <!-- Tab Content -->
-  <div class="tab-content p-3">
-
-    <!-- Catalogs Tab -->
-    <div class="tab-pane fade show active" id="catalogs">
-      <div class="container my-3">
-        <div class="row g-2">
-          <div class="col-md-2">
-            <select id="catalog-filter" class="form-select">
-              <option value="all">All Catalogs</option>
-              <option value="messier">Messier</option>
-              <option value="caldwell">Caldwell</option>
-              <option value="brightngc">Bright NGC</option>
-            </select>
-          </div>
-          <div class="col-md-2"><input id="magnitude-filter" type="number" class="form-control" placeholder="Max Mag"></div>
-          <div class="col-md-2"><input id="altitude-filter" type="number" class="form-control" placeholder="Min Alt (deg)"></div>
-          <div class="col-md-3"><input id="search-box" type="text" class="form-control" placeholder="Search by Name or ID"></div>
-          <div class="col-md-3">
-            <button class="btn btn-outline-info w-100" data-bs-toggle="collapse" data-bs-target="#scope-settings">⚙️ Scope Settings</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scope Settings -->
-      <div id="scope-settings" class="collapse container mb-3">
-        <div class="card card-body bg-secondary text-light">
-          <div class="row g-2">
-            <div class="col-md-3"><input id="aperture" type="number" class="form-control" placeholder="Aperture (mm)"></div>
-            <div class="col-md-3"><input id="focal-length" type="number" class="form-control" placeholder="Focal Length (mm)"></div>
-            <div class="col-md-3"><input id="reducer" type="number" step="0.1" class="form-control" placeholder="Reducer/Barlow"></div>
-            <div class="col-md-3"><input id="sensor" type="text" class="form-control" placeholder="Sensor WxH (mm)"></div>
-          </div>
-          <div class="mt-2">
-            <button class="btn btn-success" onclick="saveScopeSettings()">Apply</button>
-            <button class="btn btn-outline-warning ms-2" onclick="resetScopeSettings()">Reset</button>
-            <span id="scope-confirm" class="text-success ms-2"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Top 5 Tonight -->
-      <div class="container my-3">
-        <h5>🎯 Tonight’s Top 5</h5>
-        <div id="top-suggestions" class="row g-3"></div>
-      </div>
-
-      <!-- Results -->
-      <div class="container">
-        <h5>⭐ All Results</h5>
-        <div id="results" class="row g-3"></div>
-      </div>
+  <main>
+    <h2 id="catalogName">Messier</h2>
+    <div id="loadingSpinner" class="spinner hidden"></div>
+    <div id="emptyState" class="empty-state hidden">
+      <img src="images/full/placeholder.jpg" alt="No results">
+      <p>No objects found. Try adjusting filters or search terms.</p>
     </div>
+    <div id="results" class="results-grid"></div>
+  </main>
 
-    <!-- APOD Tab -->
-    <div class="tab-pane fade" id="apod">
-      <div class="container">
-        <h4>🌠 Astronomy Picture of the Day</h4>
-        <div id="apod-box" class="card bg-secondary text-light p-3">Loading...</div>
+  <!-- Modal -->
+  <div id="objectModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <span class="nav-btn left-btn">&#10094;</span>
+      <span class="nav-btn right-btn">&#10095;</span>
+      <span class="fullscreen-btn">&#x26F6;</span>
+      <img id="modalImage" src="" alt="">
+      <h2 id="modalTitle"></h2>
+      <div class="modal-stats">
+        <p id="modalType"></p>
+        <p id="modalMag"></p>
+        <p id="modalSize"></p>
       </div>
-    </div>
-
-    <!-- ISS Tab -->
-    <div class="tab-pane fade" id="iss">
-      <div class="container">
-        <h4>🛰 ISS Transit Planner</h4>
-        <div id="iss-box" class="card bg-secondary text-light p-3">Loading...</div>
-      </div>
+      <p id="modalDesc"></p>
     </div>
   </div>
 
-  <!-- FOV Modal -->
-  <div class="modal fade" id="fovModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content bg-dark text-light">
-        <div class="modal-header">
-          <h5 class="modal-title">🔭 FOV Preview</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body text-center">
-          <canvas id="fov-canvas" class="img-fluid"></canvas>
-        </div>
+  <!-- Settings -->
+  <section id="settings">
+    <h2>⚙️ Settings</h2>
+    <button id="toggleSettingsBtn">Show Advanced Settings ▼</button>
+    <div id="advancedSettings" class="hidden">
+      <label>
+        <input type="checkbox" id="cacheToggle">
+        Cache images for offline use
+      </label>
+      <p id="cacheStatus" class="status-text"></p>
+      <button id="clearCacheBtn">🗑️ Clear Cached Images</button>
+      <hr>
+      <label>
+        <input type="checkbox" id="redModeToggle">
+        Enable Red Light Mode
+      </label>
+      <hr>
+      <label for="altSlider">Minimum altitude for Top 5 Tonight: <span id="altValue">20°</span></label>
+      <input type="range" id="altSlider" min="0" max="60" step="5" value="20">
+      <hr>
+      <label>
+        <input type="checkbox" id="debugToggle">
+        Enable Debug Panel
+      </label>
+      <div id="debugPanel" class="debug hidden">
+        <button id="clearDebugBtn">🗑️ Clear Log</button>
+        <div id="debugMessages"></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Credits -->
-  <footer class="text-center small text-muted mt-5 mb-2">
-    <p>Messier images: <a href="https://www.ipac.caltech.edu/2mass/gallery/messiercat.html" target="_blank">2MASS (NASA/IPAC)</a>.  
-    APOD via <a href="https://api.nasa.gov/" target="_blank">NASA Open API</a>.  
-    ISS passes via <a href="https://www.n2yo.com/api/" target="_blank">N2YO API</a>.</p>
+  <!-- About -->
+  <section id="about">
+    <h2>ℹ️ About AstroTarget</h2>
+    <p><strong>Version:</strong> 1.0</p>
+    <p><strong>Credits:</strong> Messier, Caldwell, Bright NGC catalogs • NASA APOD • ISS Transit API</p>
+    <p><strong>Developer:</strong> AstroTarget Project</p>
+    <p>
+      <a href="https://github.com/jlevick82/Astrotarget" target="_blank">GitHub Repository</a>
+    </p>
+    <p>
+      <a href="https://apod.nasa.gov/apod/astropix.html" target="_blank">NASA APOD</a> |
+      <a href="https://spotthestation.nasa.gov" target="_blank">ISS Tracker</a>
+    </p>
+  </section>
+
+  <footer>
+    <p>🔭 AstroTarget v1.0 — Data from Messier, Caldwell, Bright NGC catalogs. Images © NASA/ESA/Hubble where credited.</p>
+    <p id="lastUpdated">Last updated: --</p>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Catalog Data -->
   <script src="messier.js"></script>
   <script src="caldwell.js"></script>
   <script src="brightngc.js"></script>
+
+  <!-- Main App Logic -->
   <script src="main.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('gps-clock').textContent = now.toUTCString();
-    }
-    setInterval(updateClock, 1000);
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker Registered'));
-    }
-  </script>
 </body>
 </html>
