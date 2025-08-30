@@ -1,4 +1,4 @@
-const brightngc = [
+const brightNGCCatalog = [
   {name:"NGC 104 – 47 Tucanae", ra:0.60, dec:-72.1, mag:4.0, size:"30", type:"Globular Cluster", img:"images/ngc104.jpg"},
   {name:"NGC 253 – Sculptor Galaxy (Silver Coin)", ra:0.88, dec:-25.3, mag:7.1, size:"25x7", type:"Galaxy", img:"images/ngc253.jpg"},
   {name:"NGC 288 – Globular Cluster in Sculptor", ra:0.90, dec:-26.6, mag:8.1, size:"13", type:"Globular Cluster", img:"images/ngc288.jpg"},
