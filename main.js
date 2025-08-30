@@ -1,6 +1,25 @@
 let allCatalogs = [...messierCatalog, ...caldwellCatalog, ...brightNGCCatalog];
 
-// Render Results
+// RA/Dec → Alt/Az
+function radecToAltAz(ra, dec, lat, lon, date) {
+  const rad = Math.PI / 180;
+  const raRad = ra * rad * 15; // RA hours → radians
+  const decRad = dec * rad;
+  const latRad = lat * rad;
+
+  // Julian date
+  const JD = (date.getTime() / 86400000) + 2440587.5;
+  const D = JD - 2451545.0;
+  const GMST = 18.697374558 + 24.06570982441908 * D;
+  const LST = (GMST + lon / 15) % 24;
+  const lstRad = LST * 15 * rad;
+
+  const HA = lstRad - raRad;
+  const sinAlt = Math.sin(decRad) * Math.sin(latRad) + Math.cos(decRad) * Math.cos(latRad) * Math.cos(HA);
+  return Math.asin(sinAlt) / rad; // degrees
+}
+
+// Results
 function renderResults(objects) {
   const results = document.getElementById('results');
   results.innerHTML = '';
@@ -13,7 +32,7 @@ function renderResults(objects) {
       <div class="col-md-4">
         <div class="card bg-secondary text-light h-100">
           <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
-               loading="lazy" onerror="this.src='images/placeholder.jpg';">
+               onerror="this.src='images/placeholder.jpg';">
           <div class="card-body">
             <h5 class="card-title">${obj.id} – ${obj.name}</h5>
             <p>${obj.type}<br>Mag: ${obj.mag} | Size: ${obj.size}</p>
@@ -114,20 +133,53 @@ function openFOVModal(image, id) {
 function renderTopSuggestions(list = allCatalogs) {
   const container = document.getElementById('top-suggestions');
   container.innerHTML = "";
-  let ranked = [...list];
-  ranked.sort((a, b) => a.mag - b.mag);
-  ranked.slice(0, 5).forEach(obj => {
-    container.innerHTML += `
-      <div class="col-md-4">
-        <div class="card bg-dark text-light h-100 border border-info">
-          <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
-               onerror="this.src='images/placeholder.jpg';">
-          <div class="card-body">
-            <h6>${obj.id} – ${obj.name}</h6>
-            <p>${obj.type}<br>Mag: ${obj.mag}</p>
+
+  if (!navigator.geolocation) {
+    container.innerHTML = "<p class='text-warning'>Location not available. Showing brightest only.</p>";
+    list.sort((a, b) => a.mag - b.mag).slice(0, 5).forEach(obj => {
+      container.innerHTML += `
+        <div class="col-md-4">
+          <div class="card bg-dark text-light h-100 border border-info">
+            <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
+                 onerror="this.src='images/placeholder.jpg';">
+            <div class="card-body"><h6>${obj.id} – ${obj.name}</h6><p>${obj.type}<br>Mag: ${obj.mag}</p></div>
           </div>
-        </div>
-      </div>`;
+        </div>`;
+    });
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const now = new Date();
+
+    let ranked = list.map(obj => {
+      if (!obj.ra || !obj.dec) return { ...obj, alt: -90 };
+      let alt = radecToAltAz(obj.ra, obj.dec, lat, lon, now);
+      return { ...obj, alt };
+    });
+
+    ranked = ranked.filter(o => o.alt > 30);
+    ranked.sort((a, b) => (a.mag - b.mag) || (b.alt - a.alt));
+
+    ranked.slice(0, 5).forEach(obj => {
+      container.innerHTML += `
+        <div class="col-md-4">
+          <div class="card bg-dark text-light h-100 border border-info">
+            <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
+                 onerror="this.src='images/placeholder.jpg';">
+            <div class="card-body">
+              <h6>${obj.id} – ${obj.name}</h6>
+              <p>${obj.type}<br>Mag: ${obj.mag}<br>Alt: ${obj.alt.toFixed(1)}°</p>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    if (ranked.length === 0) {
+      container.innerHTML = "<p class='text-muted'>No targets above 30° right now.</p>";
+    }
   });
 }
 
@@ -139,8 +191,7 @@ async function loadAPOD() {
     const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=WJVm2WSCEtWe2Reb4kqDOB69tp5fcy3Z86ZthcS3");
     const data = await res.json();
     apodBox.innerHTML = `<h5>${data.title}</h5>
-      <img src="${data.url}" class="img-fluid mb-2" alt="APOD">
-      <p>${data.explanation}</p>`;
+      <img src="${data.url}" class="img-fluid mb-2" alt="APOD"><p>${data.explanation}</p>`;
   } catch (err) {
     console.error(err);
     apodBox.textContent = "Failed to load APOD.";
@@ -159,7 +210,7 @@ async function loadISS() {
     const lat = pos.coords.latitude.toFixed(2);
     const lon = pos.coords.longitude.toFixed(2);
     const alt = 0;
-    const apiKey = "YOUR_N2YO_KEY"; // replace with your real key
+    const apiKey = "YOUR_N2YO_KEY";
     try {
       const url = `https://api.n2yo.com/rest/v1/satellite/visualpasses/25544/${lat}/${lon}/${alt}/2/300/&apiKey=${apiKey}`;
       const res = await fetch(url);
@@ -169,27 +220,3 @@ async function loadISS() {
         return;
       }
       issBox.innerHTML = data.passes.map(pass => `
-        <div class="card bg-secondary text-light p-2 mb-2">
-          <strong>${new Date(pass.startUTC * 1000).toUTCString()}</strong><br>
-          Duration: ${pass.duration} sec<br>
-          Max Elevation: ${pass.maxEl}°<br>
-          Mag: ${pass.mag}
-        </div>`).join("");
-    } catch (err) {
-      console.error(err);
-      issBox.textContent = "Failed to load ISS data.";
-    }
-  }, () => { issBox.textContent = "Location permission denied."; });
-}
-
-// Init
-document.addEventListener('DOMContentLoaded', () => {
-  loadScopeSettings();
-  applyFilters();
-  loadAPOD();
-  loadISS();
-});
-document.getElementById('catalog-filter').addEventListener('change', applyFilters);
-document.getElementById('magnitude-filter').addEventListener('input', applyFilters);
-document.getElementById('altitude-filter').addEventListener('input', applyFilters);
-document.getElementById('search-box').addEventListener('input', applyFilters);
