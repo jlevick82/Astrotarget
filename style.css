@@ -1,0 +1,68 @@
+/* ===========================
+   AstroTarget v1.0 Styles
+   =========================== */
+
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  background-color: #0b0b0b;
+  color: #f5f5f5;
+}
+
+.navbar {
+  border-bottom: 1px solid #222;
+}
+
+/* GPS clock */
+#gps-clock {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+/* Thumbnails */
+.thumb {
+  max-height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #333;
+}
+
+/* Buttons */
+.btn-outline-light {
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+/* Modal */
+.modal-content {
+  border: 1px solid #444;
+}
+#fov-image {
+  max-height: 80vh;
+  object-fit: contain;
+  border: 1px solid #555;
+  border-radius: 6px;
+}
+
+/* APOD */
+#apod img {
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* Results grid spacing */
+#results .col-md-4 {
+  display: flex;
+}
+.card.h-100 {
+  flex: 1;
+}
