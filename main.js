@@ -1,6 +1,6 @@
 let allCatalogs = [...messierCatalog, ...caldwellCatalog, ...brightNGCCatalog];
 
-// Results
+// Render Results
 function renderResults(objects) {
   const results = document.getElementById('results');
   results.innerHTML = '';
@@ -9,19 +9,18 @@ function renderResults(objects) {
     return;
   }
   objects.forEach(obj => {
-    const col = document.createElement('div');
-    col.className = 'col-md-4';
-    col.innerHTML = `
-      <div class="card bg-secondary text-light h-100">
-        <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
-             loading="lazy" onerror="this.src='images/placeholder.jpg';">
-        <div class="card-body">
-          <h5 class="card-title">${obj.id} – ${obj.name}</h5>
-          <p class="card-text">${obj.type}<br>Mag: ${obj.mag} | Size: ${obj.size}</p>
-          <button class="btn btn-outline-light btn-sm" onclick="openFOVModal('${obj.image}', '${obj.id}')">🔭 FOV Preview</button>
+    results.innerHTML += `
+      <div class="col-md-4">
+        <div class="card bg-secondary text-light h-100">
+          <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
+               loading="lazy" onerror="this.src='images/placeholder.jpg';">
+          <div class="card-body">
+            <h5 class="card-title">${obj.id} – ${obj.name}</h5>
+            <p>${obj.type}<br>Mag: ${obj.mag} | Size: ${obj.size}</p>
+            <button class="btn btn-outline-light btn-sm" onclick="openFOVModal('${obj.image}', '${obj.id}')">🔭 FOV Preview</button>
+          </div>
         </div>
       </div>`;
-    results.appendChild(col);
   });
 }
 
@@ -34,8 +33,6 @@ function applyFilters() {
   }
   const magLimit = parseFloat(document.getElementById('magnitude-filter').value);
   if (!isNaN(magLimit)) filtered = filtered.filter(obj => obj.mag <= magLimit);
-  const altLimit = parseFloat(document.getElementById('altitude-filter').value);
-  if (!isNaN(altLimit)) console.warn("Altitude filter placeholder – sky math coming v1.1+");
   const searchTerm = document.getElementById('search-box').value.toLowerCase();
   if (searchTerm) {
     filtered = filtered.filter(obj =>
@@ -43,6 +40,7 @@ function applyFilters() {
       obj.name.toLowerCase().includes(searchTerm));
   }
   renderResults(filtered);
+  renderTopSuggestions(filtered);
 }
 
 // Scope settings
@@ -93,13 +91,15 @@ function openFOVModal(image, id) {
         const focal = parseFloat(saved.focalLength) * parseFloat(saved.reducer || 1);
         const fovX = (57.3 * sensorW) / focal;
         const fovY = (57.3 * sensorH) / focal;
+        const scaleX = canvas.width * (fovX / 5);
+        const scaleY = canvas.height * (fovY / 5);
         ctx.strokeStyle = "red";
         ctx.lineWidth = 3;
         ctx.strokeRect(
-          canvas.width / 2 - (fovX * 10),
-          canvas.height / 2 - (fovY * 10),
-          fovX * 20,
-          fovY * 20
+          canvas.width / 2 - scaleX / 2,
+          canvas.height / 2 - scaleY / 2,
+          scaleX,
+          scaleY
         );
         ctx.fillStyle = "yellow";
         ctx.font = "20px Arial";
@@ -110,25 +110,24 @@ function openFOVModal(image, id) {
   new bootstrap.Modal(document.getElementById('fovModal')).show();
 }
 
-// Top Suggestions
-function renderTopSuggestions() {
+// Top 5 Tonight
+function renderTopSuggestions(list = allCatalogs) {
   const container = document.getElementById('top-suggestions');
   container.innerHTML = "";
-  let ranked = [...allCatalogs];
+  let ranked = [...list];
   ranked.sort((a, b) => a.mag - b.mag);
-  let top = ranked.slice(0, 6);
-  top.forEach(obj => {
-    const col = document.createElement('div');
-    col.className = 'col-md-4';
-    col.innerHTML = `
-      <div class="card bg-dark text-light h-100 border border-info">
-        <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}" onerror="this.src='images/placeholder.jpg';">
-        <div class="card-body">
-          <h6>${obj.id} – ${obj.name}</h6>
-          <p>${obj.type}<br>Mag: ${obj.mag}</p>
+  ranked.slice(0, 5).forEach(obj => {
+    container.innerHTML += `
+      <div class="col-md-4">
+        <div class="card bg-dark text-light h-100 border border-info">
+          <img src="${obj.image}" class="thumb card-img-top" alt="${obj.name}"
+               onerror="this.src='images/placeholder.jpg';">
+          <div class="card-body">
+            <h6>${obj.id} – ${obj.name}</h6>
+            <p>${obj.type}<br>Mag: ${obj.mag}</p>
+          </div>
         </div>
       </div>`;
-    container.appendChild(col);
   });
 }
 
@@ -148,7 +147,7 @@ async function loadAPOD() {
   }
 }
 
-// ISS (N2YO API)
+// ISS
 async function loadISS() {
   const issBox = document.getElementById('iss-box');
   issBox.textContent = "Loading ISS transits...";
@@ -160,7 +159,7 @@ async function loadISS() {
     const lat = pos.coords.latitude.toFixed(2);
     const lon = pos.coords.longitude.toFixed(2);
     const alt = 0;
-    const apiKey = "DEMO_KEY"; // replace with your N2YO key
+    const apiKey = "YOUR_N2YO_KEY"; // replace with your real key
     try {
       const url = `https://api.n2yo.com/rest/v1/satellite/visualpasses/25544/${lat}/${lon}/${alt}/2/300/&apiKey=${apiKey}`;
       const res = await fetch(url);
@@ -184,14 +183,13 @@ async function loadISS() {
 }
 
 // Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadScopeSettings();
+  applyFilters();
+  loadAPOD();
+  loadISS();
+});
 document.getElementById('catalog-filter').addEventListener('change', applyFilters);
 document.getElementById('magnitude-filter').addEventListener('input', applyFilters);
 document.getElementById('altitude-filter').addEventListener('input', applyFilters);
 document.getElementById('search-box').addEventListener('input', applyFilters);
-document.addEventListener('DOMContentLoaded', () => {
-  loadScopeSettings();
-  applyFilters();
-  renderTopSuggestions();
-  loadAPOD();
-  loadISS();
-});
