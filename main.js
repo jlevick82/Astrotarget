@@ -93,7 +93,7 @@ async function loadAPOD() {
   apodBox.textContent = "Loading APOD...";
 
   try {
-    const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY");
+const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=WJVm2WSCEtWe2Reb4kqDOB69tp5fcy3Z86ZthcS3");
     const data = await res.json();
     apodBox.innerHTML = `
       <h5>${data.title}</h5>
