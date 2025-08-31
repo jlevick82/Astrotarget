@@ -1,26 +1,27 @@
 // === AstroTarget v1.0 Main Logic ===
+const VERSION = "v1.0";
 
-// Combine catalogs (ensure each file defines messierCatalog, caldwellCatalog, brightNGCCatalog)
+// Combine catalogs
 const catalogs = {
   Messier: typeof messierCatalog !== "undefined" ? messierCatalog : [],
   Caldwell: typeof caldwellCatalog !== "undefined" ? caldwellCatalog : [],
   BrightNGC: typeof brightNGCCatalog !== "undefined" ? brightNGCCatalog : []
 };
 
-let selectedCatalog = "Messier";
+let selectedCatalog = localStorage.getItem("lastCatalog") || "Messier";
 let currentResults = [];
 let currentIndex = 0;
 let debugEnabled = false;
 let minAltitude = 20;
 
-// Scope defaults (restored from localStorage if set)
+// Scope defaults
 let scope = JSON.parse(localStorage.getItem("scope")) || {
   focalLength: 400,
   sensorWidth: 11,
   sensorHeight: 11
 };
 
-// === RA/Dec → Alt/Az conversion (J2000) ===
+// RA/Dec → Alt/Az
 function raDecToAltAz(raHours, decDeg, latDeg, lonDeg, date) {
   let raDeg = raHours * 15;
   let latRad = (latDeg * Math.PI) / 180;
@@ -28,11 +29,9 @@ function raDecToAltAz(raHours, decDeg, latDeg, lonDeg, date) {
 
   const JD = (date / 86400000) + 2440587.5;
   const d = JD - 2451545.0;
-
   let GMST = 280.46061837 + 360.98564736629 * d;
   let LST = (GMST + lonDeg) % 360;
   if (LST < 0) LST += 360;
-
   let H = (LST - raDeg) * (Math.PI / 180);
 
   let alt = Math.asin(
@@ -43,14 +42,10 @@ function raDecToAltAz(raHours, decDeg, latDeg, lonDeg, date) {
     -Math.sin(H),
     Math.tan(decRad) * Math.cos(latRad) - Math.sin(latRad) * Math.cos(H)
   );
-
-  return {
-    alt: (alt * 180) / Math.PI,
-    az: ((az * 180) / Math.PI + 360) % 360
-  };
+  return { alt: (alt * 180) / Math.PI, az: ((az * 180) / Math.PI + 360) % 360 };
 }
 
-// === Debug Logger ===
+// Debug
 function logDebug(msg) {
   console.log(msg);
   if (debugEnabled) {
@@ -62,14 +57,13 @@ function logDebug(msg) {
   }
 }
 
-// === Timestamp ===
+// Timestamp
 function updateTimestamp() {
-  const now = new Date();
   document.getElementById("lastUpdated").innerText =
-    "Last updated: " + now.toLocaleString();
+    "Last updated: " + new Date().toLocaleString();
 }
 
-// === Spinner + Empty State ===
+// Spinner
 function showSpinner() {
   document.getElementById("loadingSpinner").classList.remove("hidden");
   document.getElementById("emptyState").classList.add("hidden");
@@ -83,7 +77,7 @@ function showEmptyState() {
   document.getElementById("emptyState").classList.remove("hidden");
 }
 
-// === Render Results ===
+// Render results
 function renderResults(results) {
   hideSpinner();
   let container = document.getElementById("results");
@@ -98,12 +92,7 @@ function renderResults(results) {
   results.forEach((obj, i) => {
     let card = document.createElement("div");
     card.className = "result-card";
-    card.style.position = "relative";
-    let imgSrc =
-      obj.image && obj.image.length > 0
-        ? obj.image
-        : "images/full/placeholder.jpg";
-
+    let imgSrc = obj.image && obj.image.length > 0 ? obj.image : "images/full/placeholder.jpg";
     let fovX = (57.3 * scope.sensorWidth / scope.focalLength).toFixed(2);
     let fovY = (57.3 * scope.sensorHeight / scope.focalLength).toFixed(2);
 
@@ -114,195 +103,100 @@ function renderResults(results) {
       <p><strong>Mag:</strong> ${obj.mag}</p>
       <p><strong>Size:</strong> ${obj.size}</p>
       <p><strong>Scope FOV:</strong> ${fovX}° × ${fovY}°</p>
-      <p>${obj.desc}</p>
-    `;
-
+      <p>${obj.desc}</p>`;
     if (obj.topPick) card.classList.add("top-pick");
     card.addEventListener("click", () => openModal(i, results));
     container.appendChild(card);
   });
-}
-
-// === Modal ===
+// Modal
 function openModal(index, results) {
   currentIndex = index;
   let obj = results[index];
-  let imgSrc =
-    obj.image && obj.image.length > 0
-      ? obj.image
-      : "images/full/placeholder.jpg";
-
+  let imgSrc = obj.image && obj.image.length > 0 ? obj.image : "images/full/placeholder.jpg";
   document.getElementById("modalImage").src = imgSrc;
   document.getElementById("modalTitle").innerText = `${obj.id} — ${obj.name}`;
   document.getElementById("modalType").innerText = `Type: ${obj.type}`;
   document.getElementById("modalMag").innerText = `Magnitude: ${obj.mag}`;
   document.getElementById("modalSize").innerText = `Size: ${obj.size}`;
   document.getElementById("modalDesc").innerText = obj.desc;
-
   document.getElementById("objectModal").style.display = "flex";
 }
-function showNext() {
-  currentIndex = (currentIndex + 1) % currentResults.length;
-  openModal(currentIndex, currentResults);
-}
-function showPrev() {
-  currentIndex =
-    (currentIndex - 1 + currentResults.length) % currentResults.length;
-  openModal(currentIndex, currentResults);
-}
+function showNext() { currentIndex = (currentIndex + 1) % currentResults.length; openModal(currentIndex, currentResults); }
+function showPrev() { currentIndex = (currentIndex - 1 + currentResults.length) % currentResults.length; openModal(currentIndex, currentResults); }
 
-// === Catalog Handling ===
+// Catalogs
 function setCatalog(name) {
   selectedCatalog = name;
+  localStorage.setItem("lastCatalog", name);
   document.getElementById("catalogName").innerText = name;
   showSpinner();
   setTimeout(() => {
-    if (name === "All") {
-      let combined = [];
-      Object.values(catalogs).forEach(cat => (combined = combined.concat(cat)));
-      renderResults(combined);
-      updateTimestamp();
-      trackUsage("All Catalogs");
-      return;
-    }
-    renderResults(catalogs[name]);
+    let list = (name === "All") ? [].concat(...Object.values(catalogs)) : catalogs[name];
+    renderResults(list);
     updateTimestamp();
-    trackUsage("Catalog Switch");
+    trackUsage(name);
   }, 300);
 }
 
-// === Search ===
+// Search
 function searchObjects(query) {
   showSpinner();
   let q = query.toLowerCase();
   let results = [];
   Object.keys(catalogs).forEach(cat => {
-    results = results.concat(
-      catalogs[cat].filter(
-        obj =>
-          obj.id.toLowerCase().includes(q) ||
-          obj.name.toLowerCase().includes(q)
-      )
-    );
+    results = results.concat(catalogs[cat].filter(
+      obj => obj.id.toLowerCase().includes(q) || obj.name.toLowerCase().includes(q)
+    ));
   });
-  setTimeout(() => {
-    renderResults(results);
-    updateTimestamp();
-    trackUsage("Search");
-  }, 300);
+  setTimeout(() => { renderResults(results); updateTimestamp(); trackUsage("Search"); }, 300);
 }
 
-// === Top 5 Tonight ===
+// Top 5 Tonight
 function top5Tonight() {
   showSpinner();
   getUserLocation((lat, lon, alt) => {
-    let now = new Date();
-    let visible = [];
-    let all =
-      selectedCatalog === "All"
-        ? [].concat(...Object.values(catalogs))
-        : catalogs[selectedCatalog];
-
-    if (lat === 0 && lon === 0) {
-      logDebug("⚠️ Using default location (0°,0°). Results may be inaccurate.");
-      document.getElementById("results").innerHTML =
-        `<p>⚠️ Using default location (0°,0°). Results may be inaccurate.</p>`;
-    }
-
+    let now = new Date(), visible = [];
+    let all = selectedCatalog === "All" ? [].concat(...Object.values(catalogs)) : catalogs[selectedCatalog];
     try {
       all.forEach(obj => {
         let pos = raDecToAltAz(obj.ra, obj.dec, lat, lon, now);
         if (pos.alt > minAltitude) visible.push({ ...obj, alt: pos.alt });
       });
       visible.sort((a, b) => b.alt - a.alt);
-      setTimeout(() => {
-        renderResults(
-          visible.slice(0, 5).map(o => ({ ...o, topPick: true }))
-        );
-        updateTimestamp();
-        trackUsage("Top 5 Tonight");
-      }, 500);
+      renderResults(visible.slice(0, 5).map(o => ({ ...o, topPick: true })));
     } catch (err) {
-      logDebug("❌ Error calculating Top 5 Tonight: " + err.message);
-      document.getElementById("results").innerHTML =
-        `<p>⚠️ Unable to calculate Top 5 Tonight. Try again later.</p>`;
+      logDebug("❌ Top 5 error: " + err.message);
     }
+    updateTimestamp();
   });
 }
 
-// === GPS + Clock ===
+// GPS
 function getUserLocation(callback) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        callback(
-          pos.coords.latitude,
-          pos.coords.longitude,
-          pos.coords.altitude // may be null
-        );
-      },
-      err => {
-        logDebug("❌ Geolocation error: " + err.message);
-        document.getElementById("gpsLocation").innerText =
-          "📍 Location unavailable (using default 0°, 0°)";
-        callback(0, 0, null);
-      }
+      pos => callback(pos.coords.latitude, pos.coords.longitude, pos.coords.altitude),
+      err => { logDebug("❌ GPS error: " + err.message); callback(0, 0, null); }
     );
-  } else {
-    logDebug("❌ Geolocation not supported by this browser.");
-    document.getElementById("gpsLocation").innerText =
-      "📍 GPS not supported (using default 0°, 0°)";
-    callback(0, 0, null);
-  }
+  } else callback(0, 0, null);
 }
 function updateClock(lat, lon, alt = null) {
-  const now = new Date();
-  document.getElementById("utcTime").innerText =
-    now.toUTCString().split(" ")[4];
+  let now = new Date();
+  document.getElementById("utcTime").innerText = now.toUTCString().split(" ")[4];
   document.getElementById("localTime").innerText = now.toLocaleTimeString();
-
-  let locationText;
-  if (lat && lon && (lat !== 0 || lon !== 0)) {
-    locationText = `📍 Location: ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
-    if (alt !== null) {
-      locationText += ` (Elevation: ${alt.toFixed(0)} m)`;
-    } else {
-      locationText += ` (Elevation: unavailable)`;
-    }
-  } else {
-    locationText = "📍 Location unavailable (using default 0°, 0°)";
-  }
-
-  document.getElementById("gpsLocation").innerText = locationText;
+  document.getElementById("gpsLocation").innerText =
+    (lat || lon) ? `📍 ${lat.toFixed(2)}°, ${lon.toFixed(2)}° (Elev: ${alt ? alt.toFixed(0) + "m" : "?"})`
+                 : "📍 Location unavailable";
 }
 
-// === Scope Settings ===
-function updateScope() {
-  const f = parseFloat(document.getElementById("scopeFocal").value);
-  const w = parseFloat(document.getElementById("sensorWidth").value);
-  const h = parseFloat(document.getElementById("sensorHeight").value);
-  if (!isNaN(f) && !isNaN(w) && !isNaN(h)) {
-    scope = { focalLength: f, sensorWidth: w, sensorHeight: h };
-    localStorage.setItem("scope", JSON.stringify(scope));
-    alert("🔭 Scope settings updated!");
-  }
-}
-
-// === APOD Fetch ===
+// APOD
 async function fetchAPOD() {
-  logDebug("🌌 Fetching APOD...");
-  const apodSection = document.getElementById("apodSection");
   const apodContent = document.getElementById("apodContent");
-  apodSection.classList.remove("hidden");
-  apodContent.innerHTML = "<p>Loading APOD...</p>";
-
+  apodContent.innerHTML = "<p>Loading...</p>";
   try {
-    const res = await fetch(
-      "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY"
-    );
-    if (!res.ok) throw new Error("APOD fetch failed: " + res.status);
+    const res = await fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY");
+    if (!res.ok) throw new Error("Fetch failed");
     const data = await res.json();
-
     apodContent.innerHTML = `
       <h3>${data.title}</h3>
       <p>${data.date}</p>
@@ -310,92 +204,65 @@ async function fetchAPOD() {
         ? `<img src="${data.url}" alt="${data.title}" style="max-width:100%;border-radius:6px;">`
         : `<iframe src="${data.url}" width="100%" height="400"></iframe>`}
       <p>${data.explanation}</p>
-      <p><em>© ${data.copyright || "NASA"}</em></p>
-    `;
+      <p><em>© ${data.copyright || "NASA"}</em></p>`;
     trackUsage("APOD");
   } catch (err) {
     logDebug("❌ APOD error: " + err.message);
     apodContent.innerHTML =
-      "<p>⚠️ Failed to load APOD. Please try again later.</p>";
+      "<p>⚠️ APOD unavailable. Try again later or use your own API key.</p>";
   }
 }
 
-// === Usage Tracking ===
+// Usage stats
 function trackUsage(feature) {
   let stats = JSON.parse(localStorage.getItem("usageStats")) || {};
   stats[feature] = (stats[feature] || 0) + 1;
   localStorage.setItem("usageStats", JSON.stringify(stats));
-  logDebug(`📊 Usage tracked: ${feature}`);
 }
 
-// === Init ===
+// Init
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("catalogSelect")
-    .addEventListener("change", e => setCatalog(e.target.value));
-  document.getElementById("searchBox")
-    .addEventListener("input", e => searchObjects(e.target.value));
-  document.getElementById("topTonightBtn")
-    .addEventListener("click", top5Tonight);
-  document.getElementById("apodBtn")
-    .addEventListener("click", fetchAPOD);
+  // Version
+  document.getElementById("appVersion").innerText = VERSION;
+  document.getElementById("footerVersion").innerText = VERSION;
 
-  const modal = document.getElementById("objectModal");
-  const closeBtn = document.querySelector(".close-btn");
-  const leftBtn = document.querySelector(".left-btn");
-  const rightBtn = document.querySelector(".right-btn");
-  const fullscreenBtn = document.querySelector(".fullscreen-btn");
-  const modalImage = document.getElementById("modalImage");
+  // Catalog + Search
+  document.getElementById("catalogSelect").value = selectedCatalog;
+  document.getElementById("catalogSelect").addEventListener("change", e => setCatalog(e.target.value));
+  document.getElementById("searchBox").addEventListener("input", e => searchObjects(e.target.value));
+  document.getElementById("topTonightBtn").addEventListener("click", top5Tonight);
+  document.getElementById("apodBtn").addEventListener("click", fetchAPOD);
 
-  closeBtn.onclick = () => (modal.style.display = "none");
-  leftBtn.onclick = () => showPrev();
-  rightBtn.onclick = () => showNext();
-  fullscreenBtn.onclick = () => {
-    if (modalImage.requestFullscreen) modalImage.requestFullscreen();
-    else if (modalImage.webkitRequestFullscreen)
-      modalImage.webkitRequestFullscreen();
-  };
-  window.onclick = e => {
-    if (e.target === modal) modal.style.display = "none";
-  };
-
-  // Keyboard + Swipe Nav
-  window.addEventListener("keydown", e => {
-    if (modal.style.display === "flex") {
-      if (e.key === "ArrowRight") showNext();
-      else if (e.key === "ArrowLeft") showPrev();
-      else if (e.key === "Escape") modal.style.display = "none";
-    }
-  });
-  let touchStartX = 0, touchEndX = 0;
-  modal.addEventListener("touchstart", e => (touchStartX = e.changedTouches[0].screenX));
-  modal.addEventListener("touchend", e => {
-    touchEndX = e.changedTouches[0].screenX;
-    if (Math.abs(touchEndX - touchStartX) > 50) {
-      touchEndX > touchStartX ? showPrev() : showNext();
+  // Scope
+  document.getElementById("scopeFocal").value = scope.focalLength;
+  document.getElementById("sensorWidth").value = scope.sensorWidth;
+  document.getElementById("sensorHeight").value = scope.sensorHeight;
+  document.getElementById("saveScopeBtn").addEventListener("click", () => {
+    const f = parseFloat(document.getElementById("scopeFocal").value);
+    const w = parseFloat(document.getElementById("sensorWidth").value);
+    const h = parseFloat(document.getElementById("sensorHeight").value);
+    if (!isNaN(f) && !isNaN(w) && !isNaN(h)) {
+      scope = { focalLength: f, sensorWidth: w, sensorHeight: h };
+      localStorage.setItem("scope", JSON.stringify(scope));
+      alert("🔭 Scope settings updated!");
     }
   });
 
-  // GPS Clock
-  setInterval(() => {
-    updateClock(window.userLat, window.userLon, window.userAlt);
-  }, 1000);
+  // GPS clock
+  setInterval(() => updateClock(window.userLat, window.userLon, window.userAlt), 1000);
   getUserLocation((lat, lon, alt) => {
-    window.userLat = lat;
-    window.userLon = lon;
-    window.userAlt = alt;
+    window.userLat = lat; window.userLon = lon; window.userAlt = alt;
     updateClock(lat, lon, alt);
   });
   document.getElementById("syncBtn").addEventListener("click", () =>
     getUserLocation((lat, lon, alt) => {
-      window.userLat = lat;
-      window.userLon = lon;
-      window.userAlt = alt;
+      window.userLat = lat; window.userLon = lon; window.userAlt = alt;
       updateClock(lat, lon, alt);
-      alert("✅ Location synced successfully.");
+      alert("✅ Location synced.");
     })
   );
 
-  // Toggle Advanced Settings
+  // Advanced settings
   const toggleSettingsBtn = document.getElementById("toggleSettingsBtn");
   const advancedSettings = document.getElementById("advancedSettings");
   toggleSettingsBtn.addEventListener("click", () => {
@@ -405,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Hide Advanced Settings ▲";
   });
 
-  // Cache Settings
+  // Cache settings
   const cacheToggle = document.getElementById("cacheToggle");
   const cacheStatus = document.getElementById("cacheStatus");
   const clearCacheBtn = document.getElementById("clearCacheBtn");
@@ -415,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cacheStatus.className = "status-text cached";
       clearCacheBtn.classList.remove("hidden");
     } else {
-      cacheStatus.innerText = "🌐 Online-only mode (images load when needed)";
+      cacheStatus.innerText = "🌐 Online-only (images load when needed)";
       cacheStatus.className = "status-text online-only";
       clearCacheBtn.classList.add("hidden");
     }
@@ -434,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Red Mode
+  // Red mode
   const redModeToggle = document.getElementById("redModeToggle");
   let redModeEnabled = localStorage.getItem("redMode") === "true";
   if (redModeEnabled) document.body.classList.add("red-mode");
@@ -449,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Altitude Slider
+  // Altitude slider
   const altSlider = document.getElementById("altSlider");
   const altValue = document.getElementById("altValue");
   minAltitude = localStorage.getItem("minAltitude") || 20;
@@ -461,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("minAltitude", minAltitude);
   });
 
-  // Debug Panel
+  // Debug
   const debugToggle = document.getElementById("debugToggle");
   const debugPanel = document.getElementById("debugPanel");
   const clearDebugBtn = document.getElementById("clearDebugBtn");
@@ -483,7 +350,8 @@ document.addEventListener("DOMContentLoaded", () => {
     logDebug("🗑️ Debug log cleared");
   });
 
-  // Init first catalog
-  setCatalog("Messier");
+  // Init
+  setCatalog(selectedCatalog);
 });
 
+}
