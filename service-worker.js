@@ -2,14 +2,13 @@
 
 const CACHE_NAME = "astro-cache-v1";
 const CORE_ASSETS = [
-  "/",
-  "/index.html",
-  "/styles.css",
-  "/main.js",
-  "/messier.js",
-  "/caldwell.js",
-  "/brightngc.js",
-  "/images/full/placeholder.jpg"
+  "index.html",
+  "styles.css",
+  "main.js",
+  "messier.js",
+  "caldwell.js",
+  "brightngc.js",
+  "images/full/placeholder.jpg"
 ];
 
 // Install → cache core files
@@ -45,11 +44,11 @@ self.addEventListener("fetch", e => {
       if (response) return response;
 
       return fetch(e.request).then(fetchRes => {
-        // Check user preference for caching images
+        // Cache images separately
         if (e.request.url.includes("/images/full/")) {
           return handleImageCache(e.request, fetchRes);
         } else {
-          // Always cache core non-image requests
+          // Cache non-image assets
           return caches.open(CACHE_NAME).then(cache => {
             cache.put(e.request, fetchRes.clone());
             return fetchRes;
@@ -59,15 +58,14 @@ self.addEventListener("fetch", e => {
         console.warn("❌ Fetch failed:", e.request.url, err);
         // If image fails → serve placeholder
         if (e.request.url.includes("/images/full/")) {
-          return caches.match("/images/full/placeholder.jpg");
+          return caches.match("images/full/placeholder.jpg");
         }
       });
     })
   );
 });
 
-// Image caching behavior depends on toggle (stored in localStorage? nope, not available here)
-// Instead → use a custom header or rely on always caching images after fetch
+// Image caching behavior
 async function handleImageCache(request, fetchRes) {
   try {
     const cache = await caches.open(CACHE_NAME);

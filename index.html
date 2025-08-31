@@ -23,6 +23,7 @@
       <option value="Messier" selected>Messier</option>
       <option value="Caldwell">Caldwell</option>
       <option value="BrightNGC">Bright NGC</option>
+      <option value="All">All Catalogs</option>
     </select>
     <input type="text" id="searchBox" placeholder="🔍 Search objects...">
     <button id="topTonightBtn">⭐ Top 5 Tonight</button>
@@ -37,6 +38,12 @@
       <p>No objects found. Try adjusting filters or search terms.</p>
     </div>
     <div id="results" class="results-grid"></div>
+
+    <!-- APOD Section -->
+    <section id="apodSection" class="hidden">
+      <h2>📅 Astronomy Picture of the Day</h2>
+      <div id="apodContent"></div>
+    </section>
   </main>
 
   <!-- Modal -->
@@ -76,6 +83,12 @@
       <hr>
       <label for="altSlider">Minimum altitude for Top 5 Tonight: <span id="altValue">20°</span></label>
       <input type="range" id="altSlider" min="0" max="60" step="5" value="20">
+      <hr>
+      <h3>🔭 Scope Settings</h3>
+      <label>Focal Length (mm): <input type="number" id="scopeFocal" value="400"></label><br>
+      <label>Sensor Width (mm): <input type="number" id="sensorWidth" value="11"></label><br>
+      <label>Sensor Height (mm): <input type="number" id="sensorHeight" value="11"></label><br>
+      <button onclick="updateScope()">Save Scope Settings</button>
       <hr>
       <label>
         <input type="checkbox" id="debugToggle">
