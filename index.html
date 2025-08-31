@@ -8,8 +8,8 @@
 </head>
 <body>
   <header>
-    <h1>🌌 AstroTarget v1.0</h1>
-    <p>Select a catalog, search objects, or find tonight’s top picks.</p>
+    <h1>🌌 AstroTarget <span id="appVersion"></span></h1>
+    <p>Select a catalog, adjust your scope, and find tonight’s best targets.</p>
     <div id="gpsClock">
       <p>🕒 UTC: <span id="utcTime">--:--:--</span> | Local: <span id="localTime">--:--:--</span></p>
       <p id="gpsLocation">📍 Location: --</p>
@@ -25,9 +25,18 @@
       <option value="BrightNGC">Bright NGC</option>
       <option value="All">All Catalogs</option>
     </select>
+    
     <input type="text" id="searchBox" placeholder="🔍 Search objects...">
     <button id="topTonightBtn">⭐ Top 5 Tonight</button>
     <button id="apodBtn">📅 APOD</button>
+
+    <!-- Scope quick inputs -->
+    <div id="scopeQuickInputs">
+      <label>Focal (mm): <input type="number" id="scopeFocal" value="400"></label>
+      <label>W (mm): <input type="number" id="sensorWidth" value="11"></label>
+      <label>H (mm): <input type="number" id="sensorHeight" value="11"></label>
+      <button id="saveScopeBtn">Save</button>
+    </div>
   </section>
 
   <main>
@@ -84,12 +93,6 @@
       <label for="altSlider">Minimum altitude for Top 5 Tonight: <span id="altValue">20°</span></label>
       <input type="range" id="altSlider" min="0" max="60" step="5" value="20">
       <hr>
-      <h3>🔭 Scope Settings</h3>
-      <label>Focal Length (mm): <input type="number" id="scopeFocal" value="400"></label><br>
-      <label>Sensor Width (mm): <input type="number" id="sensorWidth" value="11"></label><br>
-      <label>Sensor Height (mm): <input type="number" id="sensorHeight" value="11"></label><br>
-      <button onclick="updateScope()">Save Scope Settings</button>
-      <hr>
       <label>
         <input type="checkbox" id="debugToggle">
         Enable Debug Panel
@@ -104,7 +107,6 @@
   <!-- About -->
   <section id="about">
     <h2>ℹ️ About AstroTarget</h2>
-    <p><strong>Version:</strong> 1.0</p>
     <p><strong>Credits:</strong> Messier, Caldwell, Bright NGC catalogs • NASA APOD • ISS Transit API</p>
     <p><strong>Developer:</strong> AstroTarget Project</p>
     <p>
@@ -117,7 +119,7 @@
   </section>
 
   <footer>
-    <p>🔭 AstroTarget v1.0 — Data from Messier, Caldwell, Bright NGC catalogs. Images © NASA/ESA/Hubble where credited.</p>
+    <p>🔭 AstroTarget <span id="footerVersion"></span> — Data from Messier, Caldwell, Bright NGC catalogs. Images © NASA/ESA/Hubble where credited.</p>
     <p id="lastUpdated">Last updated: --</p>
   </footer>
 
