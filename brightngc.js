@@ -1,4 +1,4 @@
-const brightNGC = [
+const brightNGCCatalog = [
   {
     id: "NGC 869",
     name: "h Persei (Double Cluster)",
