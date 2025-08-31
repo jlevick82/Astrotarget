@@ -22,37 +22,30 @@ let scope = JSON.parse(localStorage.getItem("scope")) || {
 
 // === RA/Dec → Alt/Az conversion (J2000) ===
 function raDecToAltAz(raHours, decDeg, latDeg, lonDeg, date) {
-  // Convert RA from hours to degrees
   let raDeg = raHours * 15;
   let latRad = (latDeg * Math.PI) / 180;
   let decRad = (decDeg * Math.PI) / 180;
 
-  // Get Julian Date
   const JD = (date / 86400000) + 2440587.5;
-  const d = JD - 2451545.0; // days since J2000
+  const d = JD - 2451545.0;
 
-  // Local Sidereal Time (in degrees)
   let GMST = 280.46061837 + 360.98564736629 * d;
   let LST = (GMST + lonDeg) % 360;
   if (LST < 0) LST += 360;
 
-  // Hour Angle
   let H = (LST - raDeg) * (Math.PI / 180);
 
-  // Altitude
   let alt = Math.asin(
     Math.sin(latRad) * Math.sin(decRad) +
     Math.cos(latRad) * Math.cos(decRad) * Math.cos(H)
   );
-
-  // Azimuth
   let az = Math.atan2(
     -Math.sin(H),
     Math.tan(decRad) * Math.cos(latRad) - Math.sin(latRad) * Math.cos(H)
   );
 
   return {
-    alt: (alt * 180) / Math.PI, // degrees
+    alt: (alt * 180) / Math.PI,
     az: ((az * 180) / Math.PI + 360) % 360
   };
 }
@@ -111,7 +104,6 @@ function renderResults(results) {
         ? obj.image
         : "images/full/placeholder.jpg";
 
-    // FOV calculation (basic, degrees per side)
     let fovX = (57.3 * scope.sensorWidth / scope.focalLength).toFixed(2);
     let fovY = (57.3 * scope.sensorHeight / scope.focalLength).toFixed(2);
 
@@ -167,9 +159,7 @@ function setCatalog(name) {
   setTimeout(() => {
     if (name === "All") {
       let combined = [];
-      Object.values(catalogs).forEach(
-        cat => (combined = combined.concat(cat))
-      );
+      Object.values(catalogs).forEach(cat => (combined = combined.concat(cat)));
       renderResults(combined);
       updateTimestamp();
       trackUsage("All Catalogs");
@@ -205,7 +195,7 @@ function searchObjects(query) {
 // === Top 5 Tonight ===
 function top5Tonight() {
   showSpinner();
-  getUserLocation((lat, lon) => {
+  getUserLocation((lat, lon, alt) => {
     let now = new Date();
     let visible = [];
     let all =
@@ -244,34 +234,46 @@ function top5Tonight() {
 function getUserLocation(callback) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      pos => callback(pos.coords.latitude, pos.coords.longitude),
+      pos => {
+        callback(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          pos.coords.altitude // may be null
+        );
+      },
       err => {
         logDebug("❌ Geolocation error: " + err.message);
         document.getElementById("gpsLocation").innerText =
           "📍 Location unavailable (using default 0°, 0°)";
-        callback(0, 0);
+        callback(0, 0, null);
       }
     );
   } else {
     logDebug("❌ Geolocation not supported by this browser.");
     document.getElementById("gpsLocation").innerText =
       "📍 GPS not supported (using default 0°, 0°)";
-    callback(0, 0);
+    callback(0, 0, null);
   }
 }
-function updateClock(lat, lon) {
+function updateClock(lat, lon, alt = null) {
   const now = new Date();
   document.getElementById("utcTime").innerText =
     now.toUTCString().split(" ")[4];
   document.getElementById("localTime").innerText = now.toLocaleTimeString();
+
+  let locationText;
   if (lat && lon && (lat !== 0 || lon !== 0)) {
-    document.getElementById(
-      "gpsLocation"
-    ).innerText = `📍 Location: ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+    locationText = `📍 Location: ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+    if (alt !== null) {
+      locationText += ` (Elevation: ${alt.toFixed(0)} m)`;
+    } else {
+      locationText += ` (Elevation: unavailable)`;
+    }
   } else {
-    document.getElementById("gpsLocation").innerText =
-      "📍 Location unavailable (using default 0°, 0°)";
+    locationText = "📍 Location unavailable (using default 0°, 0°)";
   }
+
+  document.getElementById("gpsLocation").innerText = locationText;
 }
 
 // === Scope Settings ===
@@ -328,24 +330,15 @@ function trackUsage(feature) {
 
 // === Init ===
 document.addEventListener("DOMContentLoaded", () => {
-  // Catalog switch
-  document
-    .getElementById("catalogSelect")
+  document.getElementById("catalogSelect")
     .addEventListener("change", e => setCatalog(e.target.value));
-  // Search
-  document
-    .getElementById("searchBox")
+  document.getElementById("searchBox")
     .addEventListener("input", e => searchObjects(e.target.value));
-  // Top 5
-  document
-    .getElementById("topTonightBtn")
+  document.getElementById("topTonightBtn")
     .addEventListener("click", top5Tonight);
-  // APOD
-  document
-    .getElementById("apodBtn")
+  document.getElementById("apodBtn")
     .addEventListener("click", fetchAPOD);
 
-  // Modal controls
   const modal = document.getElementById("objectModal");
   const closeBtn = document.querySelector(".close-btn");
   const leftBtn = document.querySelector(".left-btn");
@@ -365,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) modal.style.display = "none";
   };
 
-  // Keyboard nav
+  // Keyboard + Swipe Nav
   window.addEventListener("keydown", e => {
     if (modal.style.display === "flex") {
       if (e.key === "ArrowRight") showNext();
@@ -373,13 +366,8 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (e.key === "Escape") modal.style.display = "none";
     }
   });
-  // Swipe nav
-  let touchStartX = 0,
-    touchEndX = 0;
-  modal.addEventListener(
-    "touchstart",
-    e => (touchStartX = e.changedTouches[0].screenX)
-  );
+  let touchStartX = 0, touchEndX = 0;
+  modal.addEventListener("touchstart", e => (touchStartX = e.changedTouches[0].screenX));
   modal.addEventListener("touchend", e => {
     touchEndX = e.changedTouches[0].screenX;
     if (Math.abs(touchEndX - touchStartX) > 50) {
@@ -389,27 +377,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // GPS Clock
   setInterval(() => {
-    if (window.userLat && window.userLon)
-      updateClock(window.userLat, window.userLon);
-    else updateClock();
+    updateClock(window.userLat, window.userLon, window.userAlt);
   }, 1000);
-  getUserLocation((lat, lon) => {
+  getUserLocation((lat, lon, alt) => {
     window.userLat = lat;
     window.userLon = lon;
-    updateClock(lat, lon);
+    window.userAlt = alt;
+    updateClock(lat, lon, alt);
   });
-  document
-    .getElementById("syncBtn")
-    .addEventListener("click", () =>
-      getUserLocation((lat, lon) => {
-        window.userLat = lat;
-        window.userLon = lon;
-        updateClock(lat, lon);
-        alert("✅ Location synced successfully.");
-      })
-    );
+  document.getElementById("syncBtn").addEventListener("click", () =>
+    getUserLocation((lat, lon, alt) => {
+      window.userLat = lat;
+      window.userLon = lon;
+      window.userAlt = alt;
+      updateClock(lat, lon, alt);
+      alert("✅ Location synced successfully.");
+    })
+  );
 
-  // Toggle advanced settings
+  // Toggle Advanced Settings
   const toggleSettingsBtn = document.getElementById("toggleSettingsBtn");
   const advancedSettings = document.getElementById("advancedSettings");
   toggleSettingsBtn.addEventListener("click", () => {
@@ -419,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Hide Advanced Settings ▲";
   });
 
-  // Cache toggle
+  // Cache Settings
   const cacheToggle = document.getElementById("cacheToggle");
   const cacheStatus = document.getElementById("cacheStatus");
   const clearCacheBtn = document.getElementById("clearCacheBtn");
@@ -429,8 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cacheStatus.className = "status-text cached";
       clearCacheBtn.classList.remove("hidden");
     } else {
-      cacheStatus.innerText =
-        "🌐 Online-only mode (images load when needed)";
+      cacheStatus.innerText = "🌐 Online-only mode (images load when needed)";
       cacheStatus.className = "status-text online-only";
       clearCacheBtn.classList.add("hidden");
     }
@@ -449,7 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Red Light Mode
+  // Red Mode
   const redModeToggle = document.getElementById("redModeToggle");
   let redModeEnabled = localStorage.getItem("redMode") === "true";
   if (redModeEnabled) document.body.classList.add("red-mode");
@@ -464,10 +449,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Altitude slider
+  // Altitude Slider
   const altSlider = document.getElementById("altSlider");
   const altValue = document.getElementById("altValue");
   minAltitude = localStorage.getItem("minAltitude") || 20;
   altSlider.value = minAltitude;
   altValue.innerText = `${minAltitude}°`;
-  alt
+  altSlider.addEventListener("input", () => {
+    minAltitude = altSlider.value;
+    altValue.innerText = `${minAltitude}°`;
+    localStorage.setItem("minAltitude", minAltitude);
+  });
+
+  // Debug Panel
+  const debugToggle = document.getElementById("debugToggle");
+  const debugPanel = document.getElementById("debugPanel");
+  const clearDebugBtn = document.getElementById("clearDebugBtn");
+  debugEnabled = localStorage.getItem("debugEnabled") === "true";
+  debugToggle.checked = debugEnabled;
+  if (debugEnabled) debugPanel.classList.remove("hidden");
+  debugToggle.addEventListener("change", () => {
+    debugEnabled = debugToggle.checked;
+    localStorage.setItem("debugEnabled", debugEnabled);
+    if (debugEnabled) {
+      debugPanel.classList.remove("hidden");
+      logDebug("✅ Debug enabled");
+    } else {
+      debugPanel.classList.add("hidden");
+    }
+  });
+  clearDebugBtn.addEventListener("click", () => {
+    document.getElementById("debugMessages").innerHTML = "";
+    logDebug("🗑️ Debug log cleared");
+  });
+
+  // Init first catalog
+  setCatalog("Messier");
+});
+
