@@ -27,12 +27,14 @@ self.addEventListener("activate", e => {
   console.log("Service Worker: Activated");
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => {
-        if (k !== CACHE_NAME) {
-          console.log("Service Worker: Removing old cache:", k);
-          return caches.delete(k);
-        }
-      }))
+      Promise.all(
+        keys.map(k => {
+          if (k !== CACHE_NAME) {
+            console.log("Service Worker: Removing old cache:", k);
+            return caches.delete(k);
+          }
+        })
+      )
     )
   );
 });
@@ -65,7 +67,7 @@ self.addEventListener("fetch", e => {
   );
 });
 
-// Image caching behavior
+// Image caching helper
 async function handleImageCache(request, fetchRes) {
   try {
     const cache = await caches.open(CACHE_NAME);
