@@ -39,26 +39,23 @@ self.addEventListener("activate", e => {
   );
 });
 
-// Fetch → serve from cache, then network
+// Fetch → cache-first, then network
 self.addEventListener("fetch", e => {
   e.respondWith(
     caches.match(e.request).then(response => {
       if (response) return response;
 
       return fetch(e.request).then(fetchRes => {
-        // Cache images separately
         if (e.request.url.includes("/images/full/")) {
           return handleImageCache(e.request, fetchRes);
         } else {
-          // Cache non-image assets
           return caches.open(CACHE_NAME).then(cache => {
             cache.put(e.request, fetchRes.clone());
             return fetchRes;
           });
         }
       }).catch(err => {
-        console.warn("❌ Fetch failed:", e.request.url, err);
-        // If image fails → serve placeholder
+        console.warn("❌ Fetch failed:", e.request.url);
         if (e.request.url.includes("/images/full/")) {
           return caches.match("images/full/placeholder.jpg");
         }
@@ -77,3 +74,13 @@ async function handleImageCache(request, fetchRes) {
   }
   return fetchRes;
 }
+
+// Update prompt
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+self.addEventListener("activate", () => {
+  self.clients.matchAll({ type: "window" }).then(clients => {
+    clients.forEach(client => client.postMessage({ type: "NEW_VERSION" }));
+  });
+});
