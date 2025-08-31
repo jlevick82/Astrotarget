@@ -20,6 +20,43 @@ let scope = JSON.parse(localStorage.getItem("scope")) || {
   sensorHeight: 11
 };
 
+// === RA/Dec → Alt/Az conversion (J2000) ===
+function raDecToAltAz(raHours, decDeg, latDeg, lonDeg, date) {
+  // Convert RA from hours to degrees
+  let raDeg = raHours * 15;
+  let latRad = (latDeg * Math.PI) / 180;
+  let decRad = (decDeg * Math.PI) / 180;
+
+  // Get Julian Date
+  const JD = (date / 86400000) + 2440587.5;
+  const d = JD - 2451545.0; // days since J2000
+
+  // Local Sidereal Time (in degrees)
+  let GMST = 280.46061837 + 360.98564736629 * d;
+  let LST = (GMST + lonDeg) % 360;
+  if (LST < 0) LST += 360;
+
+  // Hour Angle
+  let H = (LST - raDeg) * (Math.PI / 180);
+
+  // Altitude
+  let alt = Math.asin(
+    Math.sin(latRad) * Math.sin(decRad) +
+    Math.cos(latRad) * Math.cos(decRad) * Math.cos(H)
+  );
+
+  // Azimuth
+  let az = Math.atan2(
+    -Math.sin(H),
+    Math.tan(decRad) * Math.cos(latRad) - Math.sin(latRad) * Math.cos(H)
+  );
+
+  return {
+    alt: (alt * 180) / Math.PI, // degrees
+    az: ((az * 180) / Math.PI + 360) % 360
+  };
+}
+
 // === Debug Logger ===
 function logDebug(msg) {
   console.log(msg);
@@ -433,34 +470,4 @@ document.addEventListener("DOMContentLoaded", () => {
   minAltitude = localStorage.getItem("minAltitude") || 20;
   altSlider.value = minAltitude;
   altValue.innerText = `${minAltitude}°`;
-  altSlider.addEventListener("input", () => {
-    minAltitude = altSlider.value;
-    altValue.innerText = `${minAltitude}°`;
-    localStorage.setItem("minAltitude", minAltitude);
-  });
-
-  // Debug panel
-  const debugToggle = document.getElementById("debugToggle");
-  const debugPanel = document.getElementById("debugPanel");
-  const clearDebugBtn = document.getElementById("clearDebugBtn");
-  debugEnabled = localStorage.getItem("debugEnabled") === "true";
-  debugToggle.checked = debugEnabled;
-  if (debugEnabled) debugPanel.classList.remove("hidden");
-  debugToggle.addEventListener("change", () => {
-    debugEnabled = debugToggle.checked;
-    localStorage.setItem("debugEnabled", debugEnabled);
-    if (debugEnabled) {
-      debugPanel.classList.remove("hidden");
-      logDebug("✅ Debug enabled");
-    } else {
-      debugPanel.classList.add("hidden");
-    }
-  });
-  clearDebugBtn.addEventListener("click", () => {
-    document.getElementById("debugMessages").innerHTML = "";
-    logDebug("🗑️ Debug log cleared");
-  });
-
-  // Init first catalog
-  setCatalog("Messier");
-});
+  alt
