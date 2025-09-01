@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AstroTarget Splash Prototype</title>
+<style>
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at center, #000010, #000);
+    overflow: hidden;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+  }
+  canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+  #orion, #logo, #tagline {
+    position: absolute;
+    width: 100%; text-align: center;
+    z-index: 1;
+  }
+  #logo {
+    top: 40%;
+    font-size: 3em;
+    font-weight: bold;
+    letter-spacing: 4px;
+  }
+  #astro { color: #66ccff; display: inline-block; opacity: 0; transform: translateX(-100vw); }
+  #target { color: #ff6666; display: inline-block; opacity: 0; transform: translateY(-100vh); }
+  #tagline {
+    top: 65%;
+    font-size: 1.2em;
+    opacity: 0;
+    color: #ccc;
+    font-style: italic;
+  }
+  .fadeIn { animation: fadeIn 2s forwards; }
+  .slideInX { animation: slideInX 2s forwards; }
+  .slideInY { animation: slideInY 2s forwards; }
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes slideInX { to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideInY { to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div id="logo">
+  <span id="astro">ASTRO</span>
+  <br>
+  <span id="target">TARGET</span>
+</div>
+<div id="tagline">â€œThe sky hides many secrets â€” only explorers will find them.â€</div>
+
+<script>
+// === Starfield ===
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+for (let i=0;i<200;i++) {
+  stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,alpha:Math.random()});
+}
+
+function drawStars() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(s=>{
+    s.alpha += (Math.random()-0.5)*0.05;
+    if (s.alpha<0.1) s.alpha=0.1;
+    if (s.alpha>1) s.alpha=1;
+    ctx.globalAlpha=s.alpha;
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,2*Math.PI);
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// === Orion lines (approx positions) ===
+const orionStars = {
+  Betelgeuse: [0.4,0.2],
+  Bellatrix: [0.6,0.2],
+  Saiph: [0.4,0.7],
+  Rigel: [0.6,0.7],
+  Alnitak: [0.45,0.45],
+  Alnilam: [0.5,0.45],
+  Mintaka: [0.55,0.45]
+};
+function drawOrion() {
+  ctx.strokeStyle="rgba(100,200,255,0.4)";
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  const [bx,by] = orionStars.Betelgeuse;
+  const [brx,bry] = orionStars.Bellatrix;
+  const [sx,sy] = orionStars.Saiph;
+  const [rx,ry] = orionStars.Rigel;
+  ctx.moveTo(bx*canvas.width,by*canvas.height);
+  ctx.lineTo(sx*canvas.width,sy*canvas.height);
+  ctx.moveTo(brx*canvas.width,bry*canvas.height);
+  ctx.lineTo(rx*canvas.width,ry*canvas.height);
+  ctx.moveTo(sx*canvas.width,sy*canvas.height);
+  ctx.lineTo(rx*canvas.width,ry*canvas.height);
+  ctx.moveTo(bx*canvas.width,by*canvas.height);
+  ctx.lineTo(brx*canvas.width,bry*canvas.height);
+  // Belt
+  ctx.moveTo(orionStars.Alnitak[0]*canvas.width,orionStars.Alnitak[1]*canvas.height);
+  ctx.lineTo(orionStars.Alnilam[0]*canvas.width,orionStars.Alnilam[1]*canvas.height);
+  ctx.lineTo(orionStars.Mintaka[0]*canvas.width,orionStars.Mintaka[1]*canvas.height);
+  ctx.stroke();
+
+  for (let s in orionStars) {
+    ctx.beginPath();
+    ctx.fillStyle="white";
+    ctx.arc(orionStars[s][0]*canvas.width,orionStars[s][1]*canvas.height,4,0,2*Math.PI);
+    ctx.fill();
+  }
+}
+setInterval(drawOrion,200);
+
+// === Animations ===
+setTimeout(()=>document.getElementById("astro").classList.add("slideInX"),1000);
+setTimeout(()=>document.getElementById("target").classList.add("slideInY"),2000);
+setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),3500);
+
+</script>
+</body>
+</html>
