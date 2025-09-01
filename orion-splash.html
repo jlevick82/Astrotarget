@@ -10,27 +10,29 @@
     overflow: hidden;
     color: white;
     font-family: 'Arial', sans-serif;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
   }
   canvas {
-    position: absolute;
+    position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
     z-index: 0;
   }
   #logo {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 30%;
-    font-size: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8vw; /* scales with screen */
     font-weight: bold;
-    letter-spacing: 4px;
+    letter-spacing: 0.2em;
     z-index: 1;
   }
   #astro {
     color: #66ccff;
-    display: inline-block;
     opacity: 0;
     transform: translateX(-100vw);
   }
@@ -40,40 +42,37 @@
     transform: translateY(-100vh);
     line-height: 1.2;
     color: #ff6666;
-    margin-left: 10px;
+    margin-left: 1vw;
   }
   #target span { display: block; }
   #crosshair {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 120px; height: 120px;
+    width: 20vw;
+    height: 20vw;
     border-radius: 50%;
     border: 2px solid rgba(0,255,255,0.5);
     box-shadow: 0 0 15px rgba(0,255,255,0.7);
     opacity: 0;
+    animation: pulse 2s infinite alternate;
     z-index: 0;
     pointer-events: none;
-    animation: pulse 2s infinite alternate;
   }
   #tagline {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 65%;
-    font-size: 1.2em;
+    margin-top: 2vh;
+    font-size: 3.5vw;
     opacity: 0;
     color: #ccc;
     font-style: italic;
     z-index: 1;
   }
   #bootChecks {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    top: 75%;
+    position: fixed;
+    bottom: 5%;
+    width: 90%;
+    max-width: 600px;
+    text-align: left;
     font-family: monospace;
-    font-size: 1em;
+    font-size: 3.2vw;
     z-index: 1;
   }
   .ok { color: #0f0; }
@@ -87,8 +86,8 @@
   @keyframes slideInX { to { opacity: 1; transform: translateX(0); } }
   @keyframes slideInY { to { opacity: 1; transform: translateY(0); } }
   @keyframes pulse {
-    from { opacity: 0.2; transform: translate(-50%,-50%) scale(0.9); }
-    to { opacity: 0.6; transform: translate(-50%,-50%) scale(1.1); }
+    from { opacity: 0.2; transform: scale(0.9); }
+    to { opacity: 0.6; transform: scale(1.1); }
   }
 </style>
 </head>
@@ -128,48 +127,24 @@ for (let i=0;i<200;i++) {
   });
 }
 
-// === Orion Constellation ===
-const orionStars = {
-  Betelgeuse: [0.4,0.2],
-  Bellatrix: [0.6,0.2],
-  Saiph: [0.4,0.7],
-  Rigel: [0.6,0.7],
-  Alnitak: [0.45,0.45],
-  Alnilam: [0.5,0.45],
-  Mintaka: [0.55,0.45]
-};
+// Orion placeholder (can swap with real Orion later)
 function drawOrion() {
   ctx.strokeStyle="rgba(100,200,255,0.3)";
   ctx.lineWidth=1;
   ctx.beginPath();
-  ctx.moveTo(orionStars.Betelgeuse[0]*canvas.width,orionStars.Betelgeuse[1]*canvas.height);
-  ctx.lineTo(orionStars.Saiph[0]*canvas.width,orionStars.Saiph[1]*canvas.height);
-  ctx.moveTo(orionStars.Bellatrix[0]*canvas.width,orionStars.Bellatrix[1]*canvas.height);
-  ctx.lineTo(orionStars.Rigel[0]*canvas.width,orionStars.Rigel[1]*canvas.height);
-  ctx.moveTo(orionStars.Saiph[0]*canvas.width,orionStars.Saiph[1]*canvas.height);
-  ctx.lineTo(orionStars.Rigel[0]*canvas.width,orionStars.Rigel[1]*canvas.height);
-  ctx.moveTo(orionStars.Betelgeuse[0]*canvas.width,orionStars.Betelgeuse[1]*canvas.height);
-  ctx.lineTo(orionStars.Bellatrix[0]*canvas.width,orionStars.Bellatrix[1]*canvas.height);
-  ctx.moveTo(orionStars.Alnitak[0]*canvas.width,orionStars.Alnitak[1]*canvas.height);
-  ctx.lineTo(orionStars.Alnilam[0]*canvas.width,orionStars.Alnilam[1]*canvas.height);
-  ctx.lineTo(orionStars.Mintaka[0]*canvas.width,orionStars.Mintaka[1]*canvas.height);
+  ctx.moveTo(0.4*canvas.width,0.2*canvas.height);
+  ctx.lineTo(0.4*canvas.width,0.7*canvas.height);
+  ctx.moveTo(0.6*canvas.width,0.2*canvas.height);
+  ctx.lineTo(0.6*canvas.width,0.7*canvas.height);
+  ctx.moveTo(0.45*canvas.width,0.45*canvas.height);
+  ctx.lineTo(0.55*canvas.width,0.45*canvas.height);
   ctx.stroke();
-  for (let s in orionStars) {
-    ctx.beginPath();
-    ctx.fillStyle="white";
-    ctx.arc(orionStars[s][0]*canvas.width,orionStars[s][1]*canvas.height,4,0,2*Math.PI);
-    ctx.fill();
-  }
 }
 
-// === Animation Loop ===
 function drawStars() {
-  // Fill background black each frame
   ctx.globalAlpha = 1.0;
   ctx.fillStyle = "black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // Draw stars
   stars.forEach(s=>{
     s.phase += 0.02;
     const alpha = 0.6 + 0.4*Math.sin(s.phase);
@@ -179,22 +154,19 @@ function drawStars() {
     ctx.fillStyle="white";
     ctx.fill();
   });
-
-  // Reset + draw Orion
   ctx.globalAlpha = 1.0;
   drawOrion();
-
   requestAnimationFrame(drawStars);
 }
 drawStars();
 
-// === Logo + Boot Sequence ===
+// === Animations ===
 setTimeout(()=>document.getElementById("astro").classList.add("slideInX"),1000);
 setTimeout(()=>document.getElementById("target").classList.add("slideInY"),2000);
 setTimeout(()=>document.getElementById("crosshair").style.opacity="1",3000);
 setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),4000);
 
-// Boot check function
+// Boot checks
 const bootChecks = document.getElementById("bootChecks");
 function logCheck(msg, status="wait", delay=0) {
   setTimeout(()=>{
@@ -204,8 +176,6 @@ function logCheck(msg, status="wait", delay=0) {
     bootChecks.appendChild(line);
   }, delay);
 }
-
-// Simulated sequence
 logCheck("⏳ Loading catalogs...", "wait", 4500);
 logCheck("✅ Messier loaded (110 objects)", "ok", 6000);
 logCheck("✅ Caldwell loaded (109 objects)", "ok", 7000);
