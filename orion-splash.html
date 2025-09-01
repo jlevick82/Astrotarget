@@ -8,59 +8,48 @@
 body {
   margin:0; padding:0; background:black; color:white;
   overflow:hidden; font-family:monospace;
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-  height:100vh;
+  height:100vh; display:flex; justify-content:center; align-items:center;
 }
-#stars {
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background:black; z-index:-2;
+#stars { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-2; }
+
+#reticle {
+  position:absolute; top:35%; left:50%; transform:translate(-50%,-50%);
+  width:60vw; height:60vw; max-width:400px; max-height:400px;
+  pointer-events:none; z-index:-1;
 }
-#reticle-svg {
-  position:absolute; top:35%; left:50%;
-  width:55vw; height:55vw;
-  transform:translate(-50%,-50%);
-  pointer-events:none; z-index:-1; opacity:.75;
-}
+#reticle circle,#reticle line{stroke:#0ff;stroke-width:2;fill:none;opacity:.8;}
+
 #logo {
-  position:absolute;
-  top:35%; left:50%;
-  transform:translate(-50%,-50%);
-  display:flex; flex-direction:row; align-items:center; justify-content:center;
+  position:absolute; top:35%; left:50%; transform:translate(-50%,-50%);
+  text-align:center;
 }
-#astro { 
-  color:#0ff; font-size:10vw; text-shadow:0 0 10px #0ff; letter-spacing:0.2em;
-}
-#sharedT {
-  color:#fff; font-size:10vw; text-shadow:0 0 12px #fff;
-  margin:0 0.2em;
-}
-#target {
-  color:#f44; font-size:8vw; text-shadow:0 0 10px #f44;
-  display:flex; flex-direction:column; align-items:center; line-height:1em;
-}
-#target span { display:block; }
+#astro { color:#0ff; font-size:10vw; text-shadow:0 0 10px #0ff; letter-spacing:0.2em; }
+#sharedT { color:#fff; font-size:10vw; text-shadow:0 0 12px #fff; }
+#arget { color:#f44; font-size:8vw; text-shadow:0 0 10px #f44; line-height:1em; }
+
 #tagline {
-  position:absolute; top:65%; width:90%;
-  font-size:4.5vw; text-align:center;
-  color:#0ff; font-style:italic; text-shadow:0 0 10px #0ff;
-  white-space:nowrap; overflow:hidden; border-right:.15em solid #0ff;
+  position:absolute; top:65%; left:50%; transform:translateX(-50%);
+  font-size:4.5vw; text-align:center; width:90%;
+  color:#0ff; font-style:italic; text-shadow:0 0 12px #0ff;
+  animation:flicker 3s infinite alternate;
 }
-.typewriter { animation: typing 6s steps(60,end) forwards, blink .75s step-end infinite; }
-.typewriter.finished { border-right:none; }
-@keyframes typing { from { width:0 } to { width:100% } }
-@keyframes blink { from,to{border-color:transparent} 50%{border-color:#0ff} }
+@keyframes flicker {
+  0%{opacity:1;} 45%{opacity:.9;} 50%{opacity:.6;} 100%{opacity:1;}
+}
+
 #bootlog {
-  position:absolute; bottom:5vh; text-align:center; width:100%;
-  font-size:3.8vw; line-height:1.5em; text-shadow:0 0 5px #0ff;
+  position:absolute; bottom:5vh; width:100%; text-align:center;
+  font-size:3.8vw; line-height:1.5em;
 }
-.log-entry { display:block; }
-.green { color:#0f0; }
-.yellow { color:#ff0; }
-.red { color:#f44; }
-/* ✅ Scale for mobile */
-@media (max-width:600px){
+.log-entry{display:block;}
+.green{color:#0f0;text-shadow:0 0 5px #0f0;}
+.yellow{color:#ff0;text-shadow:0 0 5px #ff0;}
+.red{color:#f44;text-shadow:0 0 5px #f44;}
+.fade{opacity:0;transition:opacity 1s ease;}
+
+@media(max-width:600px){
   #astro,#sharedT{font-size:12vw;}
-  #target{font-size:10vw;}
+  #arget{font-size:10vw;}
   #tagline{font-size:5vw;}
   #bootlog{font-size:4vw;}
 }
@@ -69,31 +58,24 @@ body {
 <body>
 <canvas id="stars"></canvas>
 
-<svg id="reticle-svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="45" stroke="#0ff" stroke-width="2" fill="none"/>
-  <circle cx="50" cy="50" r="20" stroke="#0ff" stroke-width="2" fill="none"/>
-  <line x1="50" y1="0" x2="50" y2="100" stroke="#0ff" stroke-width="1"/>
-  <line x1="0" y1="50" x2="100" y2="50" stroke="#0ff" stroke-width="1"/>
+<svg id="reticle" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45"/>
+  <circle cx="50" cy="50" r="20"/>
+  <line x1="50" y1="0" x2="50" y2="100"/>
+  <line x1="0" y1="50" x2="100" y2="50"/>
 </svg>
 
 <div id="logo">
-  <span id="astro">AS</span>
-  <span id="sharedT">T</span>
-  <span id="astro">RO</span>
-  <div id="target">
-    <span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
-  </div>
+  <div id="astro">AS<span id="sharedT">T</span>RO</div>
+  <div id="arget">ARGET</div>
 </div>
 
-<p id="tagline" class="typewriter">“The sky hides many secrets — only explorers will find them.”</p>
+<p id="tagline">“The sky hides many secrets<br>— only explorers will find them.”</p>
 
 <div id="bootlog"></div>
 
 <script>
-// Typewriter cleanup
-setTimeout(()=>{document.getElementById("tagline").classList.add("finished");},6000);
-
-// Boot log
+// Boot log steps
 const steps=[
  {msg:"Loading catalogs...",cls:"yellow"},
  {msg:"Messier loaded (110 objects)",cls:"green"},
@@ -108,27 +90,30 @@ const steps=[
  {msg:"APOD loaded",cls:"green"},
  {msg:"Lock acquired — AstroTarget Ready",cls:"red"}
 ];
-let i=0,log=document.getElementById("bootlog");
+let i=0,log=document.getElementById("bootlog"),maxVisible=4;
 function addStep(){
  if(i<steps.length){
   let e=document.createElement("span");
   e.className=`log-entry ${steps[i].cls}`;
   e.textContent=steps[i].msg;
-  log.appendChild(e); i++;
-  setTimeout(addStep,600);
+  log.appendChild(e);
+  // limit visible lines
+  if(log.children.length>maxVisible){
+    log.children[0].classList.add("fade");
+    setTimeout(()=>log.removeChild(log.children[0]),1000);
+  }
+  i++; setTimeout(addStep,800);
  }
 }
 addStep();
 
-// Starfield background
+// Starfield
 const starfield=document.getElementById("stars");
-const ctx=starfield.getContext?starfield.getContext("2d"):null;
-if(ctx){
-  starfield.width=window.innerWidth; starfield.height=window.innerHeight;
-  for(let s=0;s<120;s++){
-    ctx.fillStyle="white";
-    ctx.fillRect(Math.random()*starfield.width,Math.random()*starfield.height,1,1);
-  }
+const ctx=starfield.getContext("2d");
+starfield.width=window.innerWidth; starfield.height=window.innerHeight;
+for(let s=0;s<120;s++){
+  ctx.fillStyle="white";
+  ctx.fillRect(Math.random()*starfield.width,Math.random()*starfield.height,1,1);
 }
 </script>
 </body>
