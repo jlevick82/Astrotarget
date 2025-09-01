@@ -1,1 +1,54 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>AstroTarget Splash</title><style>body{margin:0;background:#000;color:#0ff;font-family:monospace;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;text-align:center;touch-action:manipulation}#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2}#stars span{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.6;animation:twinkle 8s infinite;animation-delay:calc(-8s*var(--d))}@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.8}}.reticle{position:relative;width:75vmin;height:75vmin;border:3px solid rgba(0,255,255,.7);border-radius:50%;box-shadow:0 0 20px rgba(0,255,255,.6);display:flex;align-items:center;justify-content:center}.reticle:before,.reticle:after{content:"";position:absolute;background:rgba(0,255,255,.8)}.reticle:before{top:50%;left:0;width:100%;height:2px}.reticle:after{left:50%;top:0;height:100%;width:2px}.inner{position:absolute;width:15%;height:15%;border:2px solid rgba(0,255,255,.9);border-radius:50%;transition:transform 1.5s ease,box-shadow 1.5s ease}.inner.pulse{transform:scale(1.3);box-shadow:0 0 20px #0ff}.logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2}.astro{display:flex;gap:.3em;font-size:8vmin;letter-spacing:.1em;text-shadow:0 0 8px #0ff}.astro .t{color:#fff;animation:shimmer 10s infinite}.target{display:flex;flex-direction:column;align-items:center;font-size:7vmin;color:#f44;text-shadow:0 0 8px #f44;line-height:1}.target span{margin:.15em 0}@keyframes shimmer{0%,85%,100%{text-shadow:0 0 8px #fff;color:#fff}90%{text-shadow:0 0 25px #ff0;color:#ff0}}.tagline{margin-top:2vh;font-size:3.5vmin;color:#0ff;text-shadow:0 0 8px #0ff;max-width:90%;line-height:1.4}.boot{margin-top:2vh;font-size:2.8vmin;line-height:1.6;text-align:center}.boot .yellow{color:#ff0}.boot .green{color:#0f0}.boot .cyan{color:#0ff}.boot .red{color:#f44}</style></head><body><div id="stars"></div><div class="reticle"><div class="inner" id="inner"></div><div class="logo"><div class="astro"><span>A</span><span>S</span><span class="t" id="t-center">T</span><span>R</span><span>O</span></div><div class="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div></div></div><div class="tagline">“The sky hides many secrets — only explorers will find them.”</div><div class="boot" id="boot"></div><script>const stars=document.getElementById("stars");for(let i=0;i<100;i++){const s=document.createElement("span");s.style.top=Math.random()*100+"%";s.style.left=Math.random()*100+"%";s.style.setProperty("--d",Math.random());stars.appendChild(s)}const steps=['<span class="yellow">⌛ Initializing scope presets...</span>','<span class="green">✔ Scope presets ready</span>','<span class="green">✔ Camera presets ready</span>','<span class="yellow">⌛ Fetching GPS...</span>','<span class="green">✔ GPS locked (38.89°N, 77.03°W)</span>','<span class="cyan">⌛ Connecting to NASA APOD...</span>','<span class="cyan">✔ APOD loaded</span>','<span class="red">🔒 Lock acquired — AstroTarget Ready</span>'],boot=document.getElementById("boot");let i=0;function showStep(){if(i<steps.length){boot.innerHTML=steps.slice(0,i+1).join("<br>");i++;setTimeout(showStep,1100)}}showStep();const t=document.getElementById("t-center"),inner=document.getElementById("inner");function sparkle(){t.classList.add("spark");inner.classList.add("pulse");setTimeout(()=>{t.classList.remove("spark");inner.classList.remove("pulse")},1500)}setInterval(()=>{if(Math.random()>.7)sparkle()},6000);</script></body></html>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AstroTarget</title>
+<style>
+html,body{margin:0;padding:0;height:100%;background:#000;color:#fff;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:'Courier New',monospace}
+canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
+#logo{position:relative;z-index:2;text-align:center}
+#astro{display:flex;justify-content:center;letter-spacing:.3em;font-size:2.2em;text-shadow:0 0 12px #0ff;color:#0ff}
+#t-trigger{color:#fff;text-shadow:0 0 15px #fff;cursor:pointer;user-select:none;z-index:10}
+#target{display:flex;flex-direction:column;align-items:center;margin-top:.3em;font-size:1.6em;letter-spacing:.2em;color:#f44;text-shadow:0 0 8px #f44}
+#reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:65vmin;height:65vmin;border:2px solid #0ff;border-radius:50%;box-shadow:0 0 25px #0ff;z-index:1}
+#reticle:before,#reticle:after{content:"";position:absolute;background:#0ff}
+#reticle:before{top:50%;left:0;width:100%;height:2px}
+#reticle:after{left:50%;top:0;width:2px;height:100%}
+#inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:25vmin;height:25vmin;border:2px solid #0ff;border-radius:50%}
+#tagline{position:relative;z-index:2;margin-top:1em;font-size:1.1em;color:#0ff;text-shadow:0 0 8px #0ff;text-align:center;max-width:90%}
+#loading{position:relative;z-index:2;margin-top:1em;font-size:.95em;line-height:1.5em;text-align:center;white-space:pre-wrap}
+.hidden{display:none}
+.green{color:#0f0;text-shadow:0 0 8px #0f0}
+.yellow{color:#ff0;text-shadow:0 0 8px #ff0}
+.red{color:#f44;text-shadow:0 0 8px #f44}
+.blue{color:#0ff;text-shadow:0 0 8px #0ff}
+</style>
+</head><body>
+<canvas id="stars"></canvas>
+<div id="reticle"><div id="inner"></div></div>
+<div id="logo">
+  <div id="astro">A S <span id="t-trigger">T</span> R O</div>
+  <div id="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
+</div>
+<div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
+<div id="loading" class="hidden"></div>
+<script>
+const c=document.getElementById("stars"),x=c.getContext("2d");
+function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener("resize",resize);
+let stars=[...Array(120)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+0.5,a:Math.random()}));
+function draw(){x.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=(Math.random()-.5)*.02;if(s.a<.2)s.a=.2;if(s.a>.8)s.a=.8;x.fillStyle=`rgba(255,255,255,${s.a})`;x.beginPath();x.arc(s.x,s.y,s.r,0,2*Math.PI);x.fill()});requestAnimationFrame(draw)}draw();
+
+const msgs=[
+ '⏳ <span class="yellow">Initializing scope presets...</span>',
+ '✔ <span class="green">Scope presets ready</span>',
+ '✔ <span class="green">Camera presets ready</span>',
+ '⏳ <span class="yellow">Fetching GPS...</span>',
+ '✔ <span class="green">GPS locked (38.89°N, 77.03°W)</span>',
+ '⏳ <span class="blue">Connecting to NASA APOD...</span>',
+ '✔ <span class="green">APOD loaded</span>',
+ '🔒 <span class="red">Lock acquired — AstroTarget Ready</span>'
+];
+const box=document.getElementById("loading");let i=0;
+setTimeout(()=>{box.classList.remove("hidden");let t=setInterval(()=>{if(i<msgs.length){box.innerHTML+=msgs[i]+"\n";i++}else clearInterval(t)},500)},1000);
+
+document.getElementById("t-trigger").addEventListener("click",()=>{alert("🚀 Easter Egg: Warp engaged!")});
+</script>
+</body></html>
