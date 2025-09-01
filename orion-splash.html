@@ -1,120 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>AstroTarget Splash</title>
 <style>
-body {
-  margin:0; padding:0; background:black; color:white;
-  overflow:hidden; font-family:monospace;
-  height:100vh; display:flex; justify-content:center; align-items:center;
-}
-#stars { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-2; }
-
-#reticle {
-  position:absolute; top:35%; left:50%; transform:translate(-50%,-50%);
-  width:60vw; height:60vw; max-width:400px; max-height:400px;
-  pointer-events:none; z-index:-1;
-}
-#reticle circle,#reticle line{stroke:#0ff;stroke-width:2;fill:none;opacity:.8;}
-
-#logo {
-  position:absolute; top:35%; left:50%; transform:translate(-50%,-50%);
-  text-align:center;
-}
-#astro { color:#0ff; font-size:10vw; text-shadow:0 0 10px #0ff; letter-spacing:0.2em; }
-#sharedT { color:#fff; font-size:10vw; text-shadow:0 0 12px #fff; }
-#arget { color:#f44; font-size:8vw; text-shadow:0 0 10px #f44; line-height:1em; }
-
-#tagline {
-  position:absolute; top:65%; left:50%; transform:translateX(-50%);
-  font-size:4.5vw; text-align:center; width:90%;
-  color:#0ff; font-style:italic; text-shadow:0 0 12px #0ff;
-  animation:flicker 3s infinite alternate;
-}
-@keyframes flicker {
-  0%{opacity:1;} 45%{opacity:.9;} 50%{opacity:.6;} 100%{opacity:1;}
-}
-
-#bootlog {
-  position:absolute; bottom:5vh; width:100%; text-align:center;
-  font-size:3.8vw; line-height:1.5em;
-}
-.log-entry{display:block;}
-.green{color:#0f0;text-shadow:0 0 5px #0f0;}
-.yellow{color:#ff0;text-shadow:0 0 5px #ff0;}
-.red{color:#f44;text-shadow:0 0 5px #f44;}
-.fade{opacity:0;transition:opacity 1s ease;}
-
-@media(max-width:600px){
-  #astro,#sharedT{font-size:12vw;}
-  #arget{font-size:10vw;}
-  #tagline{font-size:5vw;}
-  #bootlog{font-size:4vw;}
-}
-</style>
-</head>
+body{margin:0;padding:0;background:#000;color:#fff;overflow:hidden;font-family:monospace;height:100vh;display:flex;justify-content:center;align-items:center}
+#stars{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-3}
+#reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:-1;opacity:0;animation:fadeInReticle 2s ease forwards}
+@keyframes fadeInReticle{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
+.shimmer-glow{animation:shimmer 3s infinite alternate}
+@keyframes shimmer{0%{filter:drop-shadow(0 0 4px #0ff) drop-shadow(0 0 8px #0ff)}50%{filter:drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #0ff)}100%{filter:drop-shadow(0 0 4px #0ff) drop-shadow(0 0 8px #0ff)}}
+#logo{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);text-align:center}
+#astro{color:#0ff;font-size:10vw;text-shadow:0 0 10px #0ff;letter-spacing:.15em}
+#sharedT{color:#fff;font-size:10vw;text-shadow:0 0 14px #fff,0 0 28px #0ff}
+#target{margin-top:-.1em;display:flex;flex-direction:column;align-items:center}
+#target div{color:#f44;font-size:8vw;text-shadow:0 0 10px #f44,0 0 20px #f00;line-height:.9em}
+#tagline{position:absolute;top:70%;left:50%;transform:translateX(-50%);font-size:4.5vw;text-align:center;width:90%;color:#0ff;font-style:italic;text-shadow:0 0 12px #0ff;animation:flicker 3s infinite alternate}
+@keyframes flicker{0%{opacity:1}45%{opacity:.9}50%{opacity:.6}100%{opacity:1}}
+#bootlog{position:absolute;bottom:5vh;width:100%;text-align:center;font-size:3.8vw;line-height:1.5em}
+.log-entry{display:block}
+.green{color:#0f0;text-shadow:0 0 5px #0f0}
+.yellow{color:#ff0;text-shadow:0 0 5px #ff0}
+.red{color:#f44;text-shadow:0 0 5px #f44}
+.fade{opacity:0;transition:opacity 1s ease}
+@media(max-width:600px){#astro,#sharedT{font-size:12vw}#target{font-size:10vw}#tagline{font-size:5vw}#bootlog{font-size:4vw}}
+</style></head>
 <body>
 <canvas id="stars"></canvas>
-
-<svg id="reticle" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="45"/>
-  <circle cx="50" cy="50" r="20"/>
-  <line x1="50" y1="0" x2="50" y2="100"/>
-  <line x1="0" y1="50" x2="100" y2="50"/>
-</svg>
-
-<div id="logo">
-  <div id="astro">AS<span id="sharedT">T</span>RO</div>
-  <div id="arget">ARGET</div>
-</div>
-
+<canvas id="reticle"></canvas>
+<div id="logo"><div id="astro">AS<span id="sharedT">T</span>RO</div><div id="target"><div>A</div><div>R</div><div>G</div><div>E</div><div>T</div></div></div>
 <p id="tagline">“The sky hides many secrets<br>— only explorers will find them.”</p>
-
 <div id="bootlog"></div>
-
 <script>
-// Boot log steps
-const steps=[
- {msg:"Loading catalogs...",cls:"yellow"},
- {msg:"Messier loaded (110 objects)",cls:"green"},
- {msg:"Caldwell loaded (109 objects)",cls:"green"},
- {msg:"BrightNGC loaded (100 objects)",cls:"green"},
- {msg:"Initializing scope presets...",cls:"yellow"},
- {msg:"Scope presets ready",cls:"green"},
- {msg:"Camera presets ready",cls:"green"},
- {msg:"Fetching GPS...",cls:"yellow"},
- {msg:"GPS locked (38.89°N, 77.03°W)",cls:"green"},
- {msg:"Connecting to NASA APOD...",cls:"yellow"},
- {msg:"APOD loaded",cls:"green"},
- {msg:"Lock acquired — AstroTarget Ready",cls:"red"}
-];
-let i=0,log=document.getElementById("bootlog"),maxVisible=4;
-function addStep(){
- if(i<steps.length){
-  let e=document.createElement("span");
-  e.className=`log-entry ${steps[i].cls}`;
-  e.textContent=steps[i].msg;
-  log.appendChild(e);
-  // limit visible lines
-  if(log.children.length>maxVisible){
-    log.children[0].classList.add("fade");
-    setTimeout(()=>log.removeChild(log.children[0]),1000);
-  }
-  i++; setTimeout(addStep,800);
- }
-}
-addStep();
-
-// Starfield
-const starfield=document.getElementById("stars");
-const ctx=starfield.getContext("2d");
-starfield.width=window.innerWidth; starfield.height=window.innerHeight;
-for(let s=0;s<120;s++){
-  ctx.fillStyle="white";
-  ctx.fillRect(Math.random()*starfield.width,Math.random()*starfield.height,1,1);
-}
+function drawReticle(){const c=document.getElementById("reticle"),x=c.getContext("2d"),s=Math.min(window.innerWidth,window.innerHeight)*.6;c.width=s;c.height=s;const m=s/2,o=s*.45,i=s*.2;x.clearRect(0,0,s,s);x.strokeStyle="#0ff";x.lineWidth=2;x.beginPath();x.arc(m,m,o,0,2*Math.PI);x.stroke();x.beginPath();x.arc(m,m,i,0,2*Math.PI);x.stroke();x.beginPath();x.moveTo(m,0);x.lineTo(m,s);x.moveTo(0,m);x.lineTo(s,m);x.stroke();c.classList.add("shimmer-glow")}window.addEventListener("load",drawReticle);window.addEventListener("resize",drawReticle);
+const steps=[{msg:"Loading catalogs...",cls:"yellow"},{msg:"Messier loaded (110 objects)",cls:"green"},{msg:"Caldwell loaded (109 objects)",cls:"green"},{msg:"BrightNGC loaded (100 objects)",cls:"green"},{msg:"Initializing scope presets...",cls:"yellow"},{msg:"Scope presets ready",cls:"green"},{msg:"Camera presets ready",cls:"green"},{msg:"Fetching GPS...",cls:"yellow"},{msg:"GPS locked (38.89°N, 77.03°W)",cls:"green"},{msg:"Connecting to NASA APOD...",cls:"yellow"},{msg:"APOD loaded",cls:"green"},{msg:"Lock acquired — AstroTarget Ready",cls:"red"}];let i=0,l=document.getElementById("bootlog"),max=4;function addStep(){if(i<steps.length){let e=document.createElement("span");e.className=`log-entry ${steps[i].cls}`;e.textContent=steps[i].msg;l.appendChild(e);if(l.children.length>max){l.children[0].classList.add("fade");setTimeout(()=>l.removeChild(l.children[0]),1e3)}i++;setTimeout(addStep,800)}}addStep();
+const sf=document.getElementById("stars"),ctx=sf.getContext("2d");sf.width=window.innerWidth;sf.height=window.innerHeight;for(let s=0;s<120;s++){ctx.fillStyle="white";ctx.fillRect(Math.random()*sf.width,Math.random()*sf.height,1,1);}
 </script>
-</body>
-</html>
+</body></html>
