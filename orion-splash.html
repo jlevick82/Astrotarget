@@ -12,7 +12,7 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 #sharedT{position:relative;color:#fff;text-shadow:0 0 10px #0ff;cursor:pointer;display:inline-block}
 #reticle-ring{position:absolute;top:50%;left:50%;width:6vw;height:6vw;border:.4vw solid rgba(0,255,255,.7);border-radius:50%;box-shadow:0 0 12px rgba(0,255,255,.9);transform:translate(-50%,-50%);animation:pulse 2s infinite alternate;pointer-events:none;opacity:0}
 #reticle{display:flex;flex-direction:column;align-items:center;margin-top:1vh}
-.caret{font-size:3vw;color:#0ff;line-height:.9;text-shadow:0 0 6px #0ff;letter-spacing:1vw}
+.caret{font-size:3vw;color:#0ff;line-height:1;text-shadow:0 0 6px #0ff;letter-spacing:0;text-align:center}
 #target-line{color:#f66;line-height:1.2;text-align:center;font-size:7vw}
 #target-line span{display:block}
 #tagline{margin-top:3vh;font-size:3.8vw;opacity:0;color:#ccc;font-style:italic;text-align:center;text-shadow:0 0 8px #0ff;z-index:1}
@@ -32,7 +32,12 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 <canvas id="starfield"></canvas>
 <div id="logo">
   <div id="astro-line"><span class="dash">———</span>AS<span id="sharedT">T<div id="reticle-ring"></div></span>RO<span class="dash">———</span></div>
-  <div id="reticle"><div class="caret">^   ^   ^</div><div id="target-line"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div></div>
+  <div id="reticle">
+    <div class="caret">^</div>
+    <div class="caret">^</div>
+    <div class="caret">^</div>
+    <div id="target-line"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
+  </div>
 </div>
 <div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
 <div id="bootChecks"></div>
