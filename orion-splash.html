@@ -10,17 +10,19 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 #astro-line,#target-line{opacity:0}
 .dash{font-size:1em;color:#0ff;margin:0 .6em;text-shadow:0 0 8px #0ff}
 #sharedT{position:relative;display:inline-block;color:#fff;text-shadow:0 0 10px #0ff;cursor:pointer;touch-action:none;line-height:1;z-index:2}
-#reticle-svg{position:absolute;top:50%;left:50%;width:3.5em;height:3.5em;transform:translate(-50%,-50%);pointer-events:none;opacity:0}
+#reticle-svg{position:absolute;top:50%;left:50%;width:3.5em;height:3.5em;transform:translate(-50%,-50%);pointer-events:none;z-index:0}
 #reticle-svg circle{stroke:cyan;stroke-width:3;fill:none;animation:pulse 2s infinite alternate}
 #reticle-svg line{stroke:cyan;stroke-width:1;opacity:0;animation:lineFade 2s forwards}
 #target-line{color:#f66;line-height:1.2;text-align:center;font-size:7vw}
 #target-line span{display:block}
-#tagline{margin-top:3vh;font-size:3.8vw;opacity:0;color:#ccc;font-style:italic;text-align:center;text-shadow:0 0 8px #0ff,0 0 16px #0ff;z-index:1;white-space:nowrap;overflow:hidden;border-right:.15em solid #0ff;width:0}
+#tagline{margin-top:3vh;font-size:3.8vw;opacity:0;color:#ccc;font-style:italic;text-align:center;text-shadow:0 0 8px #0ff,0 0 16px #0ff;z-index:1;max-width:90vw;word-wrap:break-word;border-right:.15em solid #0ff;white-space:nowrap;overflow:hidden}
 .typewriter{animation:typing 4s steps(40,end) forwards,blink .75s step-end infinite}
 @keyframes typing{from{width:0}to{width:100%}}
 @keyframes blink{from,to{border-color:transparent}50%{border-color:#0ff}}
 @keyframes taglinePulse{0%{text-shadow:0 0 8px #0ff,0 0 16px #0ff}50%{text-shadow:0 0 20px #0ff,0 0 40px #0ff}100%{text-shadow:0 0 8px #0ff,0 0 16px #0ff}}
-#bootChecks{position:fixed;bottom:3%;left:50%;transform:translateX(-50%);width:90%;max-width:600px;text-align:center;font-family:monospace;font-size:clamp(14px,3.5vw,20px);z-index:1;line-height:1.6;text-shadow:0 0 6px #000,0 0 12px #0ff}
+#bootChecks{position:fixed;bottom:3%;left:50%;transform:translateX(-50%);width:90%;max-width:600px;text-align:center;font-family:monospace;font-size:clamp(14px,3.5vw,20px);z-index:1;line-height:1.6;text-shadow:0 0 6px #000,0 0 12px #0ff;max-height:40vh;overflow:hidden}
+#bootChecks div{opacity:0;animation:fadeInLog 1s forwards}
+@keyframes fadeInLog{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ok{color:#0ff}.fail{color:#f33}.wait{color:#39f}
 .fadeIn{animation:fadeIn 2s forwards}
 .glowReveal{animation:glowIn 2s forwards}
@@ -64,10 +66,25 @@ setTimeout(()=>{
   const tagline=document.getElementById("tagline");
   tagline.style.opacity=1;
   tagline.classList.add("typewriter");
-  setTimeout(()=>tagline.style.animation+=" ,taglinePulse 2s ease-in-out",4500);
+  setTimeout(()=>{
+    tagline.style.animation+=" ,taglinePulse 2s ease-in-out";
+    tagline.style.borderRight="none"; // remove cursor after typing
+  },4500);
 },3000);
-const b=document.getElementById("bootChecks");function log(m,c="wait",d=0){setTimeout(()=>{let l=document.createElement("div");l.className=c;l.textContent=m;b.appendChild(l);let a=b.querySelectorAll("div");a.length>6&&b.removeChild(a[0])},d)}
-log("⏳ Loading catalogs...","wait",4000);log("✔ Messier loaded (110 objects)","ok",5500);log("✔ Caldwell loaded (109 objects)","ok",6500);log("✔ BrightNGC loaded (100 objects)","ok",7500);log("⏳ Initializing scope presets...","wait",8500);log("✔ Scope presets ready","ok",9500);log("✔ Camera presets ready","ok",10500);log("⏳ Fetching GPS...","wait",11500);log("✔ GPS locked (38.89°N, 77.03°W)","ok",13000);log("⏳ Connecting to NASA APOD...","wait",14000);log("✔ APOD loaded","ok",15500);log("🎯 Lock acquired — AstroTarget Ready","ok",17000);
+const b=document.getElementById("bootChecks");
+function log(m,c="wait",d=0){setTimeout(()=>{let l=document.createElement("div");l.className=c;l.textContent=m;b.appendChild(l);let a=b.querySelectorAll("div");if(a.length>6){a[0].style.transition="opacity 0.5s";a[0].style.opacity=0;setTimeout(()=>a[0].remove(),500)}},d)}
+log("⏳ Loading catalogs...","wait",4000);
+log("✔ Messier loaded (110 objects)","ok",5500);
+log("✔ Caldwell loaded (109 objects)","ok",6500);
+log("✔ BrightNGC loaded (100 objects)","ok",7500);
+log("⏳ Initializing scope presets...","wait",8500);
+log("✔ Scope presets ready","ok",9500);
+log("✔ Camera presets ready","ok",10500);
+log("⏳ Fetching GPS...","wait",11500);
+log("✔ GPS locked (38.89°N, 77.03°W)","ok",13000);
+log("⏳ Connecting to NASA APOD...","wait",14000);
+log("✔ APOD loaded","ok",15500);
+log("🎯 Lock acquired — AstroTarget Ready","ok",17000);
 setTimeout(()=>{if(!w){document.body.style.opacity=0;setTimeout(()=>location.href="index.html",2000)}},19000);
 let t=0;document.getElementById("sharedT").addEventListener("click",()=>{t++;if(t>=7&&!w){w=!0;document.getElementById("warpQuote").style.opacity=1;setTimeout(()=>{w=!1;document.body.style.opacity=0;setTimeout(()=>location.href="index.html",2000)},15000)}});
 // shimmer loop
