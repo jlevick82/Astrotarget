@@ -1,38 +1,53 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>AstroTarget Splash</title><style>
-body{margin:0;background:#000;color:#0ff;font-family:monospace;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh}
-canvas#stars{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1}
-.logo{position:relative;width:80vmin;height:80vmin;display:flex;align-items:center;justify-content:center}
-.logo svg{position:absolute;top:0;left:0;width:100%;height:100%}
-.astrotarget{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center}
-.astro{display:flex;align-items:center;font-size:10vmin;letter-spacing:1vmin}
-.astro span{color:#0ff;text-shadow:0 0 12px #0ff}
-.astro .shared{color:#fff;text-shadow:0 0 15px #fff;font-weight:bold}
-.target{display:flex;flex-direction:column;align-items:center;font-size:8vmin;color:#f44;text-shadow:0 0 12px #f44;margin-top:.5vmin}
-.tagline{margin-top:2vmin;color:#0ff;font-size:3.5vmin;text-align:center;text-shadow:0 0 12px #0ff;max-width:90%}
-.loader{margin-top:2vmin;font-size:3vmin;text-align:center;line-height:1.6}
-.loader span{display:block;opacity:.8}
-.green{color:#0f0;text-shadow:0 0 8px #0f0}
-.yellow{color:#ff0;text-shadow:0 0 8px #ff0}
-.blue{color:#0ff;text-shadow:0 0 8px #0ff}
-.red{color:#f44;text-shadow:0 0 8px #f44}
-</style></head><body>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>AstroTarget Splash</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#0ff;font-family:monospace;overflow:hidden;touch-action:manipulation}
+canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2}
+#reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70vmin;height:70vmin;border:2px solid #0ff;border-radius:50%;box-shadow:0 0 15px #0ff,inset 0 0 10px #0ff}
+#reticle:before,#reticle:after{content:"";position:absolute;background:#0ff}
+#reticle:before{top:50%;left:0;width:100%;height:2px;transform:translateY(-50%)}
+#reticle:after{left:50%;top:0;width:2px;height:100%;transform:translateX(-50%)}
+#inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30vmin;height:30vmin;border:2px solid #0ff;border-radius:50%}
+#logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+#astro{font-size:7vmin;letter-spacing:1vmin;text-shadow:0 0 10px #fff,0 0 20px #0ff}
+#astro span{color:#0ff}
+#astro .t{color:#fff;animation:shimmer 6s infinite}
+#target{margin-top:2vmin;font-size:5vmin;line-height:1;color:#f44;text-shadow:0 0 8px #f44}
+#target span{display:block}
+@keyframes shimmer{0%,90%,100%{text-shadow:0 0 10px #fff}50%{text-shadow:0 0 25px #fff,0 0 40px #0ff}}
+#tagline{position:absolute;bottom:25%;width:100%;text-align:center;font-size:3.5vmin;color:#0ff;font-style:italic;text-shadow:0 0 8px #0ff}
+#loading{position:absolute;bottom:5%;width:100%;text-align:center;font-size:2.8vmin;line-height:1.6}
+#loading .line{opacity:0;animation:fadein 1s forwards}
+#loading .yellow{color:#ff0}#loading .green{color:#0f0}#loading .cyan{color:#0ff}#loading .red{color:#f44}
+@keyframes fadein{to{opacity:1}}
+</style></head>
+<body>
 <canvas id="stars"></canvas>
-<div class="logo">
-  <svg viewBox="0 0 200 200">
-    <circle cx="100" cy="100" r="80" stroke="#0ff" stroke-width="2" fill="none"/>
-    <circle cx="100" cy="100" r="30" stroke="#0ff" stroke-width="2" fill="none"/>
-    <line x1="20" y1="100" x2="180" y2="100" stroke="#0ff" stroke-width="2"/>
-    <line x1="100" y1="20" x2="100" y2="180" stroke="#0ff" stroke-width="2"/>
-  </svg>
-  <div class="astrotarget">
-    <div class="astro"><span>A</span><span>S</span><span class="shared">T</span><span>R</span><span>O</span></div>
-    <div class="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
-  </div>
+<div id="reticle"><div id="inner"></div></div>
+<div id="logo">
+<div id="astro"><span>A</span><span>S</span><span class="t">T</span><span>R</span><span>O</span></div>
+<div id="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
 </div>
-<div class="tagline">“The sky hides many secrets — only explorers will find them.”</div>
-<div class="loader" id="loader"></div>
+<div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
+<div id="loading"></div>
 <script>
-const canvas=document.getElementById("stars"),ctx=canvas.getContext("2d");let stars=[];function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;stars=Array.from({length:200},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,tw:Math.random()*0.5+0.5}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#fff";stars.forEach(s=>{s.r+=Math.random()*0.3-0.15;if(s.r<0.2)s.r=0.2;if(s.r>1.8)s.r=1.8;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fill()});requestAnimationFrame(draw)}window.addEventListener("resize",resize);resize();draw();
-const steps=[{txt:"Initializing scope presets...",cls:"yellow"},{txt:"Scope presets ready",cls:"green"},{txt:"Camera presets ready",cls:"green"},{txt:"Fetching GPS...",cls:"yellow"},{txt:"GPS locked (38.89°N,77.03°W)",cls:"green"},{txt:"Connecting to NASA APOD...",cls:"blue"},{txt:"APOD loaded",cls:"green"},{txt:"Lock acquired — AstroTarget Ready",cls:"red"}];let i=0;function load(){if(i<steps.length){const l=document.getElementById("loader"),s=document.createElement("span");s.className=steps[i].cls;s.textContent=steps[i].txt;l.appendChild(s);if(l.childElementCount>4)l.removeChild(l.firstChild);i++;setTimeout(load,1200)}}load();
+const c=document.getElementById("stars"),x=c.getContext("2d");let w,h,stars=[];
+function resize(){w=window.innerWidth;h=window.innerHeight;c.width=w;c.height=h}
+function initStars(){stars=[];for(let i=0;i<150;i++){stars.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+0.5,o:Math.random(),tw:Math.random()*200+50})}}
+function drawStars(){x.clearRect(0,0,w,h);stars.forEach(s=>{s.o+= (Math.random()>.5?1:-1)*0.02;if(s.o>1)s.o=1;if(s.o<0.2)s.o=0.2;x.beginPath();x.arc(s.x,s.y,s.r,0,2*Math.PI);x.fillStyle="rgba(255,255,255,"+s.o+")";x.fill()})}
+function loop(){drawStars();requestAnimationFrame(loop)}
+window.onresize=()=>{resize();initStars()};resize();initStars();loop();
+const lines=[
+'<span class="yellow">⏳ Initializing scope presets...</span>',
+'<span class="green">✔ Scope presets ready</span>',
+'<span class="green">✔ Camera presets ready</span>',
+'<span class="yellow">⏳ Fetching GPS...</span>',
+'<span class="green">✔ GPS locked (38.89°N, 77.03°W)</span>',
+'<span class="cyan">⏳ Connecting to NASA APOD...</span>',
+'<span class="green">✔ APOD loaded</span>',
+'<span class="red">🔒 Lock acquired — AstroTarget Ready</span>'
+];
+const box=document.getElementById("loading");
+lines.forEach((t,i)=>{let d=document.createElement("div");d.className="line";d.style.animationDelay=(i*1.2)+"s";d.innerHTML=t;box.appendChild(d)});
 </script>
 </body></html>
