@@ -15,6 +15,7 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+    transition: opacity 2s;
   }
   canvas {
     position: fixed;
@@ -31,49 +32,69 @@
     font-weight: bold;
     z-index: 1;
   }
-  #astro {
+  #astro-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #66ccff;
     opacity: 0;
     transform: translateX(-100vw);
     letter-spacing: 0.3em;
   }
-  #reticle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0.5em;
-  }
-  .caret {
-    font-size: 0.8em;
+  .dash {
+    font-size: 1em;
     color: #0ff;
-    line-height: 0.8;
+    margin: 0 0.6em;
+    text-shadow: 0 0 8px #0ff;
   }
-  #target {
+  #target-line {
     opacity: 0;
     transform: translateY(-100vh);
     color: #ff6666;
     line-height: 1.2;
     text-align: center;
   }
-  #target span { display: block; }
-  #crosshair {
+  #target-line span { display: block; }
+  #sharedT {
+    position: relative;
+    color: #fff;
+    text-shadow: 0 0 10px #0ff;
+    cursor: pointer;
+  }
+  #reticle-ring {
     position: absolute;
-    width: 20vw;
-    height: 20vw;
+    top: -0.55em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2.4em;
+    height: 2.4em;
+    border: 2px solid rgba(0,255,255,0.7);
     border-radius: 50%;
-    border: 2px solid rgba(0,255,255,0.5);
-    box-shadow: 0 0 15px rgba(0,255,255,0.7);
-    opacity: 0;
+    box-shadow: 0 0 12px rgba(0,255,255,0.9);
     animation: pulse 2s infinite alternate;
-    z-index: 0;
     pointer-events: none;
   }
+  #reticle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.4em;
+  }
+  .caret {
+    font-size: 1em;
+    color: #0ff;
+    line-height: 0.9;
+    text-shadow: 0 0 6px #0ff;
+    letter-spacing: 0.3em;
+  }
   #tagline {
-    margin-top: 2vh;
-    font-size: 3.5vw;
+    margin-top: 3vh;
+    font-size: 3.8vw;
     opacity: 0;
     color: #ccc;
     font-style: italic;
+    text-align: center;
+    text-shadow: 0 0 8px #0ff;
     z-index: 1;
   }
   #bootChecks {
@@ -86,14 +107,14 @@
     font-size: 3.2vw;
     z-index: 1;
     max-height: 25vh;
-    overflow: hidden; /* hide old lines */
+    overflow: hidden;
   }
   #bootChecks div {
     animation: fadeSlide 1s forwards;
   }
-  .ok { color: #0f0; }
-  .fail { color: #f33; }
-  .wait { color: #ff0; }
+  .ok { color: #0ff; text-shadow: 0 0 8px #0ff; }
+  .fail { color: #f33; text-shadow: 0 0 8px #900; }
+  .wait { color: #39f; text-shadow: 0 0 6px #0ff; }
   /* Animations */
   .fadeIn { animation: fadeIn 2s forwards; }
   .slideInX { animation: slideInX 2s forwards; }
@@ -103,32 +124,48 @@
   @keyframes slideInY { to { opacity: 1; transform: translateY(0); } }
   @keyframes pulse {
     from { opacity: 0.2; transform: scale(0.9); }
-    to { opacity: 0.6; transform: scale(1.1); }
+    to { opacity: 0.7; transform: scale(1.1); }
   }
   @keyframes fadeSlide {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Easter Egg Warp Mode */
+  #warpQuote {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+    opacity: 0;
+    z-index: 2;
   }
 </style>
 </head>
 <body>
 
 <canvas id="starfield"></canvas>
-<div id="crosshair"></div>
 
 <div id="logo">
-  <span id="astro">A S T R O</span>
+  <div id="astro-line">
+    <span class="dash">———</span>
+    AS<span id="sharedT">T<div id="reticle-ring"></div></span>RO
+    <span class="dash">———</span>
+  </div>
   <div id="reticle">
-    <div class="caret">^</div>
-    <div class="caret">^</div>
-    <span id="target">
-      <span>T</span><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
-    </span>
+    <div class="caret">^   ^   ^</div>
+    <div id="target-line">
+      <span id="sharedT">T</span>
+      <span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
+    </div>
   </div>
 </div>
 
 <div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
 <div id="bootChecks"></div>
+<div id="warpQuote">“Somewhere, something incredible is waiting to be known.” — Carl Sagan</div>
 
 <script>
 const canvas = document.getElementById("starfield");
@@ -140,7 +177,7 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// === Smooth twinkling stars ===
+// === Normal Starfield ===
 let stars = [];
 for (let i=0;i<200;i++) {
   stars.push({
@@ -150,29 +187,48 @@ for (let i=0;i<200;i++) {
     phase: Math.random()*Math.PI*2
   });
 }
+let warpMode = false;
 function drawStars() {
   ctx.globalAlpha = 1.0;
   ctx.fillStyle = "black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  stars.forEach(s=>{
-    s.phase += 0.02;
-    const alpha = 0.6 + 0.4*Math.sin(s.phase);
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
-    ctx.fillStyle="white";
-    ctx.fill();
-  });
+
+  if (warpMode) {
+    // Warp effect
+    stars.forEach(s=>{
+      ctx.beginPath();
+      ctx.strokeStyle="cyan";
+      ctx.moveTo(canvas.width/2, canvas.height/2);
+      ctx.lineTo(s.x, s.y);
+      ctx.stroke();
+      s.x += (s.x - canvas.width/2) * 0.05;
+      s.y += (s.y - canvas.height/2) * 0.05;
+      if (s.x<0||s.x>canvas.width||s.y<0||s.y>canvas.height) {
+        s.x = canvas.width/2;
+        s.y = canvas.height/2;
+      }
+    });
+  } else {
+    // Normal twinkle
+    stars.forEach(s=>{
+      s.phase += 0.02;
+      const alpha = 0.6 + 0.4*Math.sin(s.phase);
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
+      ctx.fillStyle="white";
+      ctx.fill();
+    });
+  }
   ctx.globalAlpha = 1.0;
   requestAnimationFrame(drawStars);
 }
 drawStars();
 
 // === Animations ===
-setTimeout(()=>document.getElementById("astro").classList.add("slideInX"),1000);
-setTimeout(()=>document.getElementById("target").classList.add("slideInY"),2000);
-setTimeout(()=>document.getElementById("crosshair").style.opacity="1",3000);
-setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),4000);
+setTimeout(()=>document.getElementById("astro-line").classList.add("slideInX"),1000);
+setTimeout(()=>document.getElementById("target-line").classList.add("slideInY"),2000);
+setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),3000);
 
 // Boot checks
 const bootChecks = document.getElementById("bootChecks");
@@ -182,26 +238,56 @@ function logCheck(msg, status="wait", delay=0) {
     line.className = status;
     line.textContent = msg;
     bootChecks.appendChild(line);
-
-    // Keep only last 6 visible
     const lines = bootChecks.querySelectorAll("div");
     if (lines.length > 6) {
       bootChecks.removeChild(lines[0]);
     }
   }, delay);
 }
-logCheck("⏳ Loading catalogs...", "wait", 4500);
-logCheck("✅ Messier loaded (110 objects)", "ok", 6000);
-logCheck("✅ Caldwell loaded (109 objects)", "ok", 7000);
-logCheck("✅ BrightNGC loaded (100 objects)", "ok", 8000);
-logCheck("⏳ Initializing scope presets...", "wait", 9000);
-logCheck("✅ Scope presets ready", "ok", 10000);
-logCheck("✅ Camera presets ready", "ok", 11000);
-logCheck("⏳ Fetching GPS...", "wait", 12000);
-logCheck("✅ GPS locked (38.89°N, 77.03°W)", "ok", 13500);
-logCheck("⏳ Connecting to NASA APOD...", "wait", 14500);
-logCheck("✅ APOD loaded", "ok", 16000);
-logCheck("✅ Initialization complete", "ok", 17500);
+logCheck("⏳ Loading catalogs...", "wait", 4000);
+logCheck("✔ Messier loaded (110 objects)", "ok", 5500);
+logCheck("✔ Caldwell loaded (109 objects)", "ok", 6500);
+logCheck("✔ BrightNGC loaded (100 objects)", "ok", 7500);
+logCheck("⏳ Initializing scope presets...", "wait", 8500);
+logCheck("✔ Scope presets ready", "ok", 9500);
+logCheck("✔ Camera presets ready", "ok", 10500);
+logCheck("⏳ Fetching GPS...", "wait", 11500);
+logCheck("✔ GPS locked (38.89°N, 77.03°W)", "ok", 13000);
+logCheck("⏳ Connecting to NASA APOD...", "wait", 14000);
+logCheck("✔ APOD loaded", "ok", 15500);
+logCheck("🎯 Lock acquired — AstroTarget Ready", "ok", 17000);
+
+// Auto transition after boot
+setTimeout(()=>{
+  if (!warpMode) {
+    document.body.style.opacity = 0;
+    setTimeout(()=>{
+      window.location.href = "index.html"; 
+    }, 2000);
+  }
+}, 19000);
+
+// === Easter Egg Warp Trigger ===
+let tapCount = 0;
+const sharedT = document.querySelectorAll("#sharedT");
+sharedT.forEach(el=>{
+  el.addEventListener("click", ()=>{
+    tapCount++;
+    if (tapCount >= 7 && !warpMode) {
+      warpMode = true;
+      document.getElementById("warpQuote").style.opacity = 1;
+
+      // Exit warp after 15s
+      setTimeout(()=>{
+        warpMode = false;
+        document.body.style.opacity = 0;
+        setTimeout(()=>{
+          window.location.href = "index.html"; 
+        }, 2000);
+      }, 15000);
+    }
+  });
+});
 </script>
 </body>
 </html>
