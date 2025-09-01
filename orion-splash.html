@@ -1,37 +1,44 @@
 <!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AstroTarget Splash</title>
 <style>
-body{margin:0;padding:0;background:#000;color:#fff;overflow:hidden;font-family:monospace;height:100vh;display:flex;justify-content:center;align-items:center}
-#stars{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-3}
-#reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:-1;opacity:0;animation:fadeInReticle 2s ease forwards}
-@keyframes fadeInReticle{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
-.shimmer-glow{animation:shimmer 3s infinite alternate}
-@keyframes shimmer{0%{filter:drop-shadow(0 0 4px #0ff) drop-shadow(0 0 8px #0ff)}50%{filter:drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #0ff)}100%{filter:drop-shadow(0 0 4px #0ff) drop-shadow(0 0 8px #0ff)}}
-#logo{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);text-align:center}
-#astro{color:#0ff;font-size:10vw;text-shadow:0 0 10px #0ff;letter-spacing:.15em}
-#sharedT{color:#fff;font-size:10vw;text-shadow:0 0 14px #fff,0 0 28px #0ff}
-#target{margin-top:-.1em;display:flex;flex-direction:column;align-items:center}
-#target div{color:#f44;font-size:8vw;text-shadow:0 0 10px #f44,0 0 20px #f00;line-height:.9em}
-#tagline{position:absolute;top:70%;left:50%;transform:translateX(-50%);font-size:4.5vw;text-align:center;width:90%;color:#0ff;font-style:italic;text-shadow:0 0 12px #0ff;animation:flicker 3s infinite alternate}
-@keyframes flicker{0%{opacity:1}45%{opacity:.9}50%{opacity:.6}100%{opacity:1}}
-#bootlog{position:absolute;bottom:5vh;width:100%;text-align:center;font-size:3.8vw;line-height:1.5em}
-.log-entry{display:block}
-.green{color:#0f0;text-shadow:0 0 5px #0f0}
-.yellow{color:#ff0;text-shadow:0 0 5px #ff0}
-.red{color:#f44;text-shadow:0 0 5px #f44}
-.fade{opacity:0;transition:opacity 1s ease}
-@media(max-width:600px){#astro,#sharedT{font-size:12vw}#target{font-size:10vw}#tagline{font-size:5vw}#bootlog{font-size:4vw}}
-</style></head>
-<body>
-<canvas id="stars"></canvas>
-<canvas id="reticle"></canvas>
-<div id="logo"><div id="astro">AS<span id="sharedT">T</span>RO</div><div id="target"><div>A</div><div>R</div><div>G</div><div>E</div><div>T</div></div></div>
-<p id="tagline">“The sky hides many secrets<br>— only explorers will find them.”</p>
-<div id="bootlog"></div>
+body{margin:0;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:black;color:#0ff;overflow:hidden;font-family:monospace}
+#starfield{position:absolute;width:100%;height:100%;top:0;left:0;z-index:-1}
+#logo{position:relative;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
+#astro{font-size:8vw;letter-spacing:0.5vw;text-shadow:0 0 15px #0ff;color:#0ff;margin:0;line-height:1}
+#target{display:flex;flex-direction:column;align-items:center;position:absolute;top:50%;transform:translateY(0);font-size:5.5vw;line-height:1.1;color:#f44;text-shadow:0 0 15px #f44}
+#target span{display:block}
+#reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:0.6vw solid #0ff;border-radius:50%;width:50vw;height:50vw;box-shadow:0 0 20px #0ff;display:flex;justify-content:center;align-items:center}
+#reticle:before,#reticle:after{content:"";position:absolute;background:#0ff}
+#reticle:before{width:100%;height:0.3vw}
+#reticle:after{height:100%;width:0.3vw}
+#reticle-inner{width:20vw;height:20vw;border:0.3vw solid #0ff;border-radius:50%;box-shadow:0 0 15px #0ff}
+#tagline{margin-top:auto;text-align:center;font-size:4.5vw;color:#0ff;text-shadow:0 0 12px #0ff;max-width:90%;line-height:1.3}
+#boot{margin-top:2vh;font-size:3.5vw;text-align:center;line-height:1.4;white-space:pre-line}
+.boot-yellow{color:#ff0;text-shadow:0 0 8px #ff0}
+.boot-green{color:#0f0;text-shadow:0 0 8px #0f0}
+.boot-blue{color:#0ff;text-shadow:0 0 8px #0ff}
+.boot-red{color:#f44;text-shadow:0 0 8px #f44}
+</style></head><body>
+<canvas id="starfield"></canvas>
+<div id="logo">
+<div id="astro">AS<span style="color:#fff">T</span>RO</div>
+<div id="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
+<div id="reticle"><div id="reticle-inner"></div></div>
+</div>
+<div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
+<div id="boot">
+<span class="boot-yellow">⏳ Initializing scope presets...</span><br>
+<span class="boot-green">✔ Scope presets ready</span><br>
+<span class="boot-green">✔ Camera presets ready</span><br>
+<span class="boot-yellow">⏳ Fetching GPS...</span><br>
+<span class="boot-green">✔ GPS locked (38.89°N, 77.03°W)</span><br>
+<span class="boot-blue">⏳ Connecting to NASA APOD...</span><br>
+<span class="boot-green">✔ APOD loaded</span><br>
+<span class="boot-red">🔒 Lock acquired — AstroTarget Ready</span>
+</div>
 <script>
-function drawReticle(){const c=document.getElementById("reticle"),x=c.getContext("2d"),s=Math.min(window.innerWidth,window.innerHeight)*.6;c.width=s;c.height=s;const m=s/2,o=s*.45,i=s*.2;x.clearRect(0,0,s,s);x.strokeStyle="#0ff";x.lineWidth=2;x.beginPath();x.arc(m,m,o,0,2*Math.PI);x.stroke();x.beginPath();x.arc(m,m,i,0,2*Math.PI);x.stroke();x.beginPath();x.moveTo(m,0);x.lineTo(m,s);x.moveTo(0,m);x.lineTo(s,m);x.stroke();c.classList.add("shimmer-glow")}window.addEventListener("load",drawReticle);window.addEventListener("resize",drawReticle);
-const steps=[{msg:"Loading catalogs...",cls:"yellow"},{msg:"Messier loaded (110 objects)",cls:"green"},{msg:"Caldwell loaded (109 objects)",cls:"green"},{msg:"BrightNGC loaded (100 objects)",cls:"green"},{msg:"Initializing scope presets...",cls:"yellow"},{msg:"Scope presets ready",cls:"green"},{msg:"Camera presets ready",cls:"green"},{msg:"Fetching GPS...",cls:"yellow"},{msg:"GPS locked (38.89°N, 77.03°W)",cls:"green"},{msg:"Connecting to NASA APOD...",cls:"yellow"},{msg:"APOD loaded",cls:"green"},{msg:"Lock acquired — AstroTarget Ready",cls:"red"}];let i=0,l=document.getElementById("bootlog"),max=4;function addStep(){if(i<steps.length){let e=document.createElement("span");e.className=`log-entry ${steps[i].cls}`;e.textContent=steps[i].msg;l.appendChild(e);if(l.children.length>max){l.children[0].classList.add("fade");setTimeout(()=>l.removeChild(l.children[0]),1e3)}i++;setTimeout(addStep,800)}}addStep();
-const sf=document.getElementById("stars"),ctx=sf.getContext("2d");sf.width=window.innerWidth;sf.height=window.innerHeight;for(let s=0;s<120;s++){ctx.fillStyle="white";ctx.fillRect(Math.random()*sf.width,Math.random()*sf.height,1,1);}
+const canvas=document.getElementById("starfield"),ctx=canvas.getContext("2d");let stars=[];function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}window.onresize=resize;resize();for(let i=0;i<150;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5});function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#fff";for(let s of stars){ctx.globalAlpha=Math.random();ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fill()}ctx.globalAlpha=1;requestAnimationFrame(animate)}animate();
 </script>
 </body></html>
