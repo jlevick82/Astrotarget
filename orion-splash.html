@@ -1,35 +1,73 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>AstroTarget Splash</title><style>
-body{margin:0;overflow:hidden;background:black;color:#0ff;font-family:monospace;text-align:center}
-#splashCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
-.logo{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.logo h1{margin:0;font-size:3em;letter-spacing:0.2em;color:#0ff;text-shadow:0 0 20px #0ff}
-.logo h1 span{color:#fff;text-shadow:0 0 25px #fff}
-.logo .vertical{display:flex;flex-direction:column;align-items:center;color:#f44;text-shadow:0 0 15px #f44;font-size:2em;margin-top:0.2em}
-.tagline{position:absolute;top:65%;left:50%;transform:translateX(-50%);color:#0ff;font-style:italic;font-size:1.1em;text-shadow:0 0 15px #0ff}
-#loading{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);text-align:center;font-size:0.9em}
-.check{color:#0f0} .wait{color:#ff0} .err{color:#f44} .info{color:#0ff}
-</style></head><body>
-<canvas id="splashCanvas"></canvas>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroTarget Splash</title>
+<style>
+html,body{margin:0;padding:0;height:100%;background:#000;color:#fff;
+  font-family:monospace;overflow:hidden;display:flex;flex-direction:column;
+  justify-content:space-between;align-items:center;text-align:center}
+canvas#starfield{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1}
+.logo{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.logo svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60vmin;height:60vmin}
+.logo .astro{font-size:8vmin;letter-spacing:1vmin;color:#0ff;text-shadow:0 0 10px #0ff}
+.logo .target{font-size:6vmin;color:#f44;text-shadow:0 0 10px #f44;display:flex;flex-direction:column;align-items:center;margin-top:1vmin}
+.tagline{font-size:3.5vmin;color:#0ff;text-shadow:0 0 12px #0ff;margin:2vmin;max-width:90%}
+.boot{font-size:3vmin;line-height:1.3em;min-height:5em;max-height:6em;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;width:100%}
+.boot-line{opacity:0;animation:fadeIn 0.6s forwards}
+@keyframes fadeIn{to{opacity:1}}
+.green{color:#0f0;text-shadow:0 0 8px #0f0}
+.yellow{color:#ff0;text-shadow:0 0 8px #ff0}
+.blue{color:#0ff;text-shadow:0 0 8px #0ff}
+.red{color:#f44;text-shadow:0 0 8px #f44}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
 <div class="logo">
-  <h1>A S<span>T</span>R O</h1>
-  <div class="vertical">
+  <svg viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="80" stroke="#0ff" stroke-width="2" fill="none"/>
+    <circle cx="100" cy="100" r="30" stroke="#0ff" stroke-width="2" fill="none"/>
+    <line x1="20" y1="100" x2="180" y2="100" stroke="#0ff" stroke-width="2"/>
+    <line x1="100" y1="20" x2="100" y2="180" stroke="#0ff" stroke-width="2"/>
+  </svg>
+  <div class="astro">AS<span style="color:#fff">T</span>RO</div>
+  <div class="target">
     <span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
   </div>
 </div>
+
 <div class="tagline">“The sky hides many secrets — only explorers will find them.”</div>
-<div id="loading">
-  <div class="wait">⏳ Initializing scope presets...</div>
-  <div class="check">✔ Scope presets ready</div>
-  <div class="check">✔ Camera presets ready</div>
-  <div class="wait">⏳ Fetching GPS...</div>
-  <div class="check">✔ GPS locked (38.89°N, 77.03°W)</div>
-  <div class="wait">⏳ Connecting to NASA APOD...</div>
-  <div class="check">✔ APOD loaded</div>
-  <div class="err">🔒 Lock acquired — AstroTarget Ready</div>
-</div>
+
+<div class="boot" id="boot"></div>
+
 <script>
-const canvas=document.getElementById("splashCanvas"),ctx=canvas.getContext("2d");let stars=[];
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}resize();window.onresize=resize;
-for(let i=0;i<200;i++){stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.2+0.3,o:Math.random(),m:Math.random()<.15? "pulse":"static",spd:Math.random()*0.005+0.002,t:Math.random()*100})}
-function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);for(let s of stars){if(s.m==="pulse"){s.t+=s.spd;s.o=0.4+0.6*Math.abs(Math.sin(s.t))}else if(Math.random()<0.002){s.o=Math.random()*0.6+0.4}ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fillStyle="rgba(255,255,255,"+s.o+")";ctx.fill()}requestAnimationFrame(animate)}animate();
-</script></body></html>
+// STARFIELD
+const canvas=document.getElementById('starfield'),ctx=canvas.getContext('2d');
+let stars=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+function initStars(){stars=[];for(let i=0;i<120;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,tw:Math.random()*100})}
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.tw+=0.02+Math.random()*0.02;let alpha=0.5+0.5*Math.sin(s.tw);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fillStyle=`rgba(255,255,255,${alpha})`;ctx.fill()});requestAnimationFrame(animate)}
+window.onresize=()=>{resize();initStars()};resize();initStars();animate();
+
+// BOOT SEQUENCE
+const boot=document.getElementById('boot');
+const steps=[
+  '<span class="yellow">⌛ Initializing scope presets...</span>',
+  '<span class="green">✔ Scope presets ready</span>',
+  '<span class="green">✔ Camera presets ready</span>',
+  '<span class="yellow">⌛ Fetching GPS...</span>',
+  '<span class="green">✔ GPS locked (38.89°N, 77.03°W)</span>',
+  '<span class="blue">⌛ Connecting to NASA APOD...</span>',
+  '<span class="green">✔ APOD loaded</span>',
+  '<span class="red">🔒 Lock acquired — AstroTarget Ready</span>'
+];
+let i=0;
+function showNext(){if(i>=steps.length)return;let line=document.createElement('div');line.className='boot-line';line.innerHTML=steps[i];boot.appendChild(line);setTimeout(()=>{line.style.opacity=1},50);if(boot.children.length>4)boot.removeChild(boot.firstChild);i++;setTimeout(showNext,1200)}
+showNext();
+</script>
+</body>
+</html>
