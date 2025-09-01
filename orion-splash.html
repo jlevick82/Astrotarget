@@ -1,32 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AstroTarget Splash</title>
-<style>
-html,body{margin:0;padding:0;height:100%;background:#000;color:#fff;
-  font-family:monospace;overflow:hidden;display:flex;flex-direction:column;
-  justify-content:space-between;align-items:center;text-align:center}
-canvas#starfield{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1}
-.logo{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.logo svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60vmin;height:60vmin}
-.logo .astro{font-size:8vmin;letter-spacing:1vmin;color:#0ff;text-shadow:0 0 10px #0ff}
-.logo .target{font-size:6vmin;color:#f44;text-shadow:0 0 10px #f44;display:flex;flex-direction:column;align-items:center;margin-top:1vmin}
-.tagline{font-size:3.5vmin;color:#0ff;text-shadow:0 0 12px #0ff;margin:2vmin;max-width:90%}
-.boot{font-size:3vmin;line-height:1.3em;min-height:5em;max-height:6em;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;width:100%}
-.boot-line{opacity:0;animation:fadeIn 0.6s forwards}
-@keyframes fadeIn{to{opacity:1}}
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>AstroTarget Splash</title><style>
+body{margin:0;background:#000;color:#0ff;font-family:monospace;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh}
+canvas#stars{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1}
+.logo{position:relative;width:80vmin;height:80vmin;display:flex;align-items:center;justify-content:center}
+.logo svg{position:absolute;top:0;left:0;width:100%;height:100%}
+.astrotarget{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center}
+.astro{display:flex;align-items:center;font-size:10vmin;letter-spacing:1vmin}
+.astro span{color:#0ff;text-shadow:0 0 12px #0ff}
+.astro .shared{color:#fff;text-shadow:0 0 15px #fff;font-weight:bold}
+.target{display:flex;flex-direction:column;align-items:center;font-size:8vmin;color:#f44;text-shadow:0 0 12px #f44;margin-top:.5vmin}
+.tagline{margin-top:2vmin;color:#0ff;font-size:3.5vmin;text-align:center;text-shadow:0 0 12px #0ff;max-width:90%}
+.loader{margin-top:2vmin;font-size:3vmin;text-align:center;line-height:1.6}
+.loader span{display:block;opacity:.8}
 .green{color:#0f0;text-shadow:0 0 8px #0f0}
 .yellow{color:#ff0;text-shadow:0 0 8px #ff0}
 .blue{color:#0ff;text-shadow:0 0 8px #0ff}
 .red{color:#f44;text-shadow:0 0 8px #f44}
-</style>
-</head>
-<body>
-<canvas id="starfield"></canvas>
-
+</style></head><body>
+<canvas id="stars"></canvas>
 <div class="logo">
   <svg viewBox="0 0 200 200">
     <circle cx="100" cy="100" r="80" stroke="#0ff" stroke-width="2" fill="none"/>
@@ -34,40 +24,15 @@ canvas#starfield{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-
     <line x1="20" y1="100" x2="180" y2="100" stroke="#0ff" stroke-width="2"/>
     <line x1="100" y1="20" x2="100" y2="180" stroke="#0ff" stroke-width="2"/>
   </svg>
-  <div class="astro">AS<span style="color:#fff">T</span>RO</div>
-  <div class="target">
-    <span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
+  <div class="astrotarget">
+    <div class="astro"><span>A</span><span>S</span><span class="shared">T</span><span>R</span><span>O</span></div>
+    <div class="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
   </div>
 </div>
-
 <div class="tagline">“The sky hides many secrets — only explorers will find them.”</div>
-
-<div class="boot" id="boot"></div>
-
+<div class="loader" id="loader"></div>
 <script>
-// STARFIELD
-const canvas=document.getElementById('starfield'),ctx=canvas.getContext('2d');
-let stars=[];
-function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
-function initStars(){stars=[];for(let i=0;i<120;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,tw:Math.random()*100})}
-function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.tw+=0.02+Math.random()*0.02;let alpha=0.5+0.5*Math.sin(s.tw);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fillStyle=`rgba(255,255,255,${alpha})`;ctx.fill()});requestAnimationFrame(animate)}
-window.onresize=()=>{resize();initStars()};resize();initStars();animate();
-
-// BOOT SEQUENCE
-const boot=document.getElementById('boot');
-const steps=[
-  '<span class="yellow">⌛ Initializing scope presets...</span>',
-  '<span class="green">✔ Scope presets ready</span>',
-  '<span class="green">✔ Camera presets ready</span>',
-  '<span class="yellow">⌛ Fetching GPS...</span>',
-  '<span class="green">✔ GPS locked (38.89°N, 77.03°W)</span>',
-  '<span class="blue">⌛ Connecting to NASA APOD...</span>',
-  '<span class="green">✔ APOD loaded</span>',
-  '<span class="red">🔒 Lock acquired — AstroTarget Ready</span>'
-];
-let i=0;
-function showNext(){if(i>=steps.length)return;let line=document.createElement('div');line.className='boot-line';line.innerHTML=steps[i];boot.appendChild(line);setTimeout(()=>{line.style.opacity=1},50);if(boot.children.length>4)boot.removeChild(boot.firstChild);i++;setTimeout(showNext,1200)}
-showNext();
+const canvas=document.getElementById("stars"),ctx=canvas.getContext("2d");let stars=[];function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;stars=Array.from({length:200},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,tw:Math.random()*0.5+0.5}))}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#fff";stars.forEach(s=>{s.r+=Math.random()*0.3-0.15;if(s.r<0.2)s.r=0.2;if(s.r>1.8)s.r=1.8;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,2*Math.PI);ctx.fill()});requestAnimationFrame(draw)}window.addEventListener("resize",resize);resize();draw();
+const steps=[{txt:"Initializing scope presets...",cls:"yellow"},{txt:"Scope presets ready",cls:"green"},{txt:"Camera presets ready",cls:"green"},{txt:"Fetching GPS...",cls:"yellow"},{txt:"GPS locked (38.89°N,77.03°W)",cls:"green"},{txt:"Connecting to NASA APOD...",cls:"blue"},{txt:"APOD loaded",cls:"green"},{txt:"Lock acquired — AstroTarget Ready",cls:"red"}];let i=0;function load(){if(i<steps.length){const l=document.getElementById("loader"),s=document.createElement("span");s.className=steps[i].cls;s.textContent=steps[i].txt;l.appendChild(s);if(l.childElementCount>4)l.removeChild(l.firstChild);i++;setTimeout(load,1200)}}load();
 </script>
-</body>
-</html>
+</body></html>
