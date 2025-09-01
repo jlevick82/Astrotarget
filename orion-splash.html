@@ -4,290 +4,59 @@
 <meta charset="UTF-8">
 <title>AstroTarget Splash</title>
 <style>
-  body {
-    margin: 0;
-    background: black;
-    overflow: hidden;
-    color: white;
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    transition: opacity 2s;
-  }
-  canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-  }
-  #logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 8vw;
-    font-weight: bold;
-    z-index: 1;
-  }
-  #astro-line {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #66ccff;
-    opacity: 0;
-    transform: translateX(-100vw);
-    letter-spacing: 0.3em;
-  }
-  .dash {
-    font-size: 1em;
-    color: #0ff;
-    margin: 0 0.6em;
-    text-shadow: 0 0 8px #0ff;
-  }
-  #target-line {
-    opacity: 0;
-    transform: translateY(-100vh);
-    color: #ff6666;
-    line-height: 1.2;
-    text-align: center;
-  }
-  #target-line span { display: block; }
-  #sharedT {
-    position: relative;
-    color: #fff;
-    text-shadow: 0 0 10px #0ff;
-    cursor: pointer;
-  }
-  #reticle-ring {
-    position: absolute;
-    top: -0.55em;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2.4em;
-    height: 2.4em;
-    border: 2px solid rgba(0,255,255,0.7);
-    border-radius: 50%;
-    box-shadow: 0 0 12px rgba(0,255,255,0.9);
-    animation: pulse 2s infinite alternate;
-    pointer-events: none;
-  }
-  #reticle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0.4em;
-  }
-  .caret {
-    font-size: 1em;
-    color: #0ff;
-    line-height: 0.9;
-    text-shadow: 0 0 6px #0ff;
-    letter-spacing: 0.3em;
-  }
-  #tagline {
-    margin-top: 3vh;
-    font-size: 3.8vw;
-    opacity: 0;
-    color: #ccc;
-    font-style: italic;
-    text-align: center;
-    text-shadow: 0 0 8px #0ff;
-    z-index: 1;
-  }
-  #bootChecks {
-    position: fixed;
-    bottom: 5%;
-    width: 90%;
-    max-width: 600px;
-    text-align: left;
-    font-family: monospace;
-    font-size: 3.2vw;
-    z-index: 1;
-    max-height: 25vh;
-    overflow: hidden;
-  }
-  #bootChecks div {
-    animation: fadeSlide 1s forwards;
-  }
-  .ok { color: #0ff; text-shadow: 0 0 8px #0ff; }
-  .fail { color: #f33; text-shadow: 0 0 8px #900; }
-  .wait { color: #39f; text-shadow: 0 0 6px #0ff; }
-  /* Animations */
-  .fadeIn { animation: fadeIn 2s forwards; }
-  .slideInX { animation: slideInX 2s forwards; }
-  .slideInY { animation: slideInY 2s forwards; }
-  @keyframes fadeIn { to { opacity: 1; } }
-  @keyframes slideInX { to { opacity: 1; transform: translateX(0); } }
-  @keyframes slideInY { to { opacity: 1; transform: translateY(0); } }
-  @keyframes pulse {
-    from { opacity: 0.2; transform: scale(0.9); }
-    to { opacity: 0.7; transform: scale(1.1); }
-  }
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  /* Easter Egg Warp Mode */
-  #warpQuote {
-    position: absolute;
-    bottom: 10%;
-    width: 100%;
-    text-align: center;
-    font-size: 4vw;
-    color: #0ff;
-    text-shadow: 0 0 10px #0ff;
-    opacity: 0;
-    z-index: 2;
-  }
+body{margin:0;background:#000;overflow:hidden;color:#fff;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;transition:opacity 2s}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+#logo{position:relative;display:flex;flex-direction:column;align-items:center;font-size:8vw;font-weight:700;z-index:1}
+#astro-line,#target-line{opacity:0}
+.dash{font-size:1em;color:#0ff;margin:0 .6em;text-shadow:0 0 8px #0ff}
+#sharedT{position:relative;color:#fff;text-shadow:0 0 10px #0ff;cursor:pointer;display:inline-block}
+#reticle-ring{position:absolute;top:50%;left:50%;width:6vw;height:6vw;border:.4vw solid rgba(0,255,255,.7);border-radius:50%;box-shadow:0 0 12px rgba(0,255,255,.9);transform:translate(-50%,-50%);animation:pulse 2s infinite alternate;pointer-events:none;opacity:0}
+#reticle{display:flex;flex-direction:column;align-items:center;margin-top:1vh}
+.caret{font-size:3vw;color:#0ff;line-height:.9;text-shadow:0 0 6px #0ff;letter-spacing:1vw}
+#target-line{color:#f66;line-height:1.2;text-align:center;font-size:7vw}
+#target-line span{display:block}
+#tagline{margin-top:3vh;font-size:3.8vw;opacity:0;color:#ccc;font-style:italic;text-align:center;text-shadow:0 0 8px #0ff;z-index:1}
+#bootChecks{position:fixed;bottom:5%;width:90%;max-width:600px;text-align:left;font-family:monospace;font-size:clamp(12px,3vw,18px);z-index:1;max-height:20vh;overflow:hidden}
+.ok{color:#0ff;text-shadow:0 0 8px #0ff}
+.fail{color:#f33;text-shadow:0 0 8px #900}
+.wait{color:#39f;text-shadow:0 0 6px #0ff}
+.fadeIn{animation:fadeIn 2s forwards}
+.glowReveal{animation:glowIn 2s forwards}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes glowIn{from{color:#222;text-shadow:none;opacity:0}to{opacity:1;text-shadow:0 0 12px currentColor}}
+@keyframes pulse{from{opacity:.2;transform:translate(-50%,-50%) scale(.9)}to{opacity:.7;transform:translate(-50%,-50%) scale(1.1)}}
+#warpQuote{position:absolute;bottom:10%;width:100%;text-align:center;font-size:4vw;color:#0ff;text-shadow:0 0 10px #0ff;opacity:0;z-index:2}
 </style>
 </head>
 <body>
-
 <canvas id="starfield"></canvas>
-
 <div id="logo">
-  <div id="astro-line">
-    <span class="dash">———</span>
-    AS<span id="sharedT">T<div id="reticle-ring"></div></span>RO
-    <span class="dash">———</span>
-  </div>
-  <div id="reticle">
-    <div class="caret">^   ^   ^</div>
-    <div id="target-line">
-      <span id="sharedT">T</span>
-      <span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
-    </div>
-  </div>
+  <div id="astro-line"><span class="dash">———</span>AS<span id="sharedT">T<div id="reticle-ring"></div></span>RO<span class="dash">———</span></div>
+  <div id="reticle"><div class="caret">^   ^   ^</div><div id="target-line"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div></div>
 </div>
-
 <div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
 <div id="bootChecks"></div>
 <div id="warpQuote">“Somewhere, something incredible is waiting to be known.” — Carl Sagan</div>
-
 <script>
-const canvas = document.getElementById("starfield");
-const ctx = canvas.getContext("2d");
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-// === Normal Starfield ===
-let stars = [];
-for (let i=0;i<200;i++) {
-  stars.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    r: Math.random()*1.5,
-    phase: Math.random()*Math.PI*2
-  });
-}
-let warpMode = false;
-function drawStars() {
-  ctx.globalAlpha = 1.0;
-  ctx.fillStyle = "black";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  if (warpMode) {
-    // Warp effect
-    stars.forEach(s=>{
-      ctx.beginPath();
-      ctx.strokeStyle="cyan";
-      ctx.moveTo(canvas.width/2, canvas.height/2);
-      ctx.lineTo(s.x, s.y);
-      ctx.stroke();
-      s.x += (s.x - canvas.width/2) * 0.05;
-      s.y += (s.y - canvas.height/2) * 0.05;
-      if (s.x<0||s.x>canvas.width||s.y<0||s.y>canvas.height) {
-        s.x = canvas.width/2;
-        s.y = canvas.height/2;
-      }
-    });
-  } else {
-    // Normal twinkle
-    stars.forEach(s=>{
-      s.phase += 0.02;
-      const alpha = 0.6 + 0.4*Math.sin(s.phase);
-      ctx.globalAlpha = alpha;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
-      ctx.fillStyle="white";
-      ctx.fill();
-    });
-  }
-  ctx.globalAlpha = 1.0;
-  requestAnimationFrame(drawStars);
-}
-drawStars();
-
-// === Animations ===
-setTimeout(()=>document.getElementById("astro-line").classList.add("slideInX"),1000);
-setTimeout(()=>document.getElementById("target-line").classList.add("slideInY"),2000);
-setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),3000);
-
-// Boot checks
-const bootChecks = document.getElementById("bootChecks");
-function logCheck(msg, status="wait", delay=0) {
-  setTimeout(()=>{
-    let line = document.createElement("div");
-    line.className = status;
-    line.textContent = msg;
-    bootChecks.appendChild(line);
-    const lines = bootChecks.querySelectorAll("div");
-    if (lines.length > 6) {
-      bootChecks.removeChild(lines[0]);
-    }
-  }, delay);
-}
-logCheck("⏳ Loading catalogs...", "wait", 4000);
-logCheck("✔ Messier loaded (110 objects)", "ok", 5500);
-logCheck("✔ Caldwell loaded (109 objects)", "ok", 6500);
-logCheck("✔ BrightNGC loaded (100 objects)", "ok", 7500);
-logCheck("⏳ Initializing scope presets...", "wait", 8500);
-logCheck("✔ Scope presets ready", "ok", 9500);
-logCheck("✔ Camera presets ready", "ok", 10500);
-logCheck("⏳ Fetching GPS...", "wait", 11500);
-logCheck("✔ GPS locked (38.89°N, 77.03°W)", "ok", 13000);
-logCheck("⏳ Connecting to NASA APOD...", "wait", 14000);
-logCheck("✔ APOD loaded", "ok", 15500);
-logCheck("🎯 Lock acquired — AstroTarget Ready", "ok", 17000);
-
-// Auto transition after boot
-setTimeout(()=>{
-  if (!warpMode) {
-    document.body.style.opacity = 0;
-    setTimeout(()=>{
-      window.location.href = "index.html"; 
-    }, 2000);
-  }
-}, 19000);
-
-// === Easter Egg Warp Trigger ===
-let tapCount = 0;
-const sharedT = document.querySelectorAll("#sharedT");
-sharedT.forEach(el=>{
-  el.addEventListener("click", ()=>{
-    tapCount++;
-    if (tapCount >= 7 && !warpMode) {
-      warpMode = true;
-      document.getElementById("warpQuote").style.opacity = 1;
-
-      // Exit warp after 15s
-      setTimeout(()=>{
-        warpMode = false;
-        document.body.style.opacity = 0;
-        setTimeout(()=>{
-          window.location.href = "index.html"; 
-        }, 2000);
-      }, 15000);
-    }
-  });
-});
+const c=document.getElementById("starfield"),x=c.getContext("2d");function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener("resize",resize);let s=[];for(let i=0;i<200;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5,p:Math.random()*Math.PI*2});let w=!1;function draw(){x.fillStyle="#000",x.fillRect(0,0,c.width,c.height),w?s.forEach(o=>{x.beginPath();x.strokeStyle="cyan";x.moveTo(c.width/2,c.height/2);x.lineTo(o.x,o.y);x.stroke();o.x+=(o.x-c.width/2)*.05;o.y+=(o.y-c.height/2)*.05;o.x<0||o.x>c.width||o.y<0||o.y>c.height?(o.x=c.width/2,o.y=c.height/2):0}):s.forEach(o=>{o.p+=.02;const a=.6+.4*Math.sin(o.p);x.globalAlpha=a;x.beginPath();x.arc(o.x,o.y,o.r,0,2*Math.PI);x.fillStyle="#fff";x.fill()});x.globalAlpha=1;requestAnimationFrame(draw)}draw();
+setTimeout(()=>document.getElementById("astro-line").classList.add("glowReveal"),1e3);
+setTimeout(()=>{document.getElementById("target-line").classList.add("glowReveal");document.getElementById("reticle-ring").style.opacity=1},2e3);
+setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),3e3);
+const b=document.getElementById("bootChecks");function log(m,c="wait",d=0){setTimeout(()=>{let l=document.createElement("div");l.className=c;l.textContent=m;b.appendChild(l);let a=b.querySelectorAll("div");a.length>6&&b.removeChild(a[0])},d)}
+log("⏳ Loading catalogs...","wait",4e3);
+log("✔ Messier loaded (110 objects)","ok",5500);
+log("✔ Caldwell loaded (109 objects)","ok",6500);
+log("✔ BrightNGC loaded (100 objects)","ok",7500);
+log("⏳ Initializing scope presets...","wait",8500);
+log("✔ Scope presets ready","ok",9500);
+log("✔ Camera presets ready","ok",10500);
+log("⏳ Fetching GPS...","wait",11500);
+log("✔ GPS locked (38.89°N, 77.03°W)","ok",13000);
+log("⏳ Connecting to NASA APOD...","wait",14000);
+log("✔ APOD loaded","ok",15500);
+log("🎯 Lock acquired — AstroTarget Ready","ok",17000);
+setTimeout(()=>{if(!w){document.body.style.opacity=0;setTimeout(()=>location.href="index.html",2e3)}},19000);
+let t=0;document.getElementById("sharedT").addEventListener("click",()=>{t++;if(t>=7&&!w){w=!0;document.getElementById("warpQuote").style.opacity=1;setTimeout(()=>{w=!1;document.body.style.opacity=0;setTimeout(()=>location.href="index.html",2e3)},15000)}})
 </script>
 </body>
 </html>
