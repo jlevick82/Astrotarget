@@ -6,89 +6,51 @@
 <style>
 body{margin:0;background:#000;overflow:hidden;color:#fff;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;transition:opacity 2s}
 canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
-#logo{position:relative;display:flex;flex-direction:column;align-items:center;font-size:8vw;font-weight:700;z-index:1}
+#logo{position:relative;display:flex;flex-direction:column;align-items:center;font-size:8vw;font-weight:700;z-index:1;text-align:center}
 #astro-line,#target-line{opacity:0}
-.dash{font-size:1em;color:#0ff;margin:0 .6em;text-shadow:0 0 8px #0ff}
-#sharedT{position:relative;display:inline-block;color:#fff;text-shadow:0 0 10px #0ff;cursor:pointer;touch-action:none;line-height:1;z-index:2}
-#reticle-svg{position:absolute;top:50%;left:50%;width:3.5em;height:3.5em;transform:translate(-50%,-50%);pointer-events:none;z-index:0}
-#reticle-svg circle{stroke:cyan;stroke-width:3;fill:none;animation:pulse 2s infinite alternate}
-#reticle-svg line{stroke:cyan;stroke-width:1;opacity:0;animation:lineFade 2s forwards}
-#target-line{color:#f66;line-height:1.2;text-align:center;font-size:7vw}
+#astro-line{text-shadow:0 0 8px #0ff,0 0 16px #0ff}
+#target-line{color:#f66;text-shadow:0 0 8px #f33,0 0 16px #f33;line-height:1.2;font-size:7vw}
 #target-line span{display:block}
-#tagline{margin-top:3vh;font-size:3.8vw;opacity:0;color:#ccc;font-style:italic;text-align:center;text-shadow:0 0 8px #0ff,0 0 16px #0ff;z-index:1;max-width:90vw;word-wrap:break-word;border-right:.15em solid #0ff;white-space:nowrap;overflow:hidden}
-.typewriter{animation:typing 4s steps(40,end) forwards,blink .75s step-end infinite}
-@keyframes typing{from{width:0}to{width:100%}}
+#sharedT{color:#fff;text-shadow:0 0 10px #0ff;cursor:pointer;touch-action:none;line-height:1;z-index:2;position:relative}
+#reticle-svg{position:absolute;top:50%;left:50%;width:12em;height:12em;transform:translate(-50%,-50%);pointer-events:none;z-index:0;opacity:.85}
+#reticle-svg circle{stroke:cyan;fill:none;animation:pulse 3s infinite alternate}
+#reticle-svg line{stroke:cyan}
+#tagline{margin-top:3vh;font-size:3.8vw;max-width:85vw;text-align:center;color:#ccc;font-style:italic;text-shadow:0 0 10px #0ff,0 0 20px #0ff;white-space:nowrap;overflow:hidden;border-right:.15em solid #0ff;display:inline-block}
+.typewriter{animation:typing 6s steps(60,end) forwards,blink .75s step-end infinite}
+.typewriter.finished{border-right:none}
+@keyframes typing{from{width:0}to{width:60ch}}
 @keyframes blink{from,to{border-color:transparent}50%{border-color:#0ff}}
-@keyframes taglinePulse{0%{text-shadow:0 0 8px #0ff,0 0 16px #0ff}50%{text-shadow:0 0 20px #0ff,0 0 40px #0ff}100%{text-shadow:0 0 8px #0ff,0 0 16px #0ff}}
+@keyframes pulse{from{stroke-width:2}to{stroke-width:4}}
 #bootChecks{position:fixed;bottom:3%;left:50%;transform:translateX(-50%);width:90%;max-width:600px;text-align:center;font-family:monospace;font-size:clamp(14px,3.5vw,20px);z-index:1;line-height:1.6;text-shadow:0 0 6px #000,0 0 12px #0ff;max-height:40vh;overflow:hidden}
 #bootChecks div{opacity:0;animation:fadeInLog 1s forwards}
 @keyframes fadeInLog{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ok{color:#0ff}.fail{color:#f33}.wait{color:#39f}
-.fadeIn{animation:fadeIn 2s forwards}
-.glowReveal{animation:glowIn 2s forwards}
-@keyframes fadeIn{to{opacity:1}}
-@keyframes glowIn{from{color:#222;text-shadow:none;opacity:0}to{opacity:1;text-shadow:0 0 12px currentColor}}
-@keyframes pulse{from{opacity:.3;transform:translate(-50%,-50%) scale(.95)}to{opacity:.8;transform:translate(-50%,-50%) scale(1.05)}}
-@keyframes shimmer{0%{text-shadow:0 0 10px #0ff,0 0 20px #0ff}50%{text-shadow:0 0 20px #0ff,0 0 40px #0ff}100%{text-shadow:0 0 10px #0ff,0 0 20px #0ff}}
-@keyframes lineFade{to{opacity:1}}
-.shimmer{animation:shimmer 1.5s ease-in-out}
-#warpQuote{position:absolute;bottom:12%;width:100%;text-align:center;font-size:4vw;color:#0ff;text-shadow:0 0 10px #0ff;opacity:0;z-index:2}
 </style>
 </head>
 <body>
 <canvas id="starfield"></canvas>
 <div id="logo">
-  <div id="astro-line">
-    <span class="dash">———</span>
-    AS
-    <span id="sharedT">
-      T
-      <svg id="reticle-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-        <circle cx="50" cy="50" r="45"/>
-        <line x1="50" y1="0" x2="50" y2="100"/>
-        <line x1="0" y1="50" x2="100" y2="50"/>
-      </svg>
-    </span>
-    RO
-    <span class="dash">———</span>
-  </div>
-  <div id="target-line"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
+<svg id="reticle-svg" viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="45"/>
+<circle cx="50" cy="50" r="15"/>
+<line x1="50" y1="0" x2="50" y2="100"/>
+<line x1="0" y1="50" x2="100" y2="50"/>
+<line x1="50" y1="5" x2="50" y2="15"/>
+<line x1="50" y1="85" x2="50" y2="95"/>
+<line x1="5" y1="50" x2="15" y2="50"/>
+<line x1="85" y1="50" x2="95" y2="50"/>
+</svg>
+<div id="astro-line">AS<span id="sharedT">T</span>RO</div>
+<div id="target-line"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
 </div>
-<div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
+<p id="tagline" class="typewriter">“The sky hides many secrets — only explorers will find them.”</p>
 <div id="bootChecks"></div>
-<div id="warpQuote">“Somewhere, something incredible is waiting to be known.” — Carl Sagan</div>
 <script>
-const c=document.getElementById("starfield"),x=c.getContext("2d");function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener("resize",resize);let s=[];for(let i=0;i<200;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5,p:Math.random()*Math.PI*2});let w=!1;function draw(){x.fillStyle="#000",x.fillRect(0,0,c.width,c.height),w?s.forEach(o=>{x.beginPath();x.strokeStyle="cyan";x.moveTo(c.width/2,c.height/2);x.lineTo(o.x,o.y);x.stroke();o.x+=(o.x-c.width/2)*.05;o.y+=(o.y-c.height/2)*.05;o.x<0||o.x>c.width||o.y<0||o.y>c.height?(o.x=c.width/2,o.y=c.height/2):0}):s.forEach(o=>{o.p+=.02;const a=.6+.4*Math.sin(o.p);x.globalAlpha=a;x.beginPath();x.arc(o.x,o.y,o.r,0,2*Math.PI);x.fillStyle="#fff";x.fill()});x.globalAlpha=1;requestAnimationFrame(draw)}draw();
-setTimeout(()=>document.getElementById("astro-line").classList.add("glowReveal"),1e3);
-setTimeout(()=>document.getElementById("target-line").classList.add("glowReveal"),2e3);
-setTimeout(()=>{const svg=document.getElementById("reticle-svg");svg.style.opacity=1;svg.querySelectorAll("line").forEach(l=>l.style.animationDelay="2s")},2500);
-setTimeout(()=>{
-  const tagline=document.getElementById("tagline");
-  tagline.style.opacity=1;
-  tagline.classList.add("typewriter");
-  setTimeout(()=>{
-    tagline.style.animation+=" ,taglinePulse 2s ease-in-out";
-    tagline.style.borderRight="none"; // remove cursor after typing
-  },4500);
-},3000);
-const b=document.getElementById("bootChecks");
-function log(m,c="wait",d=0){setTimeout(()=>{let l=document.createElement("div");l.className=c;l.textContent=m;b.appendChild(l);let a=b.querySelectorAll("div");if(a.length>6){a[0].style.transition="opacity 0.5s";a[0].style.opacity=0;setTimeout(()=>a[0].remove(),500)}},d)}
-log("⏳ Loading catalogs...","wait",4000);
-log("✔ Messier loaded (110 objects)","ok",5500);
-log("✔ Caldwell loaded (109 objects)","ok",6500);
-log("✔ BrightNGC loaded (100 objects)","ok",7500);
-log("⏳ Initializing scope presets...","wait",8500);
-log("✔ Scope presets ready","ok",9500);
-log("✔ Camera presets ready","ok",10500);
-log("⏳ Fetching GPS...","wait",11500);
-log("✔ GPS locked (38.89°N, 77.03°W)","ok",13000);
-log("⏳ Connecting to NASA APOD...","wait",14000);
-log("✔ APOD loaded","ok",15500);
-log("🎯 Lock acquired — AstroTarget Ready","ok",17000);
-setTimeout(()=>{if(!w){document.body.style.opacity=0;setTimeout(()=>location.href="index.html",2000)}},19000);
-let t=0;document.getElementById("sharedT").addEventListener("click",()=>{t++;if(t>=7&&!w){w=!0;document.getElementById("warpQuote").style.opacity=1;setTimeout(()=>{w=!1;document.body.style.opacity=0;setTimeout(()=>location.href="index.html",2000)},15000)}});
-// shimmer loop
-function randomShimmer(){const T=document.getElementById("sharedT");T.classList.add("shimmer");setTimeout(()=>T.classList.remove("shimmer"),1500);const next=6000+Math.random()*6000;setTimeout(randomShimmer,next)}setTimeout(randomShimmer,4000);
+const boot=["⏳ Loading catalogs...","✔ Messier loaded (110 objects)","✔ Caldwell loaded (109 objects)","✔ BrightNGC loaded (100 objects)","⏳ Initializing scope presets...","✔ Scope presets ready","✔ Camera presets ready","⏳ Fetching GPS...","✔ GPS locked (38.89°N, 77.03°W)","⏳ Connecting to NASA APOD...","✔ APOD loaded","🔒 Lock acquired — AstroTarget Ready"];
+const c=document.getElementById("bootChecks");boot.forEach((m,i)=>{setTimeout(()=>{const d=document.createElement("div");d.textContent=m;d.className=m.startsWith("✔")?"ok":m.startsWith("🔒")?"fail":"wait";c.appendChild(d)},i*700)});
+setTimeout(()=>{document.getElementById("tagline").classList.add("finished")},6000);
+// starfield
+const canvas=document.getElementById("starfield"),ctx=canvas.getContext("2d");function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}resize();window.addEventListener("resize",resize);const stars=Array(200).fill().map(()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,z:Math.random()*canvas.width}));function draw(){ctx.fillStyle="#000";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#fff";stars.forEach(s=>{s.z-=2;if(s.z<=0)s.z=canvas.width;let k=128/s.z,x=s.x*k+canvas.width/2,y=s.y*k+canvas.height/2;if(x>=0&&x<canvas.width&&y>=0&&y<canvas.height){let size=(1-s.z/canvas.width)*2;ctx.fillRect(x,y,size,size)}});requestAnimationFrame(draw)}draw();
 </script>
 </body>
 </html>
