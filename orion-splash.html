@@ -2,26 +2,114 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Orion Starfield Test</title>
+<title>AstroTarget Splash</title>
 <style>
   body {
     margin: 0;
     background: radial-gradient(ellipse at center, #000010, #000);
     overflow: hidden;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
   }
   canvas {
-    display: block;
-    width: 100vw;
-    height: 100vh;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+  }
+  #logo {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 30%;
+    font-size: 3em;
+    font-weight: bold;
+    letter-spacing: 4px;
+    z-index: 1;
+  }
+  #astro {
+    color: #66ccff;
+    display: inline-block;
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+  #target {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(-100vh);
+    line-height: 1.2;
+    color: #ff6666;
+    margin-left: 10px;
+  }
+  #target span { display: block; }
+  #crosshair {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,255,255,0.5);
+    box-shadow: 0 0 15px rgba(0,255,255,0.7);
+    opacity: 0;
+    z-index: 0;
+    pointer-events: none;
+    animation: pulse 2s infinite alternate;
+  }
+  #tagline {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 65%;
+    font-size: 1.2em;
+    opacity: 0;
+    color: #ccc;
+    font-style: italic;
+    z-index: 1;
+  }
+  #bootChecks {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 75%;
+    font-family: monospace;
+    font-size: 1em;
+    z-index: 1;
+  }
+  .ok { color: #0f0; }
+  .fail { color: #f33; }
+  .wait { color: #ff0; }
+  /* Animations */
+  .fadeIn { animation: fadeIn 2s forwards; }
+  .slideInX { animation: slideInX 2s forwards; }
+  .slideInY { animation: slideInY 2s forwards; }
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes slideInX { to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideInY { to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse {
+    from { opacity: 0.2; transform: translate(-50%,-50%) scale(0.9); }
+    to { opacity: 0.6; transform: translate(-50%,-50%) scale(1.1); }
   }
 </style>
 </head>
 <body>
+
 <canvas id="starfield"></canvas>
+<div id="crosshair"></div>
+
+<div id="logo">
+  <span id="astro">ASTRO</span>
+  <span id="target">
+    <span>T</span><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span>
+  </span>
+</div>
+
+<div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
+<div id="bootChecks"></div>
+
 <script>
 const canvas = document.getElementById("starfield");
 const ctx = canvas.getContext("2d");
-
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -29,18 +117,35 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// === Generate stars ===
+// === Smooth twinkling stars ===
 let stars = [];
 for (let i=0;i<200;i++) {
   stars.push({
     x: Math.random()*canvas.width,
     y: Math.random()*canvas.height,
     r: Math.random()*1.5,
-    alpha: Math.random()
+    phase: Math.random()*Math.PI*2
   });
 }
 
-// === Orion star positions (relative) ===
+function drawStars() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.phase += 0.02;
+    const alpha = 0.6 + 0.4*Math.sin(s.phase);
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
+    ctx.fillStyle="white";
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1.0;
+  drawOrion();
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// === Orion Constellation ===
 const orionStars = {
   Betelgeuse: [0.4,0.2],
   Bellatrix: [0.6,0.2],
@@ -50,53 +155,60 @@ const orionStars = {
   Alnilam: [0.5,0.45],
   Mintaka: [0.55,0.45]
 };
-
 function drawOrion() {
-  ctx.strokeStyle = "rgba(100,200,255,0.3)";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle="rgba(100,200,255,0.3)";
+  ctx.lineWidth=1;
   ctx.beginPath();
-  // Hourglass
-  ctx.moveTo(orionStars.Betelgeuse[0]*canvas.width, orionStars.Betelgeuse[1]*canvas.height);
-  ctx.lineTo(orionStars.Saiph[0]*canvas.width, orionStars.Saiph[1]*canvas.height);
-  ctx.moveTo(orionStars.Bellatrix[0]*canvas.width, orionStars.Bellatrix[1]*canvas.height);
-  ctx.lineTo(orionStars.Rigel[0]*canvas.width, orionStars.Rigel[1]*canvas.height);
-  ctx.moveTo(orionStars.Saiph[0]*canvas.width, orionStars.Saiph[1]*canvas.height);
-  ctx.lineTo(orionStars.Rigel[0]*canvas.width, orionStars.Rigel[1]*canvas.height);
-  ctx.moveTo(orionStars.Betelgeuse[0]*canvas.width, orionStars.Betelgeuse[1]*canvas.height);
-  ctx.lineTo(orionStars.Bellatrix[0]*canvas.width, orionStars.Bellatrix[1]*canvas.height);
-  // Belt
-  ctx.moveTo(orionStars.Alnitak[0]*canvas.width, orionStars.Alnitak[1]*canvas.height);
-  ctx.lineTo(orionStars.Alnilam[0]*canvas.width, orionStars.Alnilam[1]*canvas.height);
-  ctx.lineTo(orionStars.Mintaka[0]*canvas.width, orionStars.Mintaka[1]*canvas.height);
+  ctx.moveTo(orionStars.Betelgeuse[0]*canvas.width,orionStars.Betelgeuse[1]*canvas.height);
+  ctx.lineTo(orionStars.Saiph[0]*canvas.width,orionStars.Saiph[1]*canvas.height);
+  ctx.moveTo(orionStars.Bellatrix[0]*canvas.width,orionStars.Bellatrix[1]*canvas.height);
+  ctx.lineTo(orionStars.Rigel[0]*canvas.width,orionStars.Rigel[1]*canvas.height);
+  ctx.moveTo(orionStars.Saiph[0]*canvas.width,orionStars.Saiph[1]*canvas.height);
+  ctx.lineTo(orionStars.Rigel[0]*canvas.width,orionStars.Rigel[1]*canvas.height);
+  ctx.moveTo(orionStars.Betelgeuse[0]*canvas.width,orionStars.Betelgeuse[1]*canvas.height);
+  ctx.lineTo(orionStars.Bellatrix[0]*canvas.width,orionStars.Bellatrix[1]*canvas.height);
+  ctx.moveTo(orionStars.Alnitak[0]*canvas.width,orionStars.Alnitak[1]*canvas.height);
+  ctx.lineTo(orionStars.Alnilam[0]*canvas.width,orionStars.Alnilam[1]*canvas.height);
+  ctx.lineTo(orionStars.Mintaka[0]*canvas.width,orionStars.Mintaka[1]*canvas.height);
   ctx.stroke();
-
-  // Draw stars
   for (let s in orionStars) {
     ctx.beginPath();
-    ctx.fillStyle = "white";
-    ctx.arc(orionStars[s][0]*canvas.width, orionStars[s][1]*canvas.height, 4, 0, 2*Math.PI);
+    ctx.fillStyle="white";
+    ctx.arc(orionStars[s][0]*canvas.width,orionStars[s][1]*canvas.height,4,0,2*Math.PI);
     ctx.fill();
   }
 }
 
-// === Animation Loop ===
-function drawStars() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "white";
-  stars.forEach(s => {
-    s.alpha += (Math.random()-0.5)*0.05;
-    if (s.alpha < 0.1) s.alpha = 0.1;
-    if (s.alpha > 1) s.alpha = 1;
-    ctx.globalAlpha = s.alpha;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1.0;
-  drawOrion();
-  requestAnimationFrame(drawStars);
+// === Logo + Boot Sequence ===
+setTimeout(()=>document.getElementById("astro").classList.add("slideInX"),1000);
+setTimeout(()=>document.getElementById("target").classList.add("slideInY"),2000);
+setTimeout(()=>document.getElementById("crosshair").style.opacity="1",3000);
+setTimeout(()=>document.getElementById("tagline").classList.add("fadeIn"),4000);
+
+// Boot check function
+const bootChecks = document.getElementById("bootChecks");
+function logCheck(msg, status="wait", delay=0) {
+  setTimeout(()=>{
+    let line = document.createElement("div");
+    line.className = status;
+    line.textContent = msg;
+    bootChecks.appendChild(line);
+  }, delay);
 }
-drawStars();
+
+// Simulated sequence
+logCheck("⏳ Loading catalogs...", "wait", 4500);
+logCheck("✅ Messier loaded (110 objects)", "ok", 6000);
+logCheck("✅ Caldwell loaded (109 objects)", "ok", 7000);
+logCheck("✅ BrightNGC loaded (100 objects)", "ok", 8000);
+logCheck("⏳ Initializing scope presets...", "wait", 9000);
+logCheck("✅ Scope presets ready", "ok", 10000);
+logCheck("✅ Camera presets ready", "ok", 11000);
+logCheck("⏳ Fetching GPS...", "wait", 12000);
+logCheck("✅ GPS locked (38.89°N, 77.03°W)", "ok", 13500);
+logCheck("⏳ Connecting to NASA APOD...", "wait", 14500);
+logCheck("✅ APOD loaded", "ok", 16000);
+logCheck("✅ Initialization complete", "ok", 17500);
 </script>
 </body>
 </html>
