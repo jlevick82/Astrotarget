@@ -1,54 +1,47 @@
 <!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AstroTarget</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>AstroTarget Splash</title>
 <style>
-html,body{margin:0;padding:0;height:100%;background:#000;color:#fff;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:'Courier New',monospace}
+body{margin:0;background:#000;color:#fff;font-family:monospace;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center;touch-action:manipulation}
 canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
-#logo{position:relative;z-index:2;text-align:center}
-#astro{display:flex;justify-content:center;letter-spacing:.3em;font-size:2.2em;text-shadow:0 0 12px #0ff;color:#0ff}
+.reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75vmin;height:75vmin;border:3px solid rgba(0,255,255,.7);border-radius:50%;box-shadow:0 0 25px rgba(0,255,255,.5);z-index:1}
+.reticle:before,.reticle:after{content:"";position:absolute;background:#0ff}
+.reticle:before{top:50%;left:0;width:100%;height:2px}
+.reticle:after{left:50%;top:0;width:2px;height:100%}
+.inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20%;height:20%;border:2px solid #0ff;border-radius:50%;transition:all .6s ease}
+.inner.pulse{transform:translate(-50%,-50%) scale(1.3);box-shadow:0 0 20px #0ff}
+#logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;text-align:center}
+#astro{display:flex;justify-content:center;gap:.3em;font-size:7vmin;color:#0ff;text-shadow:0 0 10px #0ff;letter-spacing:.1em}
 #t-trigger{color:#fff;text-shadow:0 0 15px #fff;cursor:pointer;user-select:none;z-index:10}
-#target{display:flex;flex-direction:column;align-items:center;margin-top:.3em;font-size:1.6em;letter-spacing:.2em;color:#f44;text-shadow:0 0 8px #f44}
-#reticle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:65vmin;height:65vmin;border:2px solid #0ff;border-radius:50%;box-shadow:0 0 25px #0ff;z-index:1}
-#reticle:before,#reticle:after{content:"";position:absolute;background:#0ff}
-#reticle:before{top:50%;left:0;width:100%;height:2px}
-#reticle:after{left:50%;top:0;width:2px;height:100%}
-#inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:25vmin;height:25vmin;border:2px solid #0ff;border-radius:50%}
-#tagline{position:relative;z-index:2;margin-top:1em;font-size:1.1em;color:#0ff;text-shadow:0 0 8px #0ff;text-align:center;max-width:90%}
-#loading{position:relative;z-index:2;margin-top:1em;font-size:.95em;line-height:1.5em;text-align:center;white-space:pre-wrap}
-.hidden{display:none}
-.green{color:#0f0;text-shadow:0 0 8px #0f0}
-.yellow{color:#ff0;text-shadow:0 0 8px #ff0}
-.red{color:#f44;text-shadow:0 0 8px #f44}
-.blue{color:#0ff;text-shadow:0 0 8px #0ff}
+#target{display:flex;flex-direction:column;align-items:center;margin-top:.2em;font-size:6vmin;color:#f44;text-shadow:0 0 10px #f44;line-height:1}
+#target span{margin:.1em 0}
+.tagline{position:relative;z-index:2;margin-top:2vh;font-size:3.5vmin;color:#0ff;text-shadow:0 0 8px #0ff;max-width:90%}
+.boot{position:relative;z-index:2;margin-top:2vh;font-size:2.8vmin;line-height:1.4;text-align:center;white-space:pre-wrap}
+.boot .yellow{color:#ff0}.boot .green{color:#0f0}.boot .cyan{color:#0ff}.boot .red{color:#f44}
+#debug-label{position:absolute;top:.5em;left:.5em;font-size:.8em;color:#aaa;cursor:pointer;z-index:5;display:none}
+.debug-active{color:#0ff;text-shadow:0 0 5px #0ff}
+.debug-line{position:absolute;top:0;left:50%;width:2px;height:100%;background:rgba(255,0,255,.4);z-index:4;pointer-events:none}
+.debug-line.h{top:50%;left:0;width:100%;height:2px;background:rgba(0,255,255,.4)}
 </style>
 </head><body>
 <canvas id="stars"></canvas>
-<div id="reticle"><div id="inner"></div></div>
+<div class="reticle"><div class="inner" id="inner"></div></div>
 <div id="logo">
   <div id="astro">A S <span id="t-trigger">T</span> R O</div>
   <div id="target"><span>A</span><span>R</span><span>G</span><span>E</span><span>T</span></div>
 </div>
-<div id="tagline">“The sky hides many secrets — only explorers will find them.”</div>
-<div id="loading" class="hidden"></div>
+<div class="tagline">“The sky hides many secrets — only explorers will find them.”</div>
+<div class="boot" id="boot"></div>
+<div id="debug-label">[DEBUG MODE]</div>
 <script>
-const c=document.getElementById("stars"),x=c.getContext("2d");
-function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener("resize",resize);
+const c=document.querySelector("canvas"),x=c.getContext("2d");function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener("resize",resize);
 let stars=[...Array(120)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+0.5,a:Math.random()}));
 function draw(){x.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.a+=(Math.random()-.5)*.02;if(s.a<.2)s.a=.2;if(s.a>.8)s.a=.8;x.fillStyle=`rgba(255,255,255,${s.a})`;x.beginPath();x.arc(s.x,s.y,s.r,0,2*Math.PI);x.fill()});requestAnimationFrame(draw)}draw();
-
-const msgs=[
- '⏳ <span class="yellow">Initializing scope presets...</span>',
- '✔ <span class="green">Scope presets ready</span>',
- '✔ <span class="green">Camera presets ready</span>',
- '⏳ <span class="yellow">Fetching GPS...</span>',
- '✔ <span class="green">GPS locked (38.89°N, 77.03°W)</span>',
- '⏳ <span class="blue">Connecting to NASA APOD...</span>',
- '✔ <span class="green">APOD loaded</span>',
- '🔒 <span class="red">Lock acquired — AstroTarget Ready</span>'
-];
-const box=document.getElementById("loading");let i=0;
-setTimeout(()=>{box.classList.remove("hidden");let t=setInterval(()=>{if(i<msgs.length){box.innerHTML+=msgs[i]+"\n";i++}else clearInterval(t)},500)},1000);
-
-document.getElementById("t-trigger").addEventListener("click",()=>{alert("🚀 Easter Egg: Warp engaged!")});
+const msgs=['⏳ <span class="yellow">Initializing scope presets...</span>','✔ <span class="green">Scope presets ready</span>','✔ <span class="green">Camera presets ready</span>','⏳ <span class="yellow">Fetching GPS...</span>','✔ <span class="green">GPS locked (38.89°N, 77.03°W)</span>','⏳ <span class="cyan">Connecting to NASA APOD...</span>','✔ <span class="green">APOD loaded</span>','🔒 <span class="red">Lock acquired — AstroTarget Ready</span>'];const box=document.getElementById("boot");let i=0;setTimeout(()=>{let t=setInterval(()=>{if(i<msgs.length){if(box.childElementCount>=4)box.removeChild(box.firstChild);let d=document.createElement("div");d.innerHTML=msgs[i];box.appendChild(d);i++}else clearInterval(t)},1000)},1000);
+const inner=document.getElementById("inner"),T=document.getElementById("t-trigger");function sparkle(){inner.classList.add("pulse");setTimeout(()=>inner.classList.remove("pulse"),600)}setInterval(()=>{if(Math.random()>.85)sparkle()},5000);
+T.addEventListener("click",()=>{warp()});
+function warp(){let start=Date.now();function anim(){let t=(Date.now()-start)/2000;if(t>1)return;stars.forEach(s=>{s.x+=(Math.random()-.5)*30;s.y+=(Math.random()-.5)*30});c.style.filter="blur(2px) brightness(1.5)";inner.classList.add("pulse");requestAnimationFrame(anim)}anim();setTimeout(()=>{c.style.filter="";inner.classList.remove("pulse")},2200)}
+// Debug
+const params=new URLSearchParams(location.search);if(params.get("debug")==="true"){const dl=document.getElementById("debug-label");dl.style.display="block";const v=document.createElement("div"),h=document.createElement("div");v.className="debug-line";h.className="debug-line h";document.body.appendChild(v);document.body.appendChild(h);dl.classList.add("debug-active");let active=true;dl.onclick=()=>{active=!active;v.style.display=h.style.display=active?"block":"none";dl.classList.toggle("debug-active",active)}}
 </script>
 </body></html>
