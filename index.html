@@ -7,7 +7,7 @@
   <style>
     :root { --fg:#0f172a; --muted:#64748b; --accent:#1a73e8; --ok:#34a853; --warn:#c5221f; }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; color: var(--fg); margin: 0; background: #f8fafc; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; color: var(--fg); margin: 0; background: #f8fafc; }
     .wrap { max-width: 820px; margin: 0 auto; padding: 16px; }
     h1 { font-size: 22px; margin: 8px 0 4px; }
     p.sub { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
@@ -15,10 +15,7 @@
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
     label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
-    input[type="text"], input[type="number"], input[type="datetime-local"] {
-      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1;
-      border-radius: 10px; font-size: 14px; background: #fff;
-    }
+    input[type="text"], input[type="number"], input[type="datetime-local"] { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; background: #fff; }
     input[disabled] { background: #f1f5f9; color: #94a3b8; }
     .btn { border: none; border-radius: 10px; padding: 8px 10px; font-weight: 600; cursor: pointer; }
     .btn.primary { background: var(--accent); color: #fff; }
@@ -32,29 +29,34 @@
     .fav { font-size: 18px; background: none; border: none; cursor: pointer; }
     .muted { color: var(--muted); font-size: 12px; }
     .hint { font-size: 12px; color: var(--muted); }
+    #err { white-space: pre-wrap; background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:8px; border-radius:8px; display:none; }
   </style>
-  <!-- React & ReactDOM (UMD) -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <!-- Babel for inline JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Astronomy Engine -->
-  <script src="https://unpkg.com/astronomy-engine/astronomy.min.js"></script>
+
+  <!-- React & ReactDOM (pinned versions) -->
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- Babel for inline JSX (with presets!) -->
+  <script src="https://unpkg.com/@babel/standalone@7.25.7/babel.min.js"></script>
+
+  <!-- Astronomy Engine (UMD) -->
+  <script src="https://unpkg.com/astronomy-engine@2.2.2/astronomy.min.js"></script>
 </head>
 <body>
+  <div class="wrap">
+    <div id="err"></div>
+  </div>
   <div id="root" class="wrap"></div>
 
-  <script type="text/babel">
+  <!-- The app -->
+  <script type="text/babel" data-presets="env,react">
     const { useState, useEffect, useMemo } = React;
     const { Observer, MakeTime, Equator, Horizon, Illumination, Body } = Astronomy;
 
     const fovDeg = (s, f) => (57.2958 * s) / f;
     const pixelScale = (p, f) => (206.265 * p) / f;
     const raHtoDeg = h => h * 15;
-    const iso = d => {
-      const pad = n => String(n).padStart(2,"0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    };
+    const iso = d => { const pad = n => String(n).padStart(2,"0"); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
     const minutesBetween = (a,b) => Math.max(0,Math.round((b-a)/60000));
     const clock = d => d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 
@@ -115,100 +117,124 @@
 
       const cands=useMemo(()=>{
         if(lat==null||lon==null) return [];
-        const start=new Date(startISO),end=new Date(endISO);
+        const start=new Date(startISO), end=new Date(endISO);
         return Object.entries(DSO).map(([name,v])=>{
-          let first=null,last=null;
-          for(let t=new Date(start);t<=end;t=new Date(t.getTime()+5*60000)){
+          let first=null, last=null;
+          for(let t=new Date(start); t<=end; t=new Date(t.getTime()+5*60000)){
             const a=altAt(t,lat,lon,v.ra,v.dec);
-            if(a>=minAlt){if(!first) first=new Date(t);last=new Date(t);}
+            if(a>=minAlt){ if(!first) first=new Date(t); last=new Date(t); }
           }
           const best=bestAlt(start,end,lat,lon,v.ra,v.dec);
           const usable=(first&&last)?minutesBetween(first,last):0;
           const moonPct=Math.round(Illumination(Body.Moon,MakeTime(best.time)).phase_fraction*100);
-          const exp=staticExp??suggestExp(v.type,bortle,fRatio);
+          const exp=staticExp ?? suggestExp(v.type,bortle,fRatio);
           return {name,v,first,last,usable,best,moonPct,exp,
-            framesPerHour:Math.floor(3600/(exp+10+15/3)),
-            status:status[name]||"none",fav:!!fav[name]};
+                  framesPerHour:Math.floor(3600/(exp+10+15/3)),
+                  status: (JSON.parse(localStorage.getItem("astro_status")||"{}")[name]) || "none",
+                  fav: !!(JSON.parse(localStorage.getItem("astro_favs")||"{}")[name])};
         }).filter(t=>t.usable>=60)
-          .sort((a,b)=>(b.fav-a.fav)||(a.best.time-b.best.time));
-      },[lat,lon,startISO,endISO,minAlt,bortle,fRatio,staticExp,status,fav]);
+          .sort((a,b)=>(Number(b.fav)-Number(a.fav)) || (a.best.time-b.best.time));
+      },[lat,lon,startISO,endISO,minAlt,bortle,fRatio,staticExp]);
 
-      const toggleFav=n=>setFav(p=>({...p,[n]:!p[n]}));
-      const setSt=(n,s)=>setStatusMap(p=>({...p,[n]:s}));
+      const toggleFav=n=>{ setFav(p=>({...p,[n]:!p[n]})); };
+      const setSt=(n,s)=>{ setStatusMap(p=>({...p,[n]:s})); };
 
       const exportPlan=()=>{
         if(lat==null||lon==null) return;
-        const targets=cands.filter(t=>t.status==="add").map(t=>({
+        const targets=cands.filter(t=> (status[t.name]||"none")==="add").map(t=>({
           name:t.name,
-          constraints:{start:t.first.toISOString(),end:t.last.toISOString(),altitude_min_deg:minAlt},
+          constraints:{ start:t.first.toISOString(), end:t.last.toISOString(), altitude_min_deg:minAlt },
           notes:`${t.v.type}; exposure ${t.exp}s; frames/hr ~${t.framesPerHour}`,
-          camera:{gain,offset},exposure_s:t.exp,favorite:t.fav
+          camera:{ gain, offset }, exposure_s:t.exp, favorite:!!fav[t.name]
         }));
-        const seq={type:"MobilePlan",profile:{camera:"ASI533MC Pro",mount:"iEXOS-100",guider:"PHD2",
-          filter:"Dual-NB",reducer:"SVBONY 0.8x",fov_deg:[+fov.toFixed(2),+fov.toFixed(2)],pixel_scale_arcsec_per_px:+scale.toFixed(2),location:{lat,lon}},
-          defaults:{dither_every:3,settle_px:1.5,settle_s:15,center_tolerance_arcsec:15,recenter_every_minutes:20,recenter_every_frames:5,hfr_autofocus_increase:0.10},
-          targets};
+        const seq={ type:"MobilePlan",
+          profile:{ camera:"ASI533MC Pro", mount:"iEXOS-100", guider:"PHD2", filter:"Dual-NB", reducer:"SVBONY 0.8x",
+            fov_deg:[+fov.toFixed(2),+fov.toFixed(2)], pixel_scale_arcsec_per_px:+scale.toFixed(2), location:{lat,lon} },
+          defaults:{ dither_every:3, settle_px:1.5, settle_s:15, center_tolerance_arcsec:15, recenter_every_minutes:20, recenter_every_frames:5, hfr_autofocus_increase:0.10 },
+          targets };
         const blob=new Blob([JSON.stringify(seq,null,2)],{type:"application/json"});
-        const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="astro_mobile_plan.json";a.click();
+        const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="astro_mobile_plan.json"; a.click();
       };
 
-      return <div>
-        <h1>Astro Target Planner</h1>
-        <p className="sub">GPS shortlist → exposures → export JSON. Single HTML file.</p>
-        <div className="card">
-          <div className="row"><strong>Location & session</strong>
-            <label><input type="checkbox" checked={useGPS} onChange={e=>setUseGPS(e.target.checked)}/> Use GPS</label></div>
-          <div className="grid2" style={{marginTop:8}}>
-            <input type="number" step="0.0001" placeholder="Lat" value={lat??""} onChange={e=>setLat(+e.target.value)} disabled={useGPS}/>
-            <input type="number" step="0.0001" placeholder="Lon" value={lon??""} onChange={e=>setLon(+e.target.value)} disabled={useGPS}/>
-            <input type="datetime-local" value={startISO} onChange={e=>setStart(e.target.value)}/>
-            <input type="datetime-local" value={endISO} onChange={e=>setEnd(e.target.value)}/>
-            <input type="number" value={minAlt} onChange={e=>setMinAlt(+e.target.value)} placeholder="Min alt"/>
-            <input type="number" value={bortle} min="1" max="9" onChange={e=>setBortle(+e.target.value)} placeholder="Bortle"/>
+      return (
+        <div className="wrap">
+          <h1>Astro Target Planner</h1>
+          <p className="sub">GPS shortlist → exposures → export JSON. Single HTML file.</p>
+
+          <div className="card">
+            <div className="row"><strong>Location & session</strong>
+              <label><input type="checkbox" checked={useGPS} onChange={e=>setUseGPS(e.target.checked)} /> Use GPS</label></div>
+            <div className="grid2" style={{marginTop:8}}>
+              <div><label>Latitude</label><input type="number" step="0.0001" value={lat??""} onChange={e=>setLat(+e.target.value)} disabled={useGPS}/></div>
+              <div><label>Longitude</label><input type="number" step="0.0001" value={lon??""} onChange={e=>setLon(+e.target.value)} disabled={useGPS}/></div>
+              <div><label>Start (local)</label><input type="datetime-local" value={startISO} onChange={e=>setStart(e.target.value)}/></div>
+              <div><label>End (local)</label><input type="datetime-local" value={endISO} onChange={e=>setEnd(e.target.value)}/></div>
+              <div><label>Min altitude (°)</label><input type="number" value={minAlt} onChange={e=>setMinAlt(+e.target.value)}/></div>
+              <div><label>Bortle</label><input type="number" value={bortle} min="1" max="9" onChange={e=>setBortle(+e.target.value)}/></div>
+            </div>
           </div>
-        </div>
-        <div className="card">
-          <strong>Your gear</strong>
-          <div className="grid2" style={{marginTop:8}}>
-            <input type="number" value={focal} onChange={e=>setFocal(+e.target.value)} placeholder="Focal mm"/>
-            <input type="number" step="0.01" value={pixel} onChange={e=>setPixel(+e.target.value)} placeholder="Pixel µm"/>
-            <input type="number" step="0.01" value={sensor} onChange={e=>setSensor(+e.target.value)} placeholder="Sensor mm"/>
-            <input type="number" step="0.1" value={fRatio} onChange={e=>setFRatio(+e.target.value)} placeholder="f/ratio"/>
+
+          <div className="card">
+            <strong>Your gear</strong>
+            <div className="grid2" style={{marginTop:8}}>
+              <div><label>Focal length (mm)</label><input type="number" value={focal} onChange={e=>setFocal(+e.target.value)}/></div>
+              <div><label>Pixel size (µm)</label><input type="number" step="0.01" value={pixel} onChange={e=>setPixel(+e.target.value)}/></div>
+              <div><label>Sensor size (mm)</label><input type="number" step="0.01" value={sensor} onChange={e=>setSensor(+e.target.value)}/></div>
+              <div><label>f/ ratio</label><input type="number" step="0.1" value={fRatio} onChange={e=>setFRatio(+e.target.value)}/></div>
+            </div>
+            <div className="muted">FoV ≈ {fov.toFixed(2)}° × {fov.toFixed(2)}° • Scale ≈ {scale.toFixed(2)}″/px</div>
           </div>
-          <div className="muted">FoV ≈ {fov.toFixed(2)}° • Scale ≈ {scale.toFixed(2)}″/px</div>
-        </div>
-        <div className="card">
-          <div className="row"><strong>Candidates</strong>
-            <div><label style={{fontSize:12}}>Static exp (s)</label>
-              <input style={{width:90}} type="number" value={staticExp??""} onChange={e=>setStatic(e.target.value===""?null:+e.target.value)}/></div>
-          </div>
-          {cands.length===0 && <div className="muted">No matches yet.</div>}
-          {cands.map(t=>
-            <div key={t.name} className={`target ${t.status==="skip"?"dim":""}`}>
-              <div className="topbar">
-                <div style={{display:"flex",alignItems:"center",gap:8}}>
-                  <button className="fav" onClick={()=>toggleFav(t.name)}>{t.fav?"⭐":"☆"}</button>
-                  <strong>{t.name}</strong></div>
-                <span className="pill">{t.v.type}</span></div>
-              <div>Best: <b>{clock(t.best.time)}</b> @ {t.best.alt.toFixed(0)}° • Usable: {t.usable} min • Moon: {t.moonPct}%</div>
-              <div>Exp: <b>{t.exp}s</b> • ~{t.framesPerHour} f/hr</div>
-              <div className="muted">Window: {t.first?clock(t.first):"--"} – {t.last?clock(t.last):"--"}</div>
-              <div className="row" style={{gap:6,marginTop:6,justifyContent:"flex-start"}}>
-                <button className={`btn ${t.status==="add"?"primary":"ghost"}`} onClick={()=>setSt(t.name,"add")}>Add</button>
-                <button className={`btn ${t.status==="imaged"?"ok":"ghost"}`} onClick={()=>setSt(t.name,"imaged")}>Imaged</button>
-                <button className={`btn ${t.status==="skip"?"warn":"ghost"}`} onClick={()=>setSt(t.name,"skip")}>Skip</button>
-                <button className="btn" style={{background:"#f1f5f9"}} onClick={()=>setSt(t.name,"none")}>Clear</button>
+
+          <div className="card">
+            <div className="row"><strong>Candidates (≥ {minAlt}° & ≥ 60 min)</strong>
+              <div><label style={{fontSize:12}}>Static exp (s)</label>
+                <input style={{width:90}} type="number" value={staticExp??""} onChange={e=>setStatic(e.target.value===""?null:+e.target.value)}/></div>
+            </div>
+            <div id="candidates">
+              {/* Filled below via map */}
+            </div>
+            {/* Render candidate list */}
+            {cands.length===0 && <div className="muted" style={{marginTop:8}}>No matches yet—check GPS/lat/lon, time window, or min altitude.</div>}
+            {cands.map(t=>
+              <div key={t.name} className={`target ${t.status==="skip"?"dim":""}`}>
+                <div className="topbar">
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <button className="fav" onClick={()=>toggleFav(t.name)}>{t.fav?"⭐":"☆"}</button>
+                    <strong>{t.name}</strong>
+                  </div>
+                  <span className="pill">{t.v.type}</span>
+                </div>
+                <div>Best: <b>{clock(t.best.time)}</b> @ {t.best.alt.toFixed(0)}° • Usable: {t.usable} min • Moon: {t.moonPct}%</div>
+                <div>Exp: <b>{t.exp}s</b> • ~{t.framesPerHour} f/hr</div>
+                <div className="muted">Window: {t.first?clock(t.first):"--"} – {t.last?clock(t.last):"--"}</div>
+                <div className="row" style={{gap:6,marginTop:6,justifyContent:"flex-start"}}>
+                  <button className={`btn ${t.status==="add"?"primary":"ghost"}`} onClick={()=>setSt(t.name,"add")}>Add</button>
+                  <button className={`btn ${t.status==="imaged"?"ok":"ghost"}`} onClick={()=>setSt(t.name,"imaged")}>Imaged</button>
+                  <button className={`btn ${t.status==="skip"?"warn":"ghost"}`} onClick={()=>setSt(t.name,"skip")}>Skip</button>
+                  <button className="btn" style={{background:"#f1f5f9"}} onClick={()=>setSt(t.name,"none")}>Clear</button>
+                </div>
               </div>
-            </div>)}
-          <div className="row" style={{marginTop:8}}>
-            <span className="muted">Export includes Add-marked only. Favorites pin to top.</span>
-            <button className="btn primary" onClick={exportPlan}>Export JSON plan</button>
+            )}
+            <div className="row" style={{marginTop:8}}>
+              <span className="muted">Export includes Add-marked only. Favorites pin to top.</span>
+              <button className="btn primary" onClick={exportPlan}>Export JSON plan</button>
+            </div>
           </div>
+
+          <div className="hint">Tip: Add this page to your home screen. Status & favorites persist locally.</div>
         </div>
-      </div>;
+      );
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+    // Render with a catch-all error surface so you see issues on-page.
+    try {
+      ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+    } catch (e) {
+      const el = document.getElementById("err");
+      el.style.display = "block";
+      el.textContent = "Render error:\\n" + (e && e.message ? e.message : e);
+      console.error(e);
+    }
   </script>
 </body>
 </html>
