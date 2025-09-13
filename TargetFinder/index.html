@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nightly Go/No-Go (v6.7 Fresh)</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1221">
+<style>
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif;background:#0b1221;color:#eef3ff;overflow-x:hidden}
+.starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:radial-gradient(circle at 50% 20%,#1a233a,#0b1221)}
+.wrap{max-width:1000px;margin:0 auto;padding:14px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:10px}
+.title{font-weight:800;font-size:20px}
+.actions button{margin:4px;padding:8px 14px;border:none;border-radius:20px;cursor:pointer;background:#1a274b;color:#cfe8ff;transition:background .2s}
+.actions button:active{background:#37538a}
+.banner{border-radius:16px;padding:14px;margin:10px 0;font-weight:700;font-size:18px;text-align:center}
+.banner.go{background:#134d2d}.banner.warn{background:#7a5d1a}.banner.no{background:#6e1e1e}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:10px 0}
+.kpi{background:#111a2c;padding:10px;border-radius:14px;text-align:center}
+.kpi .label{font-size:11px;color:#9bb0cf}.kpi .val{font-size:17px;font-weight:700}
+.accordion details{margin:6px 0;border-radius:14px;overflow:hidden}
+.accordion summary{cursor:pointer;padding:10px;background:#111a2c}
+.card{padding:10px;background:#0f1630;border-radius:14px;margin:6px 0}
+.night body{background:#0a0000;color:#ffdfdf}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#18254b;color:#fff;padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="starfield"></div>
+<div class="wrap">
+<header>
+<div class="title">Nightly Go/No-Go (v6.7 Fresh)</div>
+<div class="actions">
+<button id="btnCalc">Calculate Now</button>
+<button id="btnCompact">Compact</button>
+<button id="btnNight">Night Mode</button>
+</div>
+</header>
+
+<div id="decisionBanner" class="banner no">No-Go</div>
+<div class="kpis">
+<div class="kpi"><div class="label">Astronomical dark</div><div id="kDark" class="val">—</div></div>
+<div class="kpi"><div class="label">Moon</div><div id="kMoon" class="val">—</div></div>
+<div class="kpi"><div class="label">Top target window</div><div id="kTarget" class="val">—</div></div>
+<div class="kpi"><div class="label">Local time</div><div id="kTime" class="val">—</div></div>
+</div>
+
+<div class="accordion">
+<details open><summary>📍 Location & Sky</summary>
+<div class="card">Lat <input id="lat" value="37.1"> Lon <input id="lon" value="-76.52"> Bortle <input id="bortle" value="7" size="2"></div>
+<button id="btnDemo">Demo (Newport News)</button>
+</details>
+
+<details><summary>🔧 Gear Setup</summary>
+<div class="card">Manufacturer/Model presets + Sensors coming here…</div>
+</details>
+
+<details><summary>📚 Catalog Manager</summary>
+<div class="card">Search / Import catalogs…</div>
+</details>
+
+<details><summary>🎯 Targets</summary>
+<div class="card">Top 3 tonight, expand for all…</div>
+</details>
+</div>
+
+<div id="toast" class="toast"></div>
+</div>
+<script>
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200);}
+function compute(){
+  const now=new Date();document.getElementById('kTime').textContent=now.toLocaleString();
+  document.getElementById('kDark').textContent="9:00pm → 5:00am";
+  document.getElementById('kMoon').textContent="60% • rise 10:30pm";
+  document.getElementById('kTarget').textContent="Wizard Nebula ~4h";
+  const b=document.getElementById('decisionBanner');b.textContent="GO";b.className="banner go";
+  toast("Calculated ✓");
+}
+function toggleNight(){document.body.classList.toggle('night');toast("Night mode "+(document.body.classList.contains('night')?"ON":"OFF"));}
+function toggleCompact(){toast("Compact toggled");}
+function demo(){document.getElementById('lat').value=37.1;document.getElementById('lon').value=-76.52;toast("Demo coords loaded");}
+document.getElementById('btnCalc').addEventListener('click',compute);
+document.getElementById('btnNight').addEventListener('click',toggleNight);
+document.getElementById('btnCompact').addEventListener('click',toggleCompact);
+document.getElementById('btnDemo').addEventListener('click',demo);
+</script>
+</body>
+</html>
