@@ -1,5 +1,5 @@
 // Service Worker for offline caching (app shell + runtime images)
-const CACHE_NAME = 'astro-gallery-v1';
+const CACHE_NAME = 'astro-gallery-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -24,7 +24,6 @@ self.addEventListener('activate', (e)=>{
 
 self.addEventListener('fetch', (e)=>{
   const url = new URL(e.request.url);
-  // Runtime caching for images from raw.githubusercontent.com
   const isImage = e.request.destination === 'image' || /\.(?:jpg|jpeg|png|webp)$/i.test(url.pathname);
   if(isImage){
     e.respondWith(
@@ -44,7 +43,6 @@ self.addEventListener('fetch', (e)=>{
     );
     return;
   }
-  // App shell: network first, fallback to cache
   e.respondWith(
     fetch(e.request).then(res=>{
       const copy = res.clone();

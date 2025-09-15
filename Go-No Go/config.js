@@ -1,5 +1,4 @@
-// Configure a default base path here (can be empty).
-// Example: "https://raw.githubusercontent.com/USER/REPO/BRANCH/images/full/"
+// Prefilled to your repo's Raw path (change in UI anytime)
 window.__ASTRO_CONFIG__ = {
-  defaultBaseUrl: ""
+  defaultBaseUrl: "https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/"
 };

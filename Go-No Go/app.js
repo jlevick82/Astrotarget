@@ -61,8 +61,6 @@ async function testPath(){
   }catch(e){ toastBad('Network error'); }
 }
 
-function pad(n){ return String(n); }
-
 function nameFor(catalog, n){
   if(catalog==='messier') return `m${n}`;
   if(catalog==='caldwell') return `c${n}`;
@@ -80,7 +78,7 @@ function makeUrl(catalog, n, hiRes=true, attempt=0){
 }
 
 function cardElement(label){
-  const node = els.cardTpl.content.cloneNode(true);
+  const node = document.querySelector('#cardTpl').content.cloneNode(true);
   node.querySelector('footer').textContent = label;
   return node;
 }
@@ -98,7 +96,6 @@ async function loadRange(){
   for(let n=s; n<=e; n++){
     const label = nameFor(catalog,n).toUpperCase();
     const node = cardElement(label);
-    const card = node.querySelector('.card');
     const img = node.querySelector('img');
     const miss = node.querySelector('.missing');
 
@@ -110,17 +107,14 @@ async function loadRange(){
         const res = await fetch(url, { cache: 'force-cache' });
         if(res.ok && res.headers.get('content-type')?.includes('image')){
           const blob = await res.blob();
-          const objUrl = URL.createObjectURL(blob);
-          img.src = objUrl;
+          img.src = URL.createObjectURL(blob);
           img.alt = label;
           loaded = true;
           break;
         }
-      }catch(e){ /* continue */ }
+      }catch(e){}
     }
-    if(!loaded){
-      miss.style.display='block';
-    }
+    if(!loaded){ miss.style.display='block'; }
     els.grid.appendChild(node);
   }
   updateCacheInfo();
@@ -154,32 +148,28 @@ function netStatus(){
 window.addEventListener('online', netStatus);
 window.addEventListener('offline', netStatus);
 
-// PWA install prompt (optional)
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
   deferredPrompt = e;
   els.installBtn.hidden = false;
 });
-els.installBtn?.addEventListener('click', async ()=>{
+document.querySelector('#installBtn')?.addEventListener('click', async ()=>{
   if(!deferredPrompt) return;
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
-  if(outcome==='accepted'){ els.installBtn.hidden = true; }
+  if(outcome==='accepted'){ document.querySelector('#installBtn').hidden = true; }
 });
 
-// Events
 els.saveBase.addEventListener('click', saveBaseUrl);
 els.testPath.addEventListener('click', testPath);
 els.load.addEventListener('click', loadRange);
 els.clearCache.addEventListener('click', clearCache);
 
-// init
 loadBaseUrl();
 netStatus();
 updateCacheInfo();
 
-// Service worker
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
