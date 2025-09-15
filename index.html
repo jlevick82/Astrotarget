@@ -3,28 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AstroTarget</title>
+<title>Astro</title>
 <link rel="icon" href="favicon.ico">
 <meta name="theme-color" content="#0b0f14">
-<link rel="preload" as="image" href="assets/logo-256.webp">
+<link rel="preload" as="image" href="assets/logo-512.webp">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="wrap">
-  <img class="logo" src="assets/logo-256.webp" alt="AstroTarget logo" width="256" height="256">
-  <h1>AstroTarget</h1>
-  <p class="tag">Field-ready planning & visual tools.</p>
+<header class="wrap center">
+  <picture>
+    <source srcset="assets/logo.svg" type="image/svg+xml">
+    <img class="logo" src="assets/logo-512.webp" alt="logo" width="256" height="256">
+  </picture>
   <nav class="cta">
-    <a class="card" href="./Go-No-Go/">
-      <div class="title">Go / No-Go</div>
-      <div class="sub">Splash → Planner (scopes • GPS • weather • Moon • top 5)</div>
-    </a>
-    <a class="card" href="./Gallery/">
-      <div class="title">Gallery</div>
-      <div class="sub">GitHub Raw loader with offline caching</div>
-    </a>
+    <a class="card" href="./Go-No-Go/">Go / No-Go</a>
+    <a class="card" href="./Gallery/">Gallery</a>
   </nav>
 </header>
-<footer class="wrap foot"><span>© 2025 AstroTarget</span></footer>
 </body>
 </html>
