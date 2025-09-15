@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroTarget</title>
+<link rel="icon" href="favicon.ico">
+<meta name="theme-color" content="#0b0f14">
+<link rel="preload" as="image" href="assets/logo-512.webp" imagesrcset="assets/logo-512.webp 512w, assets/logo-256.webp 256w" imagesizes="50vw">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="wrap">
+  <img class="logo" src="assets/logo-512.webp" alt="AstroTarget logo" width="256" height="256">
+  <h1>AstroTarget</h1>
+  <p class="tag">Field-ready tools for planning and visualizing your night sky targets.</p>
+  <nav class="cta">
+    <a class="card" href="./Go-No-Go/">
+      <div class="title">Go / No-Go</div>
+      <div class="sub">Gallery loader with offline caching</div>
+    </a>
+    <a class="card" href="./Go-No-Go/">
+      <div class="title">Gallery</div>
+      <div class="sub">Messier • Caldwell • NGC</div>
+    </a>
+  </nav>
+</header>
+
+<section class="wrap grid">
+  <article class="tile">
+    <h2>Status</h2>
+    <p>Network: <span id="net" class="pill">checking…</span></p>
+    <p>Cache items: <span id="cache" class="pill">…</span></p>
+  </article>
+  <article class="tile">
+    <h2>Docs</h2>
+    <ul>
+      <li><a href="https://github.com/jlevick82/Astrotarget" target="_blank" rel="noopener">Repo</a></li>
+      <li><a href="./Go-No-Go/README.md" target="_blank" rel="noopener">Go-No-Go README</a></li>
+    </ul>
+  </article>
+</section>
+
+<footer class="wrap foot">
+  <span>© 2025 AstroTarget</span>
+</footer>
+
+<script>
+function net(){ document.getElementById('net').textContent = navigator.onLine ? 'online' : 'offline'; }
+window.addEventListener('online', net); window.addEventListener('offline', net); net();
+
+(async function cacheInfo(){
+  try{
+    const keys = await caches.keys();
+    let total = 0;
+    for(const k of keys){
+      const c = await caches.open(k);
+      const reqs = await c.keys();
+      total += reqs.length;
+    }
+    document.getElementById('cache').textContent = total + ' item(s)';
+  }catch(e){ document.getElementById('cache').textContent = 'n/a'; }
+})();
+</script>
+</body>
+</html>

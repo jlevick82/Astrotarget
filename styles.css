@@ -1,0 +1,20 @@
+/* Sleek landing page */
+:root{
+  --bg:#0b0f14; --fg:#e7edf5; --muted:#8aa0b3; --card:#101923; --edge:#14202c; --accent:#ff7a2f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(90vh 70vh at 50% -10%, #15202b 0%, #0b0f14 55%);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Ubuntu,Apple Color Emoji,Noto Color Emoji,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:24px}
+header{display:grid;justify-items:center;text-align:center;gap:14px;padding-top:40px}
+.logo{width:180px;height:auto;filter:drop-shadow(0 12px 40px rgba(255,122,47,.35))}
+h1{margin:0;font-size:34px;letter-spacing:.5px}
+.tag{margin:0;color:var(--muted)}
+.cta{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;width:100%}
+.card{display:block;background:linear-gradient(180deg,var(--card),#0e1620);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;text-decoration:none;color:var(--fg);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.card:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+.card .title{font-size:18px;margin-bottom:6px;color:#ffe1cf}
+.card .sub{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:8px}
+.tile{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px;min-height:100px}
+.pill{display:inline-block;padding:4px 8px;border:1px solid var(--edge);background:#0f1822;border-radius:999px;color:#cfe4ff;font-size:12px}
+.foot{color:var(--muted);text-align:center}
