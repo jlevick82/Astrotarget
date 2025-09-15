@@ -6,106 +6,92 @@
   <meta name="theme-color" content="#0b0f14">
   <title>Go / No-Go</title>
   <link rel="icon" href="favicon.ico">
-  <link rel="preload" as="image" href="assets/logo-1024.webp">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- FULL LOGO SPLASH -->
-  <section id="splash" class="splash">
-    <picture>
-      <source srcset="assets/logo.svg" type="image/svg+xml">
-      <img class="logo" src="assets/logo-1024.webp" alt="logo" width="512" height="512">
-    </picture>
-    <div class="overlay">
-      <div class="progress"><div id="bar"></div></div>
-      <ul id="debug" class="debug"></ul>
-      <div id="moonBrief" class="moon-brief"></div>
+  <header class="bar">
+    <h2>Go / No-Go</h2>
+    <nav>
+      <a href="../Go-No-Go/">Home</a>
+      <a href="../Gallery/">Gallery</a>
+    </nav>
+  </header>
+
+  <section class="wrap grid-2">
+    <div class="card">
+      <h3>Setup</h3>
       <div class="row">
-        <button id="retry" hidden>Retry</button>
-        <button id="skip">Skip</button>
+        <label>Telescope</label>
+        <select id="scopeSel"></select>
+        <input id="scopeFL" type="number" placeholder="Focal length (mm)" />
+        <input id="scopeAp" type="number" placeholder="Aperture (mm)" />
       </div>
+      <div class="row">
+        <label>Reducer / Barlow</label>
+        <input id="optFactor" type="number" step="0.01" value="1.00" />
+        <div id="chips" class="chips"></div>
+        <button id="savePreset" class="small">Save as preset for this scope</button>
+      </div>
+      <div class="row">
+        <label>Camera</label>
+        <select id="camSel"></select>
+        <input id="camW" type="number" placeholder="Sensor width (mm)" />
+        <input id="camH" type="number" placeholder="Sensor height (mm)" />
+        <input id="camPx" type="number" placeholder="Pixel size (µm)" />
+      </div>
+      <div class="row">
+        <label>Location</label>
+        <input id="lat" type="number" step="0.0001" placeholder="lat" />
+        <input id="lon" type="number" step="0.0001" placeholder="lon" />
+        <button id="gpsBtn">Use GPS</button>
+        <span id="tz"></span>
+      </div>
+      <div class="row">
+        <label>Session</label>
+        <input id="start" type="datetime-local">
+        <input id="duration" type="number" min="1" value="3"> <span>hours</span>
+        <button id="saveSetup">Save</button>
+      </div>
+      <div class="row small">
+        <span id="fov">FOV: —</span>
+        <span id="scale">Scale: —</span>
+        <span id="effFL">Eff. FL: —</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Weather & Conditions</h3>
+      <div class="row">
+        <button id="fetchWx">Update Weather</button>
+        <span id="wxStatus">—</span>
+      </div>
+      <div id="wx"></div>
+      <div id="moonInfo" class="small"></div>
     </div>
   </section>
 
-  <!-- DASHBOARD -->
-  <section id="app" class="app hidden">
-    <header class="bar">
-      <h2>Go / No-Go</h2>
-      <nav><a href="../Gallery/">Gallery</a></nav>
-    </header>
-
-    <section class="wrap grid-2">
-      <div class="card">
-        <h3>Setup</h3>
-        <div class="row">
-          <label>Telescope</label>
-          <select id="scopeSel"></select>
-          <input id="scopeFL" type="number" placeholder="Focal length (mm)" />
-          <input id="scopeAp" type="number" placeholder="Aperture (mm)" />
-        </div>
-        <div class="row">
-          <label>Reducer / Barlow</label>
-          <input id="optFactor" type="number" step="0.01" value="1.00" />
-          <div id="chips" class="chips"></div>
-          <button id="savePreset" class="small">Save as preset for this scope</button>
-        </div>
-        <div class="row">
-          <label>Camera</label>
-          <select id="camSel"></select>
-          <input id="camW" type="number" placeholder="Sensor width (mm)" />
-          <input id="camH" type="number" placeholder="Sensor height (mm)" />
-          <input id="camPx" type="number" placeholder="Pixel size (µm)" />
-        </div>
-        <div class="row">
-          <label>Location</label>
-          <input id="lat" type="number" step="0.0001" placeholder="lat" />
-          <input id="lon" type="number" step="0.0001" placeholder="lon" />
-          <button id="gpsBtn">Use GPS</button>
-          <span id="tz"></span>
-        </div>
-        <div class="row">
-          <label>Session</label>
-          <input id="start" type="datetime-local">
-          <input id="duration" type="number" min="1" value="3"> <span>hours</span>
-          <button id="saveSetup">Save</button>
-        </div>
-        <div class="row small">
-          <span id="fov">FOV: —</span>
-          <span id="scale">Scale: —</span>
-          <span id="effFL">Eff. FL: —</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Weather & Conditions</h3>
-        <div class="row">
-          <button id="fetchWx">Update Weather</button>
-          <span id="wxStatus">—</span>
-        </div>
-        <div id="wx"></div>
-        <div id="moonInfo" class="small"></div>
-      </div>
-    </section>
-
-    <section class="wrap">
-      <div class="card">
-        <h3>Top 5 Recommendations</h3>
-        <p class="small">Altitude + clouds + Moon separation; must be Sun &lt; −12°.</p>
-        <ol id="top5"></ol>
-      </div>
-    </section>
-
-    <section class="wrap">
-      <div class="card">
-        <h3>Catalog Browser (subset)</h3>
-        <div class="row">
-          <input id="search" placeholder="Search Messier by name/type (subset)" />
-          <button id="recompute">Recompute</button>
-        </div>
-        <div id="table"></div>
-      </div>
-    </section>
+  <section class="wrap">
+    <div class="card">
+      <h3>Top 5 Recommendations</h3>
+      <p class="small">Altitude + clouds + Moon separation; must be Sun &lt; −12°.</p>
+      <ol id="top5"></ol>
+    </div>
   </section>
+
+  <section class="wrap">
+    <div class="card">
+      <h3>Catalog Browser</h3>
+      <div class="row">
+        <input id="search" placeholder="Search Messier by name/type" />
+        <button id="recompute">Recompute</button>
+      </div>
+      <div id="table"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>© 2025</span>
+  </footer>
 
   <script src="messier_subset.js"></script>
   <script src="app.js"></script>

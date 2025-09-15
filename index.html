@@ -3,22 +3,59 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Astro</title>
+<title>Loading…</title>
 <link rel="icon" href="favicon.ico">
-<meta name="theme-color" content="#0b0f14">
-<link rel="preload" as="image" href="assets/logo-512.webp">
+<meta name="theme-color" content="#000000">
+<link rel="preload" as="image" href="assets/logo-1024.webp">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<header class="wrap center">
-  <picture>
-    <source srcset="assets/logo.svg" type="image/svg+xml">
-    <img class="logo" src="assets/logo-512.webp" alt="logo" width="256" height="256">
-  </picture>
-  <nav class="cta">
-    <a class="card" href="./Go-No-Go/">Go / No-Go</a>
-    <a class="card" href="./Gallery/">Gallery</a>
-  </nav>
-</header>
+<body class="splashBody">
+  <section id="splash" class="splash">
+    <img class="logo" src="assets/logo-1024.webp" alt="logo" width="512" height="512">
+    <div class="overlay">
+      <div class="progress"><div id="bar"></div></div>
+      <ul id="debug" class="debug"></ul>
+      <div id="moonBrief" class="moon-brief"></div>
+      <div class="row">
+        <a class="btn" href="./Go-No-Go/">Skip</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  // If we've already seen the splash in this browser session, skip straight to the dashboard.
+  if (sessionStorage.getItem('gng.seenSplash') === '1') {
+    window.location.replace('./Go-No-Go/');
+  } else {
+    const $ = (s, r=document)=>r.querySelector(s);
+    const steps = [
+      { label:'Environment ready', run: ()=>Promise.resolve() },
+      { label:'Local storage available', run: ()=>{ localStorage.setItem('___t','1'); localStorage.removeItem('___t'); } },
+      { label:'Timezone detected', run: ()=>{ localStorage.setItem('gng.last.tz', Intl.DateTimeFormat().resolvedOptions().timeZone||''); } },
+      { label:'Weather API reachable', run: async ()=>{
+          try{ const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto', {method:'HEAD'}); if(!r.ok) throw 0; } 
+          catch(e){ const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto'); if(!r.ok) throw new Error('wx'); }
+      }},
+      { label:'Catalog primed', run: ()=>Promise.resolve() },
+      { label:'Moon data primed', run: ()=>Promise.resolve() }
+    ];
+    let progress = 0;
+    const bar = $('#bar'), debug = $('#debug');
+    function addRow(label){ const li=document.createElement('li'); const spin=document.createElement('div'); spin.className='spin';
+      const text=document.createElement('span'); text.textContent=label; const mark=document.createElement('div'); mark.className='mark'; mark.style.visibility='hidden';
+      li.appendChild(spin); li.appendChild(text); li.appendChild(mark); debug.appendChild(li); return {li,spin,text,mark}; }
+    async function runSteps(){
+      for(const st of steps){
+        const row = addRow(st.label);
+        try{ await st.run(); row.spin.remove(); row.mark.className='mark ok'; row.mark.style.visibility='visible'; progress += 100/steps.length; bar.style.width=Math.min(100,progress)+'%'; }
+        catch(e){ row.spin.remove(); row.mark.className='mark fail'; row.mark.style.visibility='visible'; }
+      }
+      // Mark splash seen only for this session
+      sessionStorage.setItem('gng.seenSplash', '1');
+      setTimeout(()=>{ window.location.replace('./Go-No-Go/'); }, 300);
+    }
+    document.addEventListener('DOMContentLoaded', runSteps);
+  }
+  </script>
 </body>
 </html>
