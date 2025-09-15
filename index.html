@@ -15,7 +15,6 @@
     <div class="overlay">
       <div class="progress"><div id="bar"></div></div>
       <ul id="debug" class="debug"></ul>
-      <div id="moonBrief" class="moon-brief"></div>
       <div class="row">
         <a class="btn" href="./Go-No-Go/">Skip</a>
       </div>
@@ -23,7 +22,6 @@
   </section>
 
   <script>
-  // If we've already seen the splash in this browser session, skip straight to the dashboard.
   if (sessionStorage.getItem('gng.seenSplash') === '1') {
     window.location.replace('./Go-No-Go/');
   } else {
@@ -35,9 +33,7 @@
       { label:'Weather API reachable', run: async ()=>{
           try{ const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto', {method:'HEAD'}); if(!r.ok) throw 0; } 
           catch(e){ const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto'); if(!r.ok) throw new Error('wx'); }
-      }},
-      { label:'Catalog primed', run: ()=>Promise.resolve() },
-      { label:'Moon data primed', run: ()=>Promise.resolve() }
+      }}
     ];
     let progress = 0;
     const bar = $('#bar'), debug = $('#debug');
@@ -50,9 +46,8 @@
         try{ await st.run(); row.spin.remove(); row.mark.className='mark ok'; row.mark.style.visibility='visible'; progress += 100/steps.length; bar.style.width=Math.min(100,progress)+'%'; }
         catch(e){ row.spin.remove(); row.mark.className='mark fail'; row.mark.style.visibility='visible'; }
       }
-      // Mark splash seen only for this session
       sessionStorage.setItem('gng.seenSplash', '1');
-      setTimeout(()=>{ window.location.replace('./Go-No-Go/'); }, 300);
+      setTimeout(()=>{ window.location.replace('./Go-No-Go/'); }, 250);
     }
     document.addEventListener('DOMContentLoaded', runSteps);
   }

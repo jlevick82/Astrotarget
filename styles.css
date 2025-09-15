@@ -17,4 +17,3 @@ html,body{margin:0;height:100%}
 @keyframes spin{to{transform:rotate(360deg)}}
 .row{display:flex;gap:8px;justify-content:center}
 .btn{background:#102b42;border:1px solid #1e4e75;color:#c7e6ff;padding:8px 12px;border-radius:10px;text-decoration:none}
-.moon-brief{color:#cfddee;text-align:center;opacity:.9}
