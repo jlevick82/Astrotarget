@@ -1,66 +1,108 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AstroTarget</title>
-<link rel="icon" href="favicon.ico">
-<meta name="theme-color" content="#0b0f14">
-<link rel="preload" as="image" href="assets/logo-512.webp" imagesrcset="assets/logo-512.webp 512w, assets/logo-256.webp 256w" imagesizes="50vw">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f14">
+  <title>Go / No-Go — AstroTarget</title>
+  <link rel="preload" as="image" href="assets/logo-256.webp">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="wrap">
-  <img class="logo" src="assets/logo-512.webp" alt="AstroTarget logo" width="256" height="256">
-  <h1>AstroTarget</h1>
-  <p class="tag">Field-ready tools for planning and visualizing your night sky targets.</p>
-  <nav class="cta">
-    <a class="card" href="./Go-No-Go/">
-      <div class="title">Go / No-Go</div>
-      <div class="sub">Gallery loader with offline caching</div>
-    </a>
-    <a class="card" href="./Go-No-Go/">
-      <div class="title">Gallery</div>
-      <div class="sub">Messier • Caldwell • NGC</div>
-    </a>
-  </nav>
-</header>
+  <!-- Splash / Loader -->
+  <section id="splash" class="splash">
+    <img class="logo" src="assets/logo-256.webp" alt="AstroTarget logo" width="200" height="200">
+    <h1>AstroTarget</h1>
+    <p class="tag">Initializing field planner…</p>
+    <div class="progress"><div id="bar"></div></div>
+    <ul id="debug" class="debug"></ul>
+    <div id="moonBrief" class="moon-brief small"></div>
+    <div class="row">
+      <button id="retry" hidden>Retry</button>
+      <button id="skip">Skip to dashboard</button>
+    </div>
+  </section>
 
-<section class="wrap grid">
-  <article class="tile">
-    <h2>Status</h2>
-    <p>Network: <span id="net" class="pill">checking…</span></p>
-    <p>Cache items: <span id="cache" class="pill">…</span></p>
-  </article>
-  <article class="tile">
-    <h2>Docs</h2>
-    <ul>
-      <li><a href="https://github.com/jlevick82/Astrotarget" target="_blank" rel="noopener">Repo</a></li>
-      <li><a href="./Go-No-Go/README.md" target="_blank" rel="noopener">Go-No-Go README</a></li>
-    </ul>
-  </article>
-</section>
+  <!-- Dashboard -->
+  <section id="app" class="app hidden">
+    <header class="bar">
+      <h2>Go / No-Go</h2>
+      <nav>
+        <a href="../Gallery/">Gallery</a>
+      </nav>
+    </header>
 
-<footer class="wrap foot">
-  <span>© 2025 AstroTarget</span>
-</footer>
+    <section class="wrap grid-2">
+      <div class="card">
+        <h3>Setup</h3>
+        <div class="row">
+          <label>Telescope</label>
+          <select id="scopeSel"></select>
+          <input id="scopeFL" type="number" placeholder="Focal length (mm)" />
+          <input id="scopeAp" type="number" placeholder="Aperture (mm)" />
+        </div>
+        <div class="row">
+          <label>Camera</label>
+          <select id="camSel"></select>
+          <input id="camW" type="number" placeholder="Sensor width (mm)" />
+          <input id="camH" type="number" placeholder="Sensor height (mm)" />
+          <input id="camPx" type="number" placeholder="Pixel size (µm)" />
+        </div>
+        <div class="row">
+          <label>Location</label>
+          <input id="lat" type="number" step="0.0001" placeholder="lat" />
+          <input id="lon" type="number" step="0.0001" placeholder="lon" />
+          <button id="gpsBtn">Use GPS</button>
+          <span id="tz"></span>
+        </div>
+        <div class="row">
+          <label>Session</label>
+          <input id="start" type="datetime-local">
+          <input id="duration" type="number" min="1" value="3"> <span>hours</span>
+          <button id="saveSetup">Save</button>
+        </div>
+        <div class="row small">
+          <span id="fov">FOV: —</span>
+          <span id="scale">Scale: —</span>
+        </div>
+      </div>
 
-<script>
-function net(){ document.getElementById('net').textContent = navigator.onLine ? 'online' : 'offline'; }
-window.addEventListener('online', net); window.addEventListener('offline', net); net();
+      <div class="card">
+        <h3>Weather & Conditions</h3>
+        <div class="row">
+          <button id="fetchWx">Update Weather</button>
+          <span id="wxStatus">—</span>
+        </div>
+        <div id="wx"></div>
+        <div id="moonInfo" class="small"></div>
+      </div>
+    </section>
 
-(async function cacheInfo(){
-  try{
-    const keys = await caches.keys();
-    let total = 0;
-    for(const k of keys){
-      const c = await caches.open(k);
-      const reqs = await c.keys();
-      total += reqs.length;
-    }
-    document.getElementById('cache').textContent = total + ' item(s)';
-  }catch(e){ document.getElementById('cache').textContent = 'n/a'; }
-})();
-</script>
+    <section class="wrap">
+      <div class="card">
+        <h3>Top 5 Recommendations</h3>
+        <p class="small">Score considers altitude, cloud cover, and Moon separation/altitude. Requires astronomical darkness (Sun < −12°).</p>
+        <ol id="top5"></ol>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="card">
+        <h3>Catalog Browser (subset)</h3>
+        <div class="row">
+          <input id="search" placeholder="Search Messier by name/type (subset)" />
+          <button id="recompute">Recompute</button>
+        </div>
+        <div id="table"></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>© 2025 AstroTarget</span>
+    </footer>
+  </section>
+
+  <script src="messier_subset.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
