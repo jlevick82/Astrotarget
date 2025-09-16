@@ -1,16 +1,14 @@
-/* Splash styles */
-:root{ --fg:#e7edf5; --muted:#8aa0b3; --ok:#64d26d; --bad:#ff5d5d; }
+/* splash styles v15 */ 
+:root{ --fg:#e7edf5; --muted:#8aa0b3; }
 *{box-sizing:border-box} html,body{margin:0;height:100%}
-.splashBody{background:#000;color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}
+body{background:#000;color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}
 .splash{min-height:100vh;display:grid;place-items:center;position:relative;overflow:hidden}
 .splash .logo{width:min(60vmin,720px);height:auto;opacity:.96;filter:drop-shadow(0 20px 60px rgba(255,122,47,.35))}
-.splash .overlay{position:absolute;inset:auto 0 0 0;padding:16px;display:grid;gap:8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65))}
+.overlay{position:absolute;inset:auto 0 0 0;padding:16px;display:grid;gap:8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65))}
 .progress{width:min(720px,92vw);height:10px;background:#0f1822;border:1px solid #1b2b3a;border-radius:999px;overflow:hidden;margin:0 auto}
 .progress #bar{height:100%;width:0%;background:linear-gradient(90deg,#ff7a2f,#ffd6c0)}
 .debug{list-style:none;margin:0 auto;padding:0;max-width:min(720px,92vw);text-align:left}
 .debug li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #14202c}
-.debug .mark{width:10px;height:10px;border-radius:50%}
-.debug .ok{background:var(--ok)} .debug .fail{background:var(--bad)}
-.debug .spin{border:2px solid #284055;border-top-color:#bcdcff;border-radius:50%;width:14px;height:14px;animation:spin 1s linear infinite}
+.spin{border:2px solid #284055;border-top-color:#bcdcff;border-radius:50%;width:14px;height:14px;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}} .row{display:flex;gap:8px;justify-content:center}
 .btn{background:#102b42;border:1px solid #1e4e75;color:#c7e6ff;padding:8px 12px;border-radius:10px;text-decoration:none}

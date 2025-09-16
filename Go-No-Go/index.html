@@ -3,18 +3,27 @@
 <head>
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#0b0f14"><title>Go / No-Go</title>
-<link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=13">
+<link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css?v=15">
 </head>
 <body>
 <header class="bar">
   <h2>Go / No-Go</h2>
-  <nav><a href="./">Home</a><a href="../Gallery/">Gallery</a></nav>
+  <nav>
+    <a href="../">Splash</a>
+    <a href="../Gallery/">Gallery</a>
+    <div class="tools">
+      <button id="btnInstall" class="link" type="button">Install</button>
+      <button id="btnCompact" class="link" type="button">Compact</button>
+      <button id="btnNight" class="link" type="button">Night</button>
+    </div>
+  </nav>
 </header>
 
 <section class="glance" id="glance">
-  <div id="statusBadge" class="badge">—</div>
-  <div class="meta"><div id="summary">Loading…</div><div id="miniMoon" class="muted">Moon —</div></div>
-  <div class="topPick" id="topPick"><span class="star" aria-hidden="true">★</span><span id="topPickName">—</span><span id="topPickMeta" class="muted"></span></div>
+  <div id="statusBadge" class="badge">-</div>
+  <div class="meta"><div id="summary">Loading...</div><div id="miniMoon" class="muted">Moon -</div></div>
+  <div class="topPick" id="topPick"><span aria-hidden="true">★</span><span id="topPickName">-</span><span id="topPickMeta" class="muted"></span></div>
 </section>
 
 <section class="wrap grid-2">
@@ -26,11 +35,11 @@
         <input id="scopeAp" type="number" placeholder="Aperture (mm)" />
       </div>
       <div class="row"><label>Reducer / Barlow</label><input id="optFactor" type="number" step="0.01" value="1.00" />
-        <div id="chips" class="chips"></div><button id="savePreset" class="small" type="button">Save as preset for this scope</button></div>
+        <div id="chips" class="chips"></div><button id="savePreset" class="small" type="button">Save as preset</button></div>
       <div class="row"><label>Camera</label><select id="camSel"></select>
         <input id="camW" type="number" placeholder="Sensor width (mm)" />
         <input id="camH" type="number" placeholder="Sensor height (mm)" />
-        <input id="camPx" type="number" placeholder="Pixel size (µm)" />
+        <input id="camPx" type="number" placeholder="Pixel size (um)" />
       </div>
       <div class="row"><label>Location</label>
         <input id="lat" type="number" step="0.0001" placeholder="lat" />
@@ -42,49 +51,49 @@
         <input id="duration" type="number" min="1" value="3"> <span>hours</span>
         <button id="saveSetup" type="button">Save</button>
       </div>
-      <div class="row small"><span id="fov">FOV: —</span><span id="scale">Scale: —</span><span id="effFL">Eff. FL: —</span></div>
+      <div class="row small"><span id="fov">FOV: -</span><span id="scale">Scale: -</span><span id="effFL">Eff. FL: -</span></div>
     </div>
   </div>
 
   <div class="card" data-collapsible="weather">
     <header class="card-head"><h3>Weather & Conditions</h3><button class="toggle" aria-expanded="true" aria-controls="body-weather" type="button">▾</button></header>
     <div class="card-body" id="body-weather">
-      <div class="row"><button id="fetchWx" type="button">Update Weather</button><span id="wxStatus">—</span></div>
+      <div class="row"><button id="fetchWx" type="button">Update Weather</button><span id="wxStatus">-</span></div>
       <div id="wx"></div><div id="moonInfo" class="small"></div>
       <div class="row small">
         <button id="offlineCache" type="button">Download offline assets</button>
         <button id="clearOffline" type="button">Clear offline cache</button>
-        <span id="cacheState" class="small">—</span>
+        <span id="cacheState" class="small">-</span>
       </div>
     </div>
   </div>
+</section>
 
 <section class="wrap">
   <div class="card" data-collapsible="scoring">
-    <header class="card-head"><h3>Scoring & Thresholds</h3>
-      <button class="toggle" aria-expanded="false" aria-controls="body-scoring" type="button">▸</button></header>
+    <header class="card-head"><h3>Scoring & Thresholds</h3><button class="toggle" aria-expanded="false" aria-controls="body-scoring" type="button">▸</button></header>
     <div class="card-body" id="body-scoring">
-      <div class="row small"><strong>Altitude (°)</strong>
+      <div class="row small"><strong>Altitude (deg)</strong>
         <label>Min <input id="s-alt-min" type="number" min="0" max="90" step="1" value="35"></label>
         <label>Best <input id="s-alt-best" type="number" min="0" max="90" step="1" value="60"></label>
       </div>
       <div class="row small"><strong>Clouds (%)</strong>
-        <label>Good ≤ <input id="s-cloud-good" type="number" min="0" max="100" step="1" value="25"></label>
-        <label>Bad ≥ <input id="s-cloud-bad" type="number" min="0" max="100" step="1" value="60"></label>
+        <label>Good <= <input id="s-cloud-good" type="number" min="0" max="100" step="1" value="25"></label>
+        <label>Bad >= <input id="s-cloud-bad" type="number" min="0" max="100" step="1" value="60"></label>
       </div>
       <div class="row small"><strong>Wind (km/h)</strong>
-        <label>Good ≤ <input id="s-wind-good" type="number" min="0" max="100" step="1" value="10"></label>
-        <label>Bad ≥ <input id="s-wind-bad" type="number" min="0" max="100" step="1" value="25"></label>
+        <label>Good <= <input id="s-wind-good" type="number" min="0" max="100" step="1" value="10"></label>
+        <label>Bad >= <input id="s-wind-bad" type="number" min="0" max="100" step="1" value="25"></label>
       </div>
       <div class="row small"><strong>Humidity (%)</strong>
-        <label>Good ≤ <input id="s-humid-good" type="number" min="0" max="100" step="1" value="35"></label>
-        <label>Bad ≥ <input id="s-humid-bad" type="number" min="0" max="100" step="1" value="85"></label>
+        <label>Good <= <input id="s-humid-good" type="number" min="0" max="100" step="1" value="35"></label>
+        <label>Bad >= <input id="s-humid-bad" type="number" min="0" max="100" step="1" value="85"></label>
       </div>
       <div class="row small"><strong>Visibility (km)</strong>
-        <label>Bad ≤ <input id="s-vis-bad" type="number" min="0" max="50" step="1" value="8"></label>
-        <label>Good ≥ <input id="s-vis-good" type="number" min="0" max="50" step="1" value="15"></label>
+        <label>Bad <= <input id="s-vis-bad" type="number" min="0" max="50" step="1" value="8"></label>
+        <label>Good >= <input id="s-vis-good" type="number" min="0" max="50" step="1" value="15"></label>
       </div>
-      <div class="row small"><strong>Moon separation (°)</strong>
+      <div class="row small"><strong>Moon separation (deg)</strong>
         <label>Tight <input id="s-moon-tight" type="number" min="0" max="90" step="1" value="20"></label>
         <label>Loose <input id="s-moon-loose" type="number" min="0" max="180" step="1" value="45"></label>
       </div>
@@ -94,7 +103,7 @@
         <label>Moon <input id="w-moon" type="number" min="0" max="1" step="0.05" value="0.25"></label>
         <label>Met <input id="w-met" type="number" min="0" max="1" step="0.05" value="0.15"></label>
       </div>
-      <p class="small">Scores normalize 0–100%. Targets below Min Alt are rejected. Weights auto-normalize.</p>
+      <p class="small">Targets below Min Alt are rejected. Weights auto-normalize.</p>
     </div>
   </div>
 </section>
@@ -102,28 +111,22 @@
 <section class="wrap">
   <div class="card" data-collapsible="top5">
     <header class="card-head"><h3>Top 5 Recommendations</h3><button class="toggle" aria-expanded="true" aria-controls="body-top5" type="button">▾</button></header>
-    <div class="card-body" id="body-top5"><p class="small">Altitude + clouds + Moon separation; Sun &lt; −12° required.</p><ol id="top5"></ol></div>
+    <div class="card-body" id="body-top5"><p class="small">Altitude + clouds + Moon separation; Sun < -12 deg required.</p><ol id="top5"></ol></div>
   </div>
 </section>
 
-<section class="wrap">
-  <div class="card" data-collapsible="catalog">
-    <header class="card-head"><h3>Catalog Browser</h3><button class="toggle" aria-expanded="false" aria-controls="body-catalog" type="button">▸</button></header>
-    <div class="card-body" id="body-catalog">
-      <div class="row"><input id="search" placeholder="Search Messier by name/type" /><button id="recompute" type="button">Recompute</button></div>
-      <div id="table"></div>
-    </div>
-  </div>
-</section>
-
-<footer class="foot"><span>© 2025</span></footer>
+<footer class="foot"><span>v15</span></footer>
 <div id="err" class="err" hidden></div>
 
-<script src="messier_subset.js?v=13"></script>
-<script src="app.js?v=13"></script>
-<script src="collapse.js?v=13"></script>
+<script src="messier_subset.js?v=15"></script>
+<script src="app.js?v=15"></script>
+<script src="collapse.js?v=15"></script>
 <script>
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}) ); }
-window.addEventListener('error',(e)=>{ const box=document.getElementById('err'); box.hidden=false; box.textContent='JS error: '+(e?.message||'unknown'); });
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js?v=15').catch(()=>{});
+  });
+}
+window.addEventListener('error',(e)=>{ const box=document.getElementById('err'); box.hidden=false; box.textContent='JS error: '+(e && e.message ? e.message : 'unknown'); });
 </script>
 </body></html>
