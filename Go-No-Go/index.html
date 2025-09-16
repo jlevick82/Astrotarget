@@ -1,120 +1,71 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="theme-color" content="#0b0f14"><title>Go / No-Go</title>
-<link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css?v=18">
-</head>
-<body>
+<link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=19">
+</head><body>
 <header class="bar">
-  <h2>Go / No-Go</h2>
-  <nav>
-    <a href="../">Splash</a>
-    <a href="../Gallery/">Gallery</a>
+  <div class="container">
+    <h2>Go / No-Go</h2>
+    <nav>
+    <a href="../" style="color:#cfe4ff;text-decoration:none">Splash</a>
+    <a href="../Gallery/" style="color:#cfe4ff;text-decoration:none">Gallery</a>
     <div class="tools">
-      <button id="btnInstall" class="link" type="button">Install</button>
-      <button id="btnCompact" class="link" type="button">Compact</button>
-      <button id="btnNight" class="link" type="button">Night</button>
+      <button id="btnInstall" type="button">Install</button>
+      <button id="btnCompact" type="button">Compact</button>
+      <button id="btnNight" type="button">Night</button>
     </div>
-  </nav>
+    </nav>
+  </div>
 </header>
-
-<section class="glance" id="glance">
-  <div id="statusBadge" class="badge">-</div>
+<section class="glance"><div id="statusBadge" class="badge">-</div>
   <div class="meta"><div id="summary">Loading...</div><div id="miniMoon" class="muted">Moon -</div></div>
-  <div class="topPick" id="topPick"><span aria-hidden="true">★</span><span id="topPickName">-</span><span id="topPickMeta" class="muted"></span></div>
+  <div class="topPick" id="topPick"><span aria-hidden="true">★</span><span id="topPickName">-</span> <span id="topPickMeta" class="muted"></span></div>
 </section>
-
 <section class="wrap grid-2">
   <div class="card" data-collapsible="setup">
     <header class="card-head"><h3>Setup</h3><button class="toggle" aria-expanded="false" aria-controls="body-setup" type="button">▸</button></header>
     <div class="card-body" id="body-setup">
       <div class="row"><label>Telescope</label><select id="scopeSel"></select>
-        <input id="scopeFL" type="number" placeholder="Focal length (mm)" />
-        <input id="scopeAp" type="number" placeholder="Aperture (mm)" />
-      </div>
-      <div class="row"><label>Reducer / Barlow</label><input id="optFactor" type="number" step="0.01" value="1.00" />
-        <div id="chips" class="chips"></div><button id="savePreset" class="small" type="button">Save as preset</button></div>
+        <input id="scopeFL" type="number" placeholder="Focal length (mm)"/><input id="scopeAp" type="number" placeholder="Aperture (mm)"/></div>
+      <div class="row"><label>Reducer / Barlow</label><input id="optFactor" type="number" step="0.01" value="1.00"/><div id="chips" class="chips"></div><button id="savePreset" class="small" type="button">Save</button></div>
       <div class="row"><label>Camera</label><select id="camSel"></select>
-        <input id="camW" type="number" placeholder="Sensor width (mm)" />
-        <input id="camH" type="number" placeholder="Sensor height (mm)" />
-        <input id="camPx" type="number" placeholder="Pixel size (um)" />
-      </div>
-      <div class="row"><label>Location</label>
-        <input id="lat" type="number" step="0.0001" placeholder="lat" />
-        <input id="lon" type="number" step="0.0001" placeholder="lon" />
-        <button id="gpsBtn" type="button">Use GPS</button><span id="tz"></span>
-      </div>
-      <div class="row"><label>Session</label>
-        <input id="start" type="datetime-local">
-        <input id="duration" type="number" min="1" value="3"> <span>hours</span>
-        <button id="saveSetup" type="button">Save</button>
-      </div>
+        <input id="camW" type="number" placeholder="Sensor width (mm)"/><input id="camH" type="number" placeholder="Sensor height (mm)"/><input id="camPx" type="number" placeholder="Pixel size (um)"/></div>
+      <div class="row"><label>Location</label><input id="lat" type="number" step="0.0001" placeholder="lat"/><input id="lon" type="number" step="0.0001" placeholder="lon"/><button id="gpsBtn" type="button">Use GPS</button><span id="tz"></span></div>
+      <div class="row"><label>Session</label><input id="start" type="datetime-local"><input id="duration" type="number" min="1" value="3"> <span>hours</span><button id="saveSetup" type="button">Save</button></div>
+      <div class="row"><label>Preset name</label><input id="presetName" type="text" placeholder="e.g. Edge8 + 533MC + 0.7x"><button id="btnSaveNamed" type="button">Save preset</button><select id="presetList"><option value="">Load preset…</option></select><button id="btnDeleteNamed" type="button">Delete</button></div>
       <div class="row small"><span id="fov">FOV: -</span><span id="scale">Scale: -</span><span id="effFL">Eff. FL: -</span></div>
     </div>
   </div>
-
   <div class="card" data-collapsible="weather">
     <header class="card-head"><h3>Weather & Conditions</h3><button class="toggle" aria-expanded="true" aria-controls="body-weather" type="button">▾</button></header>
     <div class="card-body" id="body-weather">
       <div class="row"><button id="fetchWx" type="button">Update Weather</button><span id="wxStatus">-</span></div>
       <div id="wx"></div><div id="moonInfo" class="small"></div>
-      <div class="row small">
-        <button id="offlineCache" type="button">Download offline assets</button>
-        <button id="clearOffline" type="button">Clear offline cache</button>
-        <span id="cacheState" class="small">-</span>
-      </div>
+      <div class="row small"><button id="offlineCache" type="button">Download offline assets</button><button id="clearOffline" type="button">Clear offline cache</button><span id="cacheState" class="small">-</span></div>
     </div>
   </div>
 </section>
-
 <section class="wrap">
   <div class="card" data-collapsible="scoring">
     <header class="card-head"><h3>Scoring & Thresholds</h3><button class="toggle" aria-expanded="false" aria-controls="body-scoring" type="button">▸</button></header>
     <div class="card-body" id="body-scoring">
-      <div class="row small"><strong>Altitude (deg)</strong>
-        <label>Min <input id="s-alt-min" type="number" min="0" max="90" step="1" value="35"></label>
-        <label>Best <input id="s-alt-best" type="number" min="0" max="90" step="1" value="60"></label>
-      </div>
-      <div class="row small"><strong>Clouds (%)</strong>
-        <label>Good <= <input id="s-cloud-good" type="number" min="0" max="100" step="1" value="25"></label>
-        <label>Bad >= <input id="s-cloud-bad" type="number" min="0" max="100" step="1" value="60"></label>
-      </div>
-      <div class="row small"><strong>Wind (km/h)</strong>
-        <label>Good <= <input id="s-wind-good" type="number" min="0" max="100" step="1" value="10"></label>
-        <label>Bad >= <input id="s-wind-bad" type="number" min="0" max="100" step="1" value="25"></label>
-      </div>
-      <div class="row small"><strong>Humidity (%)</strong>
-        <label>Good <= <input id="s-humid-good" type="number" min="0" max="100" step="1" value="35"></label>
-        <label>Bad >= <input id="s-humid-bad" type="number" min="0" max="100" step="1" value="85"></label>
-      </div>
-      <div class="row small"><strong>Visibility (km)</strong>
-        <label>Bad <= <input id="s-vis-bad" type="number" min="0" max="50" step="1" value="8"></label>
-        <label>Good >= <input id="s-vis-good" type="number" min="0" max="50" step="1" value="15"></label>
-      </div>
-      <div class="row small"><strong>Moon separation (deg)</strong>
-        <label>Tight <input id="s-moon-tight" type="number" min="0" max="90" step="1" value="20"></label>
-        <label>Loose <input id="s-moon-loose" type="number" min="0" max="180" step="1" value="45"></label>
-      </div>
-      <div class="row small"><strong>Weights</strong>
-        <label>Altitude <input id="w-alt" type="number" min="0" max="1" step="0.05" value="0.35"></label>
-        <label>Clouds <input id="w-cloud" type="number" min="0" max="1" step="0.05" value="0.25"></label>
-        <label>Moon <input id="w-moon" type="number" min="0" max="1" step="0.05" value="0.25"></label>
-        <label>Met <input id="w-met" type="number" min="0" max="1" step="0.05" value="0.15"></label>
-      </div>
+      <div class="row small"><strong>Altitude (deg)</strong> <label>Min <input id="s-alt-min" type="number" value="35"></label> <label>Best <input id="s-alt-best" type="number" value="60"></label></div>
+      <div class="row small"><strong>Clouds (%)</strong> <label>Good <= <input id="s-cloud-good" type="number" value="25"></label> <label>Bad >= <input id="s-cloud-bad" type="number" value="60"></label></div>
+      <div class="row small"><strong>Wind (km/h)</strong> <label>Good <= <input id="s-wind-good" type="number" value="10"></label> <label>Bad >= <input id="s-wind-bad" type="number" value="25"></label></div>
+      <div class="row small"><strong>Humidity (%)</strong> <label>Good <= <input id="s-humid-good" type="number" value="35"></label> <label>Bad >= <input id="s-humid-bad" type="number" value="85"></label></div>
+      <div class="row small"><strong>Visibility (km)</strong> <label>Bad <= <input id="s-vis-bad" type="number" value="8"></label> <label>Good >= <input id="s-vis-good" type="number" value="15"></label></div>
+      <div class="row small"><strong>Moon separation (deg)</strong> <label>Tight <input id="s-moon-tight" type="number" value="20"></label> <label>Loose <input id="s-moon-loose" type="number" value="45"></label></div>
+      <div class="row small"><strong>Weights</strong> <label>Alt <input id="w-alt" type="number" step="0.05" value="0.35"></label> <label>Cloud <input id="w-cloud" type="number" step="0.05" value="0.25"></label> <label>Moon <input id="w-moon" type="number" step="0.05" value="0.25"></label> <label>Met <input id="w-met" type="number" step="0.05" value="0.15"></label></div>
       <p class="small">Targets below Min Alt are rejected. Weights auto-normalize.</p>
     </div>
   </div>
 </section>
-
 <section class="wrap">
   <div class="card" data-collapsible="top5">
     <header class="card-head"><h3>Top 5 Recommendations</h3><button class="toggle" aria-expanded="true" aria-controls="body-top5" type="button">▾</button></header>
     <div class="card-body" id="body-top5"><p class="small">Altitude + clouds + Moon separation; Sun < -12 deg required.</p><ol id="top5"></ol></div>
   </div>
 </section>
-
 <section class="wrap">
   <div class="card collapsed" data-collapsible="catalog">
     <header class="card-head"><h3>Catalog (subset)</h3><button class="toggle" aria-expanded="false" aria-controls="body-catalog" type="button">▸</button></header>
@@ -124,19 +75,7 @@
     </div>
   </div>
 </section>
-
 <footer class="foot"><span>v18</span></footer>
-<div id="err" class="err" hidden></div>
-
-<script src="messier_subset.js?v=18"></script>
-<script src="app.js?v=18"></script>
-<script src="collapse.js?v=18"></script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./sw.js?v=18').catch(()=>{});
-  });
-}
-window.addEventListener('error',(e)=>{ const box=document.getElementById('err'); if(!box) return; box.hidden=false; box.textContent='JS error: '+(e && e.message ? e.message : 'unknown'); });
-</script>
+<script src="messier_subset.js?v=19"></script><script src="app.js?v=19"></script><script src="collapse.js?v=19"></script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js?v=19').catch(()=>{});});}</script>
 </body></html>

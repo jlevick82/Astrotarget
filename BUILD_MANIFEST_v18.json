@@ -1,0 +1,146 @@
+{
+  "count": 35,
+  "total_bytes": 4689244,
+  "files": [
+    {
+      "path": "favicon.ico",
+      "bytes": 155651
+    },
+    {
+      "path": "manifest.webmanifest",
+      "bytes": 181
+    },
+    {
+      "path": "styles.css",
+      "bytes": 819
+    },
+    {
+      "path": "index.html",
+      "bytes": 1704
+    },
+    {
+      "path": "assets/logo-1024.webp",
+      "bytes": 103346
+    },
+    {
+      "path": "assets/logo-1024.png",
+      "bytes": 1486643
+    },
+    {
+      "path": "assets/logo-512.webp",
+      "bytes": 37076
+    },
+    {
+      "path": "assets/logo-512.png",
+      "bytes": 383911
+    },
+    {
+      "path": "assets/logo-256.webp",
+      "bytes": 12718
+    },
+    {
+      "path": "assets/logo-256.png",
+      "bytes": 107086
+    },
+    {
+      "path": "assets/logo-128.webp",
+      "bytes": 4416
+    },
+    {
+      "path": "assets/logo-128.png",
+      "bytes": 30198
+    },
+    {
+      "path": "Go-No-Go/favicon.ico",
+      "bytes": 155651
+    },
+    {
+      "path": "Go-No-Go/manifest.webmanifest",
+      "bytes": 173
+    },
+    {
+      "path": "Go-No-Go/styles.css",
+      "bytes": 2189
+    },
+    {
+      "path": "Go-No-Go/index.html",
+      "bytes": 6661
+    },
+    {
+      "path": "Go-No-Go/messier_subset.js",
+      "bytes": 1115
+    },
+    {
+      "path": "Go-No-Go/collapse.js",
+      "bytes": 1002
+    },
+    {
+      "path": "Go-No-Go/app.js",
+      "bytes": 22154
+    },
+    {
+      "path": "Go-No-Go/sw.js",
+      "bytes": 1043
+    },
+    {
+      "path": "Go-No-Go/precache.json",
+      "bytes": 200
+    },
+    {
+      "path": "Go-No-Go/assets/logo-1024.webp",
+      "bytes": 103346
+    },
+    {
+      "path": "Go-No-Go/assets/logo-1024.png",
+      "bytes": 1486643
+    },
+    {
+      "path": "Go-No-Go/assets/logo-512.webp",
+      "bytes": 37076
+    },
+    {
+      "path": "Go-No-Go/assets/logo-512.png",
+      "bytes": 383911
+    },
+    {
+      "path": "Go-No-Go/assets/logo-256.webp",
+      "bytes": 12718
+    },
+    {
+      "path": "Go-No-Go/assets/logo-256.png",
+      "bytes": 107086
+    },
+    {
+      "path": "Go-No-Go/assets/logo-128.webp",
+      "bytes": 4416
+    },
+    {
+      "path": "Go-No-Go/assets/logo-128.png",
+      "bytes": 30198
+    },
+    {
+      "path": "Gallery/index.html",
+      "bytes": 2088
+    },
+    {
+      "path": "Gallery/styles.css",
+      "bytes": 2149
+    },
+    {
+      "path": "Gallery/config.js",
+      "bytes": 117
+    },
+    {
+      "path": "Gallery/app.js",
+      "bytes": 4276
+    },
+    {
+      "path": "Gallery/manifest.webmanifest",
+      "bytes": 184
+    },
+    {
+      "path": "Gallery/sw.js",
+      "bytes": 1099
+    }
+  ]
+}

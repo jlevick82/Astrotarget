@@ -1,1 +1,1 @@
-window.__ASTRO_CONFIG__ = { defaultBaseUrl: "https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/" };
+window.__ASTRO_CONFIG__={defaultBaseUrl:"https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/"};
