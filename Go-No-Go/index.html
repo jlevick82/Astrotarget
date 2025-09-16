@@ -58,6 +58,45 @@
       </div>
     </div>
   </div>
+
+<section class="wrap">
+  <div class="card" data-collapsible="scoring">
+    <header class="card-head"><h3>Scoring & Thresholds</h3>
+      <button class="toggle" aria-expanded="false" aria-controls="body-scoring" type="button">▸</button></header>
+    <div class="card-body" id="body-scoring">
+      <div class="row small"><strong>Altitude (°)</strong>
+        <label>Min <input id="s-alt-min" type="number" min="0" max="90" step="1" value="35"></label>
+        <label>Best <input id="s-alt-best" type="number" min="0" max="90" step="1" value="60"></label>
+      </div>
+      <div class="row small"><strong>Clouds (%)</strong>
+        <label>Good ≤ <input id="s-cloud-good" type="number" min="0" max="100" step="1" value="25"></label>
+        <label>Bad ≥ <input id="s-cloud-bad" type="number" min="0" max="100" step="1" value="60"></label>
+      </div>
+      <div class="row small"><strong>Wind (km/h)</strong>
+        <label>Good ≤ <input id="s-wind-good" type="number" min="0" max="100" step="1" value="10"></label>
+        <label>Bad ≥ <input id="s-wind-bad" type="number" min="0" max="100" step="1" value="25"></label>
+      </div>
+      <div class="row small"><strong>Humidity (%)</strong>
+        <label>Good ≤ <input id="s-humid-good" type="number" min="0" max="100" step="1" value="35"></label>
+        <label>Bad ≥ <input id="s-humid-bad" type="number" min="0" max="100" step="1" value="85"></label>
+      </div>
+      <div class="row small"><strong>Visibility (km)</strong>
+        <label>Bad ≤ <input id="s-vis-bad" type="number" min="0" max="50" step="1" value="8"></label>
+        <label>Good ≥ <input id="s-vis-good" type="number" min="0" max="50" step="1" value="15"></label>
+      </div>
+      <div class="row small"><strong>Moon separation (°)</strong>
+        <label>Tight <input id="s-moon-tight" type="number" min="0" max="90" step="1" value="20"></label>
+        <label>Loose <input id="s-moon-loose" type="number" min="0" max="180" step="1" value="45"></label>
+      </div>
+      <div class="row small"><strong>Weights</strong>
+        <label>Altitude <input id="w-alt" type="number" min="0" max="1" step="0.05" value="0.35"></label>
+        <label>Clouds <input id="w-cloud" type="number" min="0" max="1" step="0.05" value="0.25"></label>
+        <label>Moon <input id="w-moon" type="number" min="0" max="1" step="0.05" value="0.25"></label>
+        <label>Met <input id="w-met" type="number" min="0" max="1" step="0.05" value="0.15"></label>
+      </div>
+      <p class="small">Scores normalize 0–100%. Targets below Min Alt are rejected. Weights auto-normalize.</p>
+    </div>
+  </div>
 </section>
 
 <section class="wrap">
