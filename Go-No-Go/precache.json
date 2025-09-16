@@ -1,10 +1,10 @@
 [
   "./",
   "./index.html",
-  "./styles.css?v=19",
-  "./app.js?v=19",
-  "./collapse.js?v=19",
-  "./messier_subset.js?v=19",
+  "./styles.css?v=20",
+  "./app.js?v=20",
+  "./collapse.js?v=20",
+  "./messier_subset.js?v=20",
   "./favicon.ico",
   "./assets/logo-1024.webp",
   "./assets/logo-512.webp"

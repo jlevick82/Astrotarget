@@ -1,21 +1,2 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Astrotarget</title><link rel="icon" href="favicon.ico"><link rel="stylesheet" href="styles.css?v=19"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#000">
-</head><body>
-<section class="splash">
-  <img class="logo" src="assets/logo-1024.webp" alt="Astrotarget">
-  <div class="overlay">
-    <div class="progress"><div id="bar"></div></div>
-    <ul id="debug" class="debug"></ul>
-    <a class="btn" href="./Go-No-Go/">Skip</a>
-  </div>
-</section>
-<script>(function(){ if(sessionStorage.getItem('gng.seenSplash')==='1'){location.replace('./Go-No-Go/');return;} const steps=[
-  {label:'Env', run:()=>Promise.resolve()},
-  {label:'Storage', run:()=>{localStorage.setItem('_t','1');localStorage.removeItem('_t');}},
-  {label:'Timezone', run:()=>{localStorage.setItem('gng.last.tz', Intl.DateTimeFormat().resolvedOptions().timeZone||'');}},
-  {label:'Weather ping', run:()=>fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto',{method:'HEAD'}).catch(()=>{})}
-]; const bar=document.getElementById('bar'), dbg=document.getElementById('debug'); let p=0;
-function row(t){ const li=document.createElement('li'); li.textContent=t+' ...'; dbg.appendChild(li); return li; }
-(async()=>{ for(const s of steps){ const li=row(s.label); try{ await s.run(); li.textContent += ' OK'; p+=100/steps.length; bar.style.width=p+'%'; } catch(e){ li.textContent += ' FAIL'; } } sessionStorage.setItem('gng.seenSplash','1'); setTimeout(()=>location.replace('./Go-No-Go/'),180); })(); })();</script>
-</body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Astrotarget</title><link rel="icon" href="favicon.ico"><link rel="stylesheet" href="styles.css?v=20"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#000"></head>
+<body><section class="splash"><a href="./Go-No-Go/"><img class="logo" src="assets/logo-1024.webp" alt="Astrotarget"></a></section></body></html>

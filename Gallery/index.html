@@ -1,11 +1,10 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#0b0f14"><title>Astro Gallery</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=19"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#0b0f14"><title>Astro Gallery</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=20"></head><body>
 <header><nav class="left"><a href="../Go-No-Go/">Home</a></nav><h1>Astro Gallery</h1><div class="right"><div id="go-no-go" class="pill">Ready</div></div></header>
 <section class="controls"><div class="row"><label>GitHub Raw Base URL</label><input id="baseUrl" type="url" placeholder="https://raw.githubusercontent.com/<user>/<repo>/<branch>/images/full/"><button id="saveBase" type="button">Save</button><button id="testPath" type="button">Test</button></div>
   <p class="hint">Example: https://raw.githubusercontent.com/USER/REPO/BRANCH/images/full/</p>
   <div class="row"><label>Catalog</label><select id="catalog"><option value="messier">Messier</option><option value="caldwell">Caldwell</option><option value="ngc">NGC</option></select><label>Range</label><input id="startNum" type="number" min="1" value="1"><span>to</span><input id="endNum" type="number" min="1" value="20"><button id="loadBtn" type="button">Load</button></div>
-  <div class="row small"><label><input type="checkbox" id="lazy"> Lazy-load</label><label><input type="checkbox" id="hires" checked> Prefer .jpg</label><label><input type="checkbox" id="lores"> Try -thumb.jpg</label></div>
-  <div class="row small"><button id="clearCache" type="button">Clear Cache</button><span id="cacheInfo">cache: ...</span><span id="netStatus" class="net">online</span></div></section>
+</section>
 <main id="grid" class="grid"></main>
 <template id="cardTpl"><article class="card"><div class="thumb"><img alt="" loading="lazy"><div class="missing">No image yet</div></div><footer></footer></article></template>
-<footer class="app-footer"><a href="../Go-No-Go/">Back to Home</a><span>v18</span><a href="#" id="installBtn" hidden>Install</a></footer>
-<script src="config.js?v=19"></script><script src="app.js?v=19"></script></body></html>
+<footer class="app-footer"><a href="../Go-No-Go/">Back to Home</a><span>v20</span></footer>
+<script src="config.js?v=20"></script><script src="app.js?v=20"></script></body></html>
