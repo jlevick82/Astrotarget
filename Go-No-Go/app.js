@@ -1,3 +1,4 @@
+window.GNG_VERSION='v12';
 window.GNG_VERSION='v11';
 'use strict';
 const $ = (s, r=document)=>r.querySelector(s);
@@ -54,7 +55,7 @@ const scopes=[
   {id:'rasa8', name:"Celestron RASA 8 (400mm f/2)", fl:400, ap:203, presets:[1.0]},
   {id:'sw150p',name:"SkyWatcher 150P (750mm f/5)", fl:750, ap:150, presets:[1.0,2.0]},
   {id:'c6',   name:"Celestron C6 / 6SE (1500mm f/10)", fl:1500, ap:150, presets:[0.63,1.0,2.0]},
-  {id:'custom',name:"Custom…", fl:null, ap:null, presets:[1.0]}
+  {id:'custom',name:"Custom...", fl:null, ap:null, presets:[1.0]}
 ];
 const cameras=[
   {name:"ZWO ASI533MC Pro (IMX533)", w:11.31, h:11.31, px:3.76},
@@ -68,7 +69,7 @@ const cameras=[
   {name:"Nikon D750", w:35.9, h:24.0, px:5.97},
   {name:"Nikon Z6", w:35.9, h:23.9, px:5.94},
   {name:"Sony A7 III", w:35.8, h:23.8, px:5.94},
-  {name:"Custom…", w:null, h:null, px:null}
+  {name:"Custom...", w:null, h:null, px:null}
 ];
 
 /* ===== Scoring defaults (astro-imaging biased) ===== */
@@ -131,17 +132,17 @@ function bind(){ const U=ui();
 
 function renderChips(){ const U=ui(); U.chips.innerHTML=''; const s=scopes[parseInt(U.scopeSel.value,10)]; const key=`gng.preset.${s.id}`; const custom=localStorage.getItem(key);
   const list=[...s.presets]; if(custom){ const v=parseFloat(custom); if(Number.isFinite(v) && !list.includes(v)) list.unshift(v); }
-  list.forEach(f=>{ const b=document.createElement('button'); b.textContent=`${f}×`; b.addEventListener('click',()=>{ U.optFactor.value=String(f); highlightChip(f); updateOptics(); }); U.chips.appendChild(b); });
+  list.forEach(f=>{ const b=document.createElement('button'); b.textContent=`${f}x`; b.addEventListener('click',()=>{ U.optFactor.value=String(f); highlightChip(f); updateOptics(); }); U.chips.appendChild(b); });
   highlightChip(parseFloat(U.optFactor.value)||1);
 }
-function highlightChip(v){ const U=ui(); [...U.chips.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.textContent===`${v}×`)); }
+function highlightChip(v){ const U=ui(); [...U.chips.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.textContent===`${v}x`)); }
 function applyScope(){ const U=ui(); const s=scopes[parseInt(U.scopeSel.value,10)]; if(s.fl){U.scopeFL.value=s.fl;} if(s.ap){U.scopeAp.value=s.ap;} }
 function applyCam(){ const U=ui(); const c=cameras[parseInt(U.camSel.value,10)]; if(c.w){U.camW.value=c.w;} if(c.h){U.camH.value=c.h;} if(c.px){U.camPx.value=c.px;} }
 function updateOptics(){ const U=ui(); const fl=parseFloat(U.scopeFL.value)||0; const f=parseFloat(U.optFactor.value)||1; const eff=fl*f;
   const sw=parseFloat(U.camW.value)||0, sh=parseFloat(U.camH.value)||0, px=parseFloat(U.camPx.value)||0;
-  U.effFL.textContent = eff>0 ? `Eff. FL: ${eff.toFixed(0)} mm` : 'Eff. FL: —';
-  U.fov.textContent = (eff>0 && sw>0 && sh>0) ? `FOV: ${(57.2958*sw/eff).toFixed(1)}° × ${(57.2958*sh/eff).toFixed(1)}°` : 'FOV: —';
-  U.scale.textContent = (eff>0 && px>0) ? `Scale: ${(206.265*px/eff).toFixed(2)}″/px` : 'Scale: —';
+  U.effFL.textContent = eff>0 ? `Eff. FL: ${eff.toFixed(0)} mm` : 'Eff. FL: -';
+  U.fov.textContent = (eff>0 && sw>0 && sh>0) ? `FOV: ${(57.2958*sw/eff).toFixed(1)} deg x ${(57.2958*sh/eff).toFixed(1)} deg` : 'FOV: -';
+  U.scale.textContent = (eff>0 && px>0) ? `Scale: ${(206.265*px/eff).toFixed(2)}"/px` : 'Scale: -';
 }
 function saveSetup(){ const U=ui(); const data={scope:{fl:U.scopeFL.value, ap:U.scopeAp.value, sel:U.scopeSel.value, factor:U.optFactor.value},
   cam:{w:U.camW.value, h:U.camH.value, px:U.camPx.value, sel:U.camSel.value},
@@ -161,21 +162,21 @@ async function tryGPS(){ const U=ui(); try{ U.gps.disabled=true;
 
 async function autoFetchWeather(){ const U=ui(); const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
   if(!Number.isFinite(lat)||!Number.isFinite(lon)){ U.wxStatus.textContent='Set lat/lon'; return; }
-  U.wxStatus.textContent='Loading…';
+  U.wxStatus.textContent='Loading...';
   try{ const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m&timezone=auto`);
     const j=await r.json(); lastWeather=j; U.wxStatus.textContent='Updated'; renderWx(j); computeAll();
   }catch(e){ U.wxStatus.textContent='Weather failed'; }
 }
 function renderWx(j){ const U=ui(); if(!j || !j.hourly){ U.wx.innerHTML='<span class="small">No weather.</span>'; return; }
   const n=6; const t=j.hourly.time.slice(0,n).map((tm,i)=>({time:tm, cloud:j.hourly.cloud_cover[i], vis:(j.hourly.visibility[i]||0)/1000, temp:j.hourly.temperature_2m[i], rh:j.hourly.relative_humidity_2m[i], wind:j.hourly.wind_speed_10m[i], gust:j.hourly.wind_gusts_10m[i]}));
-  let html='<table><thead><tr><th>Time</th><th>Cloud %</th><th>Vis km</th><th>Temp °C</th><th>RH %</th><th>Wind</th><th>Gust</th></tr></thead><tbody>';
-  for(const r of t){ html+=`<tr><td>${r.time}</td><td>${r.cloud}</td><td>${r.vis.toFixed(0)}</td><td>${r.temp}</td><td>${r.rh||'—'}</td><td>${r.wind||'—'}</td><td>${r.gust||'—'}</td></tr>`; } html+='</tbody></table>'; U.wx.innerHTML=html; }
+  let html='<table><thead><tr><th>Time</th><th>Cloud %</th><th>Vis km</th><th>Temp  degC</th><th>RH %</th><th>Wind</th><th>Gust</th></tr></thead><tbody>';
+  for(const r of t){ html+=`<tr><td>${r.time}</td><td>${r.cloud}</td><td>${r.vis.toFixed(0)}</td><td>${r.temp}</td><td>${r.rh||'-'}</td><td>${r.wind||'-'}</td><td>${r.gust||'-'}</td></tr>`; } html+='</tbody></table>'; U.wx.innerHTML=html; }
 
 function updateMoonInfo(){ const U=ui(); const lat=parseFloat(U.lat.value)||0, lon=parseFloat(U.lon.value)||0;
   const start=new Date(U.start.value||new Date()); const hours=parseInt(U.dur.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
   const s=sunEq(mid), m=moonEq(mid); const altM=altFor(m.raH,m.decD,lat,lon,mid); const phase=(m.lonD-s.lamD+360)%360; const illum=(1-Math.cos(d2r(phase)))/2;
-  ui().moonInfo.textContent=`Moon: ${(illum*100).toFixed(0)}% • Alt ${altM.toFixed(0)}° at ${mid.toLocaleTimeString()}`;
-  ui().miniMoon.textContent=`Moon ${(illum*100).toFixed(0)}% • alt ${altM.toFixed(0)}°`;
+  ui().moonInfo.textContent=`Moon: ${(illum*100).toFixed(0)}% • Alt ${altM.toFixed(0)} deg at ${mid.toLocaleTimeString()}`;
+  ui().miniMoon.textContent=`Moon ${(illum*100).toFixed(0)}% • alt ${altM.toFixed(0)} deg`;
   return {s,m,altM,illum}; }
 
 function clamp01(x){ return Math.max(0, Math.min(1, x)); }
@@ -239,21 +240,21 @@ function scoreTarget(o, mid, lat, lon, mInfo){
 
 function computeTop5(){
   const U=ui(); const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ U.top5.innerHTML='<li class="bad">Set location first</li>'; U.topPickName.textContent='—'; U.topPickMeta.textContent=''; return; }
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ U.top5.innerHTML='<li class="bad">Set location first</li>'; U.topPickName.textContent='-'; U.topPickMeta.textContent=''; return; }
   const start=new Date(U.start.value); const hours=parseInt(U.dur.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
-  const s=sunEq(mid); const altSun=altFor(s.raH,s.decD,lat,lon,mid); if(altSun>-12){ U.top5.innerHTML='<li class="bad">Astronomical darkness not reached.</li>'; U.topPickName.textContent='—'; U.topPickMeta.textContent=''; return; }
+  const s=sunEq(mid); const altSun=altFor(s.raH,s.decD,lat,lon,mid); if(altSun>-12){ U.top5.innerHTML='<li class="bad">Astronomical darkness not reached.</li>'; U.topPickName.textContent='-'; U.topPickMeta.textContent=''; return; }
   const m=moonEq(mid); const mInfo={ raH:m.raH, decD:m.decD, illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2 };
   const scored=window.MESSIER_SUBSET.map(o=>{ const r=scoreTarget(o, mid, lat, lon, mInfo); return {...o, ...r}; })
     .filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-  U.top5.innerHTML = scored.length ? scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${o.id}</strong> — ${o.name} • alt ${o.alt.toFixed(0)}° • ${(o.sep??0).toFixed(0)}° from Moon • ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="bad">No suitable targets.</li>';
-  if(scored.length){ const t=scored[0]; U.topPickName.textContent = t.name; U.topPickMeta.textContent = `alt ${t.alt.toFixed(0)}° • ${(t.sep??0).toFixed(0)}° from Moon • ${(t.score*100).toFixed(0)}%`; }
-  else { U.topPickName.textContent='—'; U.topPickMeta.textContent=''; }
+  U.top5.innerHTML = scored.length ? scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${o.id}</strong> - ${o.name} • alt ${o.alt.toFixed(0)} deg • ${(o.sep??0).toFixed(0)} deg from Moon • ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="bad">No suitable targets.</li>';
+  if(scored.length){ const t=scored[0]; U.topPickName.textContent = t.name; U.topPickMeta.textContent = `alt ${t.alt.toFixed(0)} deg • ${(t.sep??0).toFixed(0)} deg from Moon • ${(t.score*100).toFixed(0)}%`; }
+  else { U.topPickName.textContent='-'; U.topPickMeta.textContent=''; }
   updateMoonInfo(); glanceStatus(); renderTable();
 }
 
 function renderTable(){ const U=ui(); const q=(U.search?.value||'').toLowerCase();
   const rows=window.MESSIER_SUBSET.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q))
-    .map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(3)}h</td><td>${o.dec.toFixed(1)}°</td></tr>`).join('');
+    .map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(3)}h</td><td>${o.dec.toFixed(1)} deg</td></tr>`).join('');
   U.table.innerHTML=`<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th></tr></thead><tbody>${rows}</tbody></table>`; }
 
 function computeAll(){ updateMoonInfo(); computeTop5(); glanceStatus(); }

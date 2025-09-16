@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#0b0f14"><title>Go / No-Go</title>
-<link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=11">
+<link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
 <header class="bar">
@@ -119,9 +119,9 @@
 <footer class="foot"><span>© 2025</span></footer>
 <div id="err" class="err" hidden></div>
 
-<script src="messier_subset.js?v=11"></script>
-<script src="app.js?v=11"></script>
-<script src="collapse.js?v=11"></script>
+<script src="messier_subset.js?v=12"></script>
+<script src="app.js?v=12"></script>
+<script src="collapse.js?v=12"></script>
 <script>
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}) ); }
 window.addEventListener('error',(e)=>{ const box=document.getElementById('err'); box.hidden=false; box.textContent='JS error: '+(e?.message||'unknown'); });
