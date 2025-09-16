@@ -42,5 +42,5 @@ let deferredPrompt; window.addEventListener('beforeinstallprompt', (e)=>{ e.prev
 document.querySelector('#installBtn')?.addEventListener('click', async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); try{ await deferredPrompt.userChoice; }catch(e){} });
 
 els.saveBase.addEventListener('click', saveBaseUrl); els.testPath.addEventListener('click', testPath); els.load.addEventListener('click', loadRange); els.clearCache.addEventListener('click', clearCache);
-loadBaseUrl(); netStatus(); updateCacheInfo(); if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js?v=15').catch(()=>{}) ); }
+loadBaseUrl(); netStatus(); updateCacheInfo(); if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js?v=18').catch(()=>{}) ); }
 })();

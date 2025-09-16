@@ -26,7 +26,7 @@
 .card{background:var(--card);border:1px solid var(--edge);border-radius:var(--radius);box-shadow:0 8px 22px rgba(0,0,0,.35);overflow:hidden;transition:transform .12s ease, box-shadow .12s ease}
 .card:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(0,0,0,.4)}
 .card-head{display:flex;align-items:center;justify-content:space-between;padding:10px var(--pad);border-bottom:1px solid var(--edge)}
-.card-body{padding:var(--pad)}
+.card-body{padding:calc(var(--pad) - 2px)}
 .toggle{background:#0f1822;border:1px solid #1b2b3a;color:#cfe4ff;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:14px;min-width:34px}
 .card.collapsed .card-body{display:none}.card.collapsed .toggle{opacity:.8}
 

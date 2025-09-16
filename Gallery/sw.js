@@ -1,5 +1,5 @@
-const CACHE_NAME='astro-gallery-v7';
-const APP_SHELL=['./','./index.html','./styles.css?v=15','./app.js?v=15','./config.js?v=15','./manifest.webmanifest'];
+const CACHE_NAME='astro-gallery-v9';
+const APP_SHELL=['./','./index.html','./styles.css?v=18','./app.js?v=18','./config.js?v=18','./manifest.webmanifest'];
 self.addEventListener('install',event=>{ event.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(APP_SHELL)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',event=>{ event.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>k===CACHE_NAME?Promise.resolve():caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',event=>{

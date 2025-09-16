@@ -4,7 +4,7 @@
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#0b0f14"><title>Go / No-Go</title>
 <link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css?v=15">
+<link rel="stylesheet" href="styles.css?v=18">
 </head>
 <body>
 <header class="bar">
@@ -115,18 +115,28 @@
   </div>
 </section>
 
-<footer class="foot"><span>v15</span></footer>
+<section class="wrap">
+  <div class="card collapsed" data-collapsible="catalog">
+    <header class="card-head"><h3>Catalog (subset)</h3><button class="toggle" aria-expanded="false" aria-controls="body-catalog" type="button">▸</button></header>
+    <div class="card-body" id="body-catalog">
+      <div class="row"><input id="search" type="search" placeholder="Search Messier subset..."></div>
+      <div id="table"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot"><span>v18</span></footer>
 <div id="err" class="err" hidden></div>
 
-<script src="messier_subset.js?v=15"></script>
-<script src="app.js?v=15"></script>
-<script src="collapse.js?v=15"></script>
+<script src="messier_subset.js?v=18"></script>
+<script src="app.js?v=18"></script>
+<script src="collapse.js?v=18"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./sw.js?v=15').catch(()=>{});
+    navigator.serviceWorker.register('./sw.js?v=18').catch(()=>{});
   });
 }
-window.addEventListener('error',(e)=>{ const box=document.getElementById('err'); box.hidden=false; box.textContent='JS error: '+(e && e.message ? e.message : 'unknown'); });
+window.addEventListener('error',(e)=>{ const box=document.getElementById('err'); if(!box) return; box.hidden=false; box.textContent='JS error: '+(e && e.message ? e.message : 'unknown'); });
 </script>
 </body></html>

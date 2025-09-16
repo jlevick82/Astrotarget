@@ -1,4 +1,4 @@
-/* splash styles v15 */ 
+/* splash styles v18 */ 
 :root{ --fg:#e7edf5; --muted:#8aa0b3; }
 *{box-sizing:border-box} html,body{margin:0;height:100%}
 body{background:#000;color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}

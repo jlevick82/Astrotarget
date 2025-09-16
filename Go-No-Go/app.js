@@ -1,4 +1,4 @@
-window.GNG_VERSION='v15';
+window.GNG_VERSION='v18';
 (function(){
 'use strict';
 const $ = (s, r=document)=>r.querySelector(s);
@@ -98,13 +98,13 @@ function init(){
   // ensure buttons not implicit submit
   document.querySelectorAll('button:not([type])').forEach(b=>b.setAttribute('type','button'));
   // presets
-  scopes.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.name; U.scopeSel.appendChild(o); });
-  cameras.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.name; U.camSel.appendChild(o); });
-  U.scopeSel.value=0; U.camSel.value=0; applyScope(); applyCam(); renderChips();
+  scopes.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.name; U.scopeSel?.appendChild(o); });
+  cameras.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.name; U.camSel?.appendChild(o); });
+  if(U.scopeSel) U.scopeSel.value=0; if(U.camSel) U.camSel.value=0; applyScope(); applyCam(); renderChips();
   // session
-  const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset()); U.start.value=now.toISOString().slice(0,16);
-  U.tz.textContent=Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const Llat=localStorage.getItem('gng.last.lat'), Llon=localStorage.getItem('gng.last.lon'); if(Llat && Llon){ U.lat.value=Llat; U.lon.value=Llon; autoFetchWeather(); } else { tryGPS(); }
+  const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset()); if(U.start) U.start.value=now.toISOString().slice(0,16);
+  if(U.tz) U.tz.textContent=Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const Llat=localStorage.getItem('gng.last.lat'), Llon=localStorage.getItem('gng.last.lon'); if(Llat && Llon && U.lat && U.lon){ U.lat.value=Llat; U.lon.value=Llon; autoFetchWeather(); } else { tryGPS(); }
   loadSaved(); updateOptics(); bind(); hydrateThresholdControls(); updateMoonInfo(); glanceStatus(); updateCacheState();
 }
 
@@ -112,95 +112,95 @@ function bindHeaderTools(){
   const U=ui();
   // install
   let deferred=null;
-  window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferred=e; U.btnInstall.disabled=false; });
-  U.btnInstall.addEventListener('click', async ()=>{ if(!deferred) return; deferred.prompt(); try{ await deferred.userChoice; }catch(e){} deferred=null; U.btnInstall.disabled=true; });
+  window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferred=e; if(U.btnInstall) U.btnInstall.disabled=false; });
+  if(U.btnInstall) U.btnInstall.addEventListener('click', async ()=>{ if(!deferred) return; deferred.prompt(); try{ await deferred.userChoice; }catch(e){} deferred=null; U.btnInstall.disabled=true; });
   // compact
   const root=document.documentElement;
   const compact=localStorage.getItem('gng.ui.compact')==='1';
   root.classList.toggle('compact', compact);
-  U.btnCompact.textContent = compact ? 'Comfort' : 'Compact';
-  U.btnCompact.addEventListener('click', ()=>{ const now = !root.classList.contains('compact'); root.classList.toggle('compact', now); localStorage.setItem('gng.ui.compact', now?'1':'0'); U.btnCompact.textContent = now ? 'Comfort' : 'Compact'; });
-  // night (explicit toggle still keeps dark but allows future alt themes)
+  if(U.btnCompact) U.btnCompact.textContent = compact ? 'Comfort' : 'Compact';
+  if(U.btnCompact) U.btnCompact.addEventListener('click', ()=>{ const now = !root.classList.contains('compact'); root.classList.toggle('compact', now); localStorage.setItem('gng.ui.compact', now?'1':'0'); U.btnCompact.textContent = now ? 'Comfort' : 'Compact'; });
+  // night
   const night=localStorage.getItem('gng.ui.night')==='1';
   root.classList.toggle('night', night);
-  U.btnNight.textContent = night ? 'Day' : 'Night';
-  U.btnNight.addEventListener('click', ()=>{ const now = !root.classList.contains('night'); root.classList.toggle('night', now); localStorage.setItem('gng.ui.night', now?'1':'0'); U.btnNight.textContent = now ? 'Day' : 'Night'; });
+  if(U.btnNight) U.btnNight.textContent = night ? 'Day' : 'Night';
+  if(U.btnNight) U.btnNight.addEventListener('click', ()=>{ const now = !root.classList.contains('night'); root.classList.toggle('night', now); localStorage.setItem('gng.ui.night', now?'1':'0'); U.btnNight.textContent = now ? 'Day' : 'Night'; });
 }
 
 function bind(){ const U=ui();
-  U.scopeSel.addEventListener('change', ()=>{applyScope(); renderChips(); updateOptics(); computeAll();});
-  U.camSel.addEventListener('change', ()=>{applyCam(); updateOptics();});
-  U.scopeFL.addEventListener('input', updateOptics);
-  U.optFactor.addEventListener('input', ()=>{ updateOptics(); highlightChip(parseFloat(U.optFactor.value)||1); });
-  U.camW.addEventListener('input', updateOptics); U.camH.addEventListener('input', updateOptics); U.camPx.addEventListener('input', updateOptics);
-  U.gps.addEventListener('click', tryGPS);
-  U.fetchWx.addEventListener('click', autoFetchWeather);
-  U.recompute.addEventListener('click', computeAll);
-  U.save.addEventListener('click', saveSetup);
-  U.savePreset.addEventListener('click', ()=>{ const s=scopes[parseInt(U.scopeSel.value,10)]; const factor=parseFloat(U.optFactor.value)||1; localStorage.setItem('gng.preset.'+s.id, String(factor)); renderChips(); });
-  U.search.addEventListener('input', renderTable);
-  if(U.offlineBtn) U.offlineBtn.addEventListener('click', precacheOffline);
-  if(U.clearOffline) U.clearOffline.addEventListener('click', clearOfflineCache);
+  U.scopeSel && U.scopeSel.addEventListener('change', ()=>{applyScope(); renderChips(); updateOptics(); computeAll();});
+  U.camSel && U.camSel.addEventListener('change', ()=>{applyCam(); updateOptics();});
+  U.scopeFL && U.scopeFL.addEventListener('input', updateOptics);
+  U.optFactor && U.optFactor.addEventListener('input', ()=>{ updateOptics(); highlightChip(parseFloat(U.optFactor.value)||1); });
+  U.camW && U.camW.addEventListener('input', updateOptics); U.camH && U.camH.addEventListener('input', updateOptics); U.camPx && U.camPx.addEventListener('input', updateOptics);
+  U.gps && U.gps.addEventListener('click', tryGPS);
+  U.fetchWx && U.fetchWx.addEventListener('click', autoFetchWeather);
+  U.recompute && U.recompute.addEventListener('click', computeAll);
+  U.save && U.save.addEventListener('click', saveSetup);
+  U.savePreset && U.savePreset.addEventListener('click', ()=>{ const s=scopes[parseInt(U.scopeSel.value,10)]; const factor=parseFloat(U.optFactor.value)||1; localStorage.setItem('gng.preset.'+s.id, String(factor)); renderChips(); });
+  U.search && U.search.addEventListener('input', renderTable);
+  U.offlineBtn && U.offlineBtn.addEventListener('click', precacheOffline);
+  U.clearOffline && U.clearOffline.addEventListener('click', clearOfflineCache);
   renderTable();
 }
 
-function renderChips(){ const U=ui(); U.chips.innerHTML=''; const s=scopes[parseInt(U.scopeSel.value,10)]; const key='gng.preset.'+s.id; const custom=localStorage.getItem(key);
+function renderChips(){ const U=ui(); if(!U.chips || !U.scopeSel) return; U.chips.innerHTML=''; const s=scopes[parseInt(U.scopeSel.value,10)]; if(!s) return; const key='gng.preset.'+s.id; const custom=localStorage.getItem(key);
   const list=s.presets.slice(); if(custom){ const v=parseFloat(custom); if(Number.isFinite(v) && list.indexOf(v)<0) list.unshift(v); }
-  list.forEach(f=>{ const b=document.createElement('button'); b.textContent=String(f)+'x'; b.addEventListener('click',()=>{ U.optFactor.value=String(f); highlightChip(f); updateOptics(); }); U.chips.appendChild(b); });
-  highlightChip(parseFloat(U.optFactor.value)||1);
+  list.forEach(f=>{ const b=document.createElement('button'); b.textContent=String(f)+'x'; b.addEventListener('click',()=>{ if(U.optFactor){ U.optFactor.value=String(f); highlightChip(f); updateOptics(); } }); U.chips.appendChild(b); });
+  highlightChip(parseFloat(U.optFactor?.value)||1);
 }
-function highlightChip(v){ const U=ui(); Array.from(U.chips.querySelectorAll('button')).forEach(b=>b.classList.toggle('active', b.textContent===String(v)+'x')); }
-function applyScope(){ const U=ui(); const s=scopes[parseInt(U.scopeSel.value,10)]; if(s){ if(s.fl){U.scopeFL.value=s.fl;} if(s.ap){U.scopeAp.value=s.ap;} } }
-function applyCam(){ const U=ui(); const c=cameras[parseInt(U.camSel.value,10)]; if(c){ if(c.w){U.camW.value=c.w;} if(c.h){U.camH.value=c.h;} if(c.px){U.camPx.value=c.px;} } }
-function updateOptics(){ const U=ui(); const fl=parseFloat(U.scopeFL.value)||0; const f=parseFloat(U.optFactor.value)||1; const eff=fl*f;
-  const sw=parseFloat(U.camW.value)||0, sh=parseFloat(U.camH.value)||0, px=parseFloat(U.camPx.value)||0;
+function highlightChip(v){ const U=ui(); if(!U.chips) return; Array.from(U.chips.querySelectorAll('button')).forEach(b=>b.classList.toggle('active', b.textContent===String(v)+'x')); }
+function applyScope(){ const U=ui(); if(!U.scopeSel) return; const s=scopes[parseInt(U.scopeSel.value,10)]; if(s){ if(U.scopeFL && s.fl){U.scopeFL.value=s.fl;} if(U.scopeAp && s.ap){U.scopeAp.value=s.ap;} } }
+function applyCam(){ const U=ui(); if(!U.camSel) return; const c=cameras[parseInt(U.camSel.value,10)]; if(c){ if(U.camW && c.w){U.camW.value=c.w;} if(U.camH && c.h){U.camH.value=c.h;} if(U.camPx && c.px){U.camPx.value=c.px;} } }
+function updateOptics(){ const U=ui(); if(!U.effFL||!U.fov||!U.scale) return; const fl=parseFloat(U.scopeFL?.value)||0; const f=parseFloat(U.optFactor?.value)||1; const eff=fl*f;
+  const sw=parseFloat(U.camW?.value)||0, sh=parseFloat(U.camH?.value)||0, px=parseFloat(U.camPx?.value)||0;
   U.effFL.textContent = eff>0 ? 'Eff. FL: '+eff.toFixed(0)+' mm' : 'Eff. FL: -';
   U.fov.textContent = (eff>0 && sw>0 && sh>0) ? 'FOV: '+(57.2958*sw/eff).toFixed(1)+' deg x '+(57.2958*sh/eff).toFixed(1)+' deg' : 'FOV: -';
-  U.scale.textContent = (eff>0 && px>0) ? 'Scale: '+(206.265*px/eff).toFixed(2)+' "/px' : 'Scale: -';
+  U.scale.textContent = (eff>0 && px>0) ? 'Scale: '+(206.265*px/eff).toFixed(2)+' \"/px' : 'Scale: -';
 }
-function saveSetup(){ const U=ui(); const data={scope:{fl:U.scopeFL.value, ap:U.scopeAp.value, sel:U.scopeSel.value, factor:U.optFactor.value},
-  cam:{w:U.camW.value, h:U.camH.value, px:U.camPx.value, sel:U.camSel.value},
-  loc:{lat:U.lat.value, lon:U.lon.value}, session:{start:U.start.value, dur:U.dur.value}}; localStorage.setItem('gng.setup', JSON.stringify(data)); }
+function saveSetup(){ const U=ui(); if(!U.scopeFL) return; const data={scope:{fl:U.scopeFL.value, ap:U.scopeAp?.value, sel:U.scopeSel?.value, factor:U.optFactor?.value},
+  cam:{w:U.camW?.value, h:U.camH?.value, px:U.camPx?.value, sel:U.camSel?.value},
+  loc:{lat:U.lat?.value, lon:U.lon?.value}, session:{start:U.start?.value, dur:U.dur?.value}}; localStorage.setItem('gng.setup', JSON.stringify(data)); }
 function loadSaved(){ const U=ui(); const j=localStorage.getItem('gng.setup'); if(!j) return; const d=JSON.parse(j);
-  if(d.scope){ U.scopeSel.value=d.scope.sel; U.scopeFL.value=d.scope.fl; U.scopeAp.value=d.scope.ap; U.optFactor.value=d.scope.factor||'1.00'; }
-  if(d.cam){ U.camSel.value=d.cam.sel; U.camW.value=d.cam.w; U.camH.value=d.cam.h; U.camPx.value=d.cam.px; }
-  if(d.loc){ U.lat.value=d.loc.lat; U.lon.value=d.loc.lon; }
-  if(d.session){ U.start.value=d.session.start; U.dur.value=d.session.dur; } }
+  if(d.scope){ if(U.scopeSel) U.scopeSel.value=d.scope.sel; if(U.scopeFL) U.scopeFL.value=d.scope.fl; if(U.scopeAp) U.scopeAp.value=d.scope.ap; if(U.optFactor) U.optFactor.value=d.scope.factor||'1.00'; }
+  if(d.cam){ if(U.camSel) U.camSel.value=d.cam.sel; if(U.camW) U.camW.value=d.cam.w; if(U.camH) U.camH.value=d.cam.h; if(U.camPx) U.camPx.value=d.cam.px; }
+  if(d.loc){ if(U.lat) U.lat.value=d.loc.lat; if(U.lon) U.lon.value=d.loc.lon; }
+  if(d.session){ if(U.start) U.start.value=d.session.start; if(U.dur) U.dur.value=d.session.dur; } }
 
-async function tryGPS(){ const U=ui(); try{ U.gps.disabled=true;
+async function tryGPS(){ const U=ui(); if(!U.gps) return; try{ U.gps.disabled=true;
   const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
-  U.lat.value=pos.coords.latitude.toFixed(5); U.lon.value=pos.coords.longitude.toFixed(5);
-  localStorage.setItem('gng.last.lat', U.lat.value); localStorage.setItem('gng.last.lon', U.lon.value);
+  if(U.lat) U.lat.value=pos.coords.latitude.toFixed(5); if(U.lon) U.lon.value=pos.coords.longitude.toFixed(5);
+  localStorage.setItem('gng.last.lat', U.lat?U.lat.value:''); localStorage.setItem('gng.last.lon', U.lon?U.lon.value:'');
   autoFetchWeather();
-} catch(e){ U.wxStatus.textContent='GPS failed'; } finally{ U.gps.disabled=false; } }
+} catch(e){ if(U.wxStatus) U.wxStatus.textContent='GPS failed'; } finally{ if(U.gps) U.gps.disabled=false; } }
 
-async function autoFetchWeather(){ const U=ui(); const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ U.wxStatus.textContent='Set lat/lon'; return; }
-  U.wxStatus.textContent='Loading...';
+async function autoFetchWeather(){ const U=ui(); const lat=parseFloat(U.lat?.value), lon=parseFloat(U.lon?.value);
+  if(!(Number.isFinite(lat)&&Number.isFinite(lon))){ if(U.wxStatus) U.wxStatus.textContent='Set lat/lon'; return; }
+  if(U.wxStatus) U.wxStatus.textContent='Loading...';
   try{ const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=cloud_cover,visibility,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m&timezone=auto');
-    const j=await r.json(); lastWeather=j; U.wxStatus.textContent='Updated'; renderWx(j); computeAll();
-  }catch(e){ U.wxStatus.textContent='Weather failed'; }
+    const j=await r.json(); lastWeather=j; if(U.wxStatus) U.wxStatus.textContent='Updated'; renderWx(j); computeAll();
+  }catch(e){ if(U.wxStatus) U.wxStatus.textContent='Weather failed'; }
 }
-function renderWx(j){ const U=ui(); if(!j || !j.hourly){ U.wx.innerHTML='<span class="small">No weather.</span>'; return; }
+function renderWx(j){ const U=ui(); if(!U.wx){ return; } if(!j || !j.hourly){ U.wx.innerHTML='<span class=\"small\">No weather.</span>'; return; }
   const n=6; const t=j.hourly.time.slice(0,n).map((tm,i)=>({time:tm, cloud:j.hourly.cloud_cover[i], vis:(j.hourly.visibility[i]||0)/1000, temp:j.hourly.temperature_2m[i], rh:j.hourly.relative_humidity_2m[i], wind:j.hourly.wind_speed_10m[i], gust:j.hourly.wind_gusts_10m[i]}));
   let html='<table><thead><tr><th>Time</th><th>Cloud %</th><th>Vis km</th><th>Temp C</th><th>RH %</th><th>Wind</th><th>Gust</th></tr></thead><tbody>';
   for(const r of t){ html+='<tr><td>'+r.time+'</td><td>'+r.cloud+'</td><td>'+r.vis.toFixed(0)+'</td><td>'+r.temp+'</td><td>'+(r.rh||'-')+'</td><td>'+(r.wind||'-')+'</td><td>'+(r.gust||'-')+'</td></tr>'; } html+='</tbody></table>'; U.wx.innerHTML=html; }
 
-function updateMoonInfo(){ const U=ui(); const lat=parseFloat(U.lat.value)||0, lon=parseFloat(U.lon.value)||0;
-  const start=new Date(U.start.value||new Date()); const hours=parseInt(U.dur.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
+function updateMoonInfo(){ const U=ui(); if(!U.moonInfo||!U.miniMoon) return; const lat=parseFloat(U.lat?.value)||0, lon=parseFloat(U.lon?.value)||0;
+  const start=new Date(U.start?.value||new Date()); const hours=parseInt(U.dur?.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
   const s=sunEq(mid), m=moonEq(mid); const altM=altFor(m.raH,m.decD,lat,lon,mid); const phase=(m.lonD-s.lamD+360)%360; const illum=(1-Math.cos(d2r(phase)))/2;
-  ui().moonInfo.textContent='Moon: '+Math.round(illum*100)+'% • Alt '+altM.toFixed(0)+' deg at '+mid.toLocaleTimeString();
-  ui().miniMoon.textContent='Moon '+Math.round(illum*100)+'% • alt '+altM.toFixed(0)+' deg';
+  U.moonInfo.textContent='Moon: '+Math.round(illum*100)+'% • Alt '+altM.toFixed(0)+' deg at '+mid.toLocaleTimeString();
+  U.miniMoon.textContent='Moon '+Math.round(illum*100)+'% • alt '+altM.toFixed(0)+' deg';
   return {s,m,altM,illum};
 }
 
 function clamp01(x){ return Math.max(0, Math.min(1, x)); }
 function lerp01(x, a0, a1){ if(a0===a1) return 0; return clamp01((x - a0) / (a1 - a0)); }
 
-function glanceStatus(){ const U=ui();
+function glanceStatus(){ const U=ui(); if(!U.statusBadge||!U.summary) return;
   const clouds=Array.from(document.querySelectorAll('#wx tbody tr td:nth-child(2)')).slice(0,3).map(td=>parseFloat(td.textContent)||50);
   const avgCloud = clouds.length?(clouds.reduce((a,b)=>a+b,0)/clouds.length):60;
-  const s=sunEq(new Date(U.start.value)); const altSun=altFor(s.raH,s.decD,parseFloat(U.lat.value)||0,parseFloat(U.lon.value)||0,new Date(U.start.value));
+  const s=sunEq(new Date(U.start?.value||new Date())); const altSun=altFor(s.raH,s.decD,parseFloat(U.lat?.value)||0,parseFloat(U.lon?.value)||0,new Date(U.start?.value||new Date()));
   const dark = altSun<=-12;
   let status='MARGINAL', cls='marginal';
   if(!dark) { status='NO-GO'; cls='nogo'; }
@@ -235,45 +235,42 @@ function scoreTarget(o, mid, lat, lon, mInfo){
 }
 
 function computeTop5(){
-  const U=ui(); const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ U.top5.innerHTML='<li class="bad">Set location first</li>'; U.topPickName.textContent='-'; U.topPickMeta.textContent=''; return; }
-  const start=new Date(U.start.value); const hours=parseInt(U.dur.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
-  const s=sunEq(mid); const altSun=altFor(s.raH,s.decD,lat,lon,mid); if(altSun>-12){ U.top5.innerHTML='<li class="bad">Astronomical darkness not reached.</li>'; U.topPickName.textContent='-'; U.topPickMeta.textContent=''; return; }
+  const U=ui(); if(!U.top5||!U.topPickName||!U.topPickMeta) return;
+  const lat=parseFloat(U.lat?.value), lon=parseFloat(U.lon?.value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ U.top5.innerHTML='<li class=\"bad\">Set location first</li>'; U.topPickName.textContent='-'; U.topPickMeta.textContent=''; return; }
+  const start=new Date(U.start?.value||new Date()); const hours=parseInt(U.dur?.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
+  const s=sunEq(mid); const altSun=altFor(s.raH,s.decD,lat,lon,mid); if(altSun>-12){ U.top5.innerHTML='<li class=\"bad\">Astronomical darkness not reached.</li>'; U.topPickName.textContent='-'; U.topPickMeta.textContent=''; return; }
   const m=moonEq(mid); const mInfo={ raH:m.raH, decD:m.decD, illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2 };
   const scored=window.MESSIER_SUBSET.map(o=>{ const r=scoreTarget(o, mid, lat, lon, mInfo); return {id:o.id, name:o.name, type:o.type, alt:r.alt, sep:r.sep, score:r.score}; })
     .filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-  U.top5.innerHTML = scored.length ? scored.map((o,i)=>'<li>'+(i===0?'<span aria-hidden="true">★</span> ':'')+'<strong>'+o.id+'</strong> — '+o.name+' • alt '+o.alt.toFixed(0)+' deg • '+(o.sep||0).toFixed(0)+' deg from Moon • '+(o.score*100).toFixed(0)+'%</li>').join('') : '<li class="bad">No suitable targets.</li>';
+  U.top5.innerHTML = scored.length ? scored.map((o,i)=>'<li>'+(i===0?'<span aria-hidden=\"true\">★</span> ':'')+'<strong>'+o.id+'</strong> — '+o.name+' • alt '+o.alt.toFixed(0)+' deg • '+(o.sep||0).toFixed(0)+' deg from Moon • '+(o.score*100).toFixed(0)+'%</li>').join('') : '<li class=\"bad\">No suitable targets.</li>';
   if(scored.length){ const t=scored[0]; U.topPickName.textContent = t.name; U.topPickMeta.textContent = 'alt '+t.alt.toFixed(0)+' deg • '+(t.sep||0).toFixed(0)+' deg from Moon • '+(t.score*100).toFixed(0)+'%'; }
   else { U.topPickName.textContent='-'; U.topPickMeta.textContent=''; }
-  updateMoonInfo(); glanceStatus(); renderTable();
+  updateMoonInfo(); glanceStatus(); if(ui().table) renderTable();
 }
 
-function renderTable(){ const U=ui(); const q=(U.search && U.search.value||'').toLowerCase();
+function renderTable(){ const U=ui(); if(!U.table) return; const q=(U.search && U.search.value||'').toLowerCase();
   const rows=window.MESSIER_SUBSET.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q))
     .map(o=>'<tr><td>'+o.id+'</td><td>'+o.name+'</td><td>'+o.type+'</td><td>'+o.ra.toFixed(3)+'h</td><td>'+o.dec.toFixed(1)+' deg</td></tr>').join('');
   U.table.innerHTML='<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
-function computeAll(){ updateMoonInfo(); computeTop5(); glanceStatus(); }
+function computeAll(){ updateMoonInfo(); computeTop5(); glanceStatus(); if(ui().table) renderTable(); }
 
 // Offline cache
 async function precacheOffline(){
-  try{ await navigator.serviceWorker.ready; const res = await fetch('./precache.json?v=15', {cache:'no-store'}); const files = await res.json();
-    const cache = await caches.open('gng-app-v6'); await cache.addAll(files); ui().cacheState.textContent = 'Offline assets stored.'; }
-  catch(e){ ui().cacheState.textContent = 'Offline caching failed.'; }
+  try{ await navigator.serviceWorker.ready; const res = await fetch('./precache.json?v=18', {cache:'no-store'}); const files = await res.json();
+    const cache = await caches.open('gng-app-v8'); await cache.addAll(files); ui().cacheState && (ui().cacheState.textContent = 'Offline assets stored.'); }
+  catch(e){ ui().cacheState && (ui().cacheState.textContent = 'Offline caching failed.'); }
 }
 async function clearOfflineCache(){
   const keys = await caches.keys();
-  await Promise.all(keys.map(k => (k.startsWith('gng-') || k==='gng-app-v6') ? caches.delete(k) : null));
-  ui().cacheState.textContent = 'Offline cache cleared.';
+  await Promise.all(keys.map(k => (k.startsWith('gng-') || k==='gng-app-v8') ? caches.delete(k) : null));
+  ui().cacheState && (ui().cacheState.textContent = 'Offline cache cleared.');
 }
 async function updateCacheState(){
-  try{ const keys = await caches.keys(); const g = keys.filter(k=>k.startsWith('gng-') || k==='gng-app-v6'); ui().cacheState.textContent = g.length ? 'Offline caches: '+g.join(', ') : 'No offline cache yet.'; }
-  catch(e){ ui().cacheState.textContent='cache: n/a'; }
+  try{ const keys = await caches.keys(); const g = keys.filter(k=>k.startsWith('gng-') || k==='gng-app-v8'); ui().cacheState && (ui().cacheState.textContent = g.length ? 'Offline caches: '+g.join(', ') : 'No offline cache yet.'); }
+  catch(e){ ui().cacheState && (ui().cacheState.textContent='cache: n/a'); }
 }
-
-document.addEventListener('DOMContentLoaded', ()=>{
-  // nothing additional
-});
 
 })();
