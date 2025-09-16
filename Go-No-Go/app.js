@@ -1,4 +1,4 @@
-window.GNG_VERSION='v12';
+window.GNG_VERSION='v13';
 window.GNG_VERSION='v11';
 'use strict';
 const $ = (s, r=document)=>r.querySelector(s);
@@ -175,8 +175,8 @@ function renderWx(j){ const U=ui(); if(!j || !j.hourly){ U.wx.innerHTML='<span c
 function updateMoonInfo(){ const U=ui(); const lat=parseFloat(U.lat.value)||0, lon=parseFloat(U.lon.value)||0;
   const start=new Date(U.start.value||new Date()); const hours=parseInt(U.dur.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
   const s=sunEq(mid), m=moonEq(mid); const altM=altFor(m.raH,m.decD,lat,lon,mid); const phase=(m.lonD-s.lamD+360)%360; const illum=(1-Math.cos(d2r(phase)))/2;
-  ui().moonInfo.textContent=`Moon: ${(illum*100).toFixed(0)}% • Alt ${altM.toFixed(0)} deg at ${mid.toLocaleTimeString()}`;
-  ui().miniMoon.textContent=`Moon ${(illum*100).toFixed(0)}% • alt ${altM.toFixed(0)} deg`;
+  ui().moonInfo.textContent=`Moon: ${(illum*100).toFixed(0)}%   Alt ${altM.toFixed(0)} deg at ${mid.toLocaleTimeString()}`;
+  ui().miniMoon.textContent=`Moon ${(illum*100).toFixed(0)}%   alt ${altM.toFixed(0)} deg`;
   return {s,m,altM,illum}; }
 
 function clamp01(x){ return Math.max(0, Math.min(1, x)); }
@@ -194,7 +194,7 @@ function glanceStatus(){
   else if(avgCloud>=TH.cloud_bad) { status='NO-GO'; cls='nogo'; }
   U.statusBadge.textContent = status; U.statusBadge.className = 'badge ' + cls;
   const visCell = document.querySelector('#wx tbody tr td:nth-child(3)'); const vis = visCell? Number(visCell.textContent)||0 : 0;
-  U.summary.textContent = `${status} • Clouds ~${Math.round(avgCloud)}% • Vis ${Math.round(vis)}km • ${dark?'Astro dark':'Too bright'}`;
+  U.summary.textContent = `${status}   Clouds ~${Math.round(avgCloud)}%   Vis ${Math.round(vis)}km   ${dark?'Astro dark':'Too bright'}`;
 }
 
 function scoreTarget(o, mid, lat, lon, mInfo){
@@ -246,8 +246,8 @@ function computeTop5(){
   const m=moonEq(mid); const mInfo={ raH:m.raH, decD:m.decD, illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2 };
   const scored=window.MESSIER_SUBSET.map(o=>{ const r=scoreTarget(o, mid, lat, lon, mInfo); return {...o, ...r}; })
     .filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-  U.top5.innerHTML = scored.length ? scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${o.id}</strong> - ${o.name} • alt ${o.alt.toFixed(0)} deg • ${(o.sep??0).toFixed(0)} deg from Moon • ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="bad">No suitable targets.</li>';
-  if(scored.length){ const t=scored[0]; U.topPickName.textContent = t.name; U.topPickMeta.textContent = `alt ${t.alt.toFixed(0)} deg • ${(t.sep??0).toFixed(0)} deg from Moon • ${(t.score*100).toFixed(0)}%`; }
+  U.top5.innerHTML = scored.length ? scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true"> </span> ':''}<strong>${o.id}</strong> - ${o.name}   alt ${o.alt.toFixed(0)} deg   ${(o.sep??0).toFixed(0)} deg from Moon   ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="bad">No suitable targets.</li>';
+  if(scored.length){ const t=scored[0]; U.topPickName.textContent = t.name; U.topPickMeta.textContent = `alt ${t.alt.toFixed(0)} deg   ${(t.sep??0).toFixed(0)} deg from Moon   ${(t.score*100).toFixed(0)}%`; }
   else { U.topPickName.textContent='-'; U.topPickMeta.textContent=''; }
   updateMoonInfo(); glanceStatus(); renderTable();
 }
