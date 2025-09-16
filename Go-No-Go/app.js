@@ -1,3 +1,4 @@
+window.GNG_VERSION='v11';
 'use strict';
 const $ = (s, r=document)=>r.querySelector(s);
 

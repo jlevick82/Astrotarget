@@ -1,4 +1,4 @@
-const APP_CACHE='gng-app-v1';
+const APP_CACHE='gng-app-v2';
 const APP_SHELL=['./','./index.html','./styles.css','./app.js','./collapse.js','./messier_subset.js','./favicon.ico',
 './assets/logo-128.png','./assets/logo-256.png','./assets/logo-512.png','./assets/logo-1024.webp','./assets/logo-512.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(APP_CACHE).then(c=>c.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});

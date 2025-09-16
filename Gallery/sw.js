@@ -1,4 +1,4 @@
-const CACHE_NAME='astro-gallery-v2'; const APP_SHELL=['./','./index.html','./styles.css','./app.js','./config.js','./manifest.webmanifest'];
+const CACHE_NAME='astro-gallery-v3'; const APP_SHELL=['./','./index.html','./styles.css','./app.js','./config.js','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>k===CACHE_NAME?null:caches.delete(k))))); self.clients.claim();});
 self.addEventListener('fetch',e=>{
