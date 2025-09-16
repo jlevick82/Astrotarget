@@ -1,1 +1,6 @@
-body{margin:0;background:#000;color:#e7edf5;font-family:system-ui,Segoe UI,Roboto,Ubuntu,sans-serif} .splash{min-height:100vh;display:grid;place-items:center;position:relative} .logo{width:min(60vmin,720px);height:auto}
+body{margin:0;background:#000;color:#e7edf5;font-family:system-ui,Segoe UI,Roboto,Ubuntu,sans-serif}
+.splash{min-height:100vh;display:grid;place-items:center}
+.logo{width:min(60vmin,720px);height:auto}
+.bar{height:10px;background:#122131;border-radius:8px;overflow:hidden;margin-top:16px}
+.bar>i{display:block;height:100%;width:0;background:#2f80ed;transition:width .15s}
+.dbg{color:#8aa5c8;font-size:12px;max-width:840px;margin:10px auto;line-height:1.35}
