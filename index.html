@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Loading…</title>
+<title>Astrotarget</title>
 <link rel="icon" href="favicon.ico">
 <meta name="theme-color" content="#000000">
 <link rel="preload" as="image" href="assets/logo-1024.webp">
 <link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
 </head>
 <body class="splashBody">
   <section id="splash" class="splash">
-    <img class="logo" src="assets/logo-1024.webp" alt="logo" width="512" height="512">
+    <img class="logo" src="assets/logo-1024.webp" alt="Astrotarget">
     <div class="overlay">
       <div class="progress"><div id="bar"></div></div>
       <ul id="debug" class="debug"></ul>
@@ -20,37 +20,30 @@
       </div>
     </div>
   </section>
-
-  <script>
-  if (sessionStorage.getItem('gng.seenSplash') === '1') {
-    window.location.replace('./Go-No-Go/');
-  } else {
-    const $ = (s, r=document)=>r.querySelector(s);
-    const steps = [
-      { label:'Environment ready', run: ()=>Promise.resolve() },
-      { label:'Local storage available', run: ()=>{ localStorage.setItem('___t','1'); localStorage.removeItem('___t'); } },
-      { label:'Timezone detected', run: ()=>{ localStorage.setItem('gng.last.tz', Intl.DateTimeFormat().resolvedOptions().timeZone||''); } },
-      { label:'Weather API reachable', run: async ()=>{
-          try{ const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto', {method:'HEAD'}); if(!r.ok) throw 0; } 
-          catch(e){ const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto'); if(!r.ok) throw new Error('wx'); }
-      }}
-    ];
-    let progress = 0;
-    const bar = $('#bar'), debug = $('#debug');
-    function addRow(label){ const li=document.createElement('li'); const spin=document.createElement('div'); spin.className='spin';
-      const text=document.createElement('span'); text.textContent=label; const mark=document.createElement('div'); mark.className='mark'; mark.style.visibility='hidden';
-      li.appendChild(spin); li.appendChild(text); li.appendChild(mark); debug.appendChild(li); return {li,spin,text,mark}; }
-    async function runSteps(){
-      for(const st of steps){
-        const row = addRow(st.label);
-        try{ await st.run(); row.spin.remove(); row.mark.className='mark ok'; row.mark.style.visibility='visible'; progress += 100/steps.length; bar.style.width=Math.min(100,progress)+'%'; }
-        catch(e){ row.spin.remove(); row.mark.className='mark fail'; row.mark.style.visibility='visible'; }
-      }
-      sessionStorage.setItem('gng.seenSplash', '1');
-      setTimeout(()=>{ window.location.replace('./Go-No-Go/'); }, 250);
+<script>
+if (sessionStorage.getItem('gng.seenSplash') === '1') {
+  location.replace('./Go-No-Go/');
+} else {
+  const $=(s,r=document)=>r.querySelector(s);
+  const steps=[
+    {label:'Environment ready', run:()=>Promise.resolve()},
+    {label:'Storage available', run:()=>{localStorage.setItem('___t','1'); localStorage.removeItem('___t');}},
+    {label:'Timezone detected', run:()=>{localStorage.setItem('gng.last.tz', Intl.DateTimeFormat().resolvedOptions().timeZone||'');}},
+    {label:'Weather API ping', run:async()=>{
+      try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto',{method:'HEAD'}); if(!r.ok) throw 0;}
+      catch(e){const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&timezone=auto'); if(!r.ok) throw 0;}
+    }}
+  ];
+  let p=0; const bar=$('#bar'), dbg=$('#debug');
+  function row(label){ const li=document.createElement('li'); li.innerHTML='<div class="spin"></div><span>'+label+'</span><div class="mark" style="visibility:hidden"></div>'; dbg.appendChild(li); return li; }
+  (async()=>{
+    for(const st of steps){ const li=row(st.label); const spin=li.querySelector('.spin'), mark=li.querySelector('.mark');
+      try{ await st.run(); spin.remove(); mark.className='mark ok'; mark.style.visibility='visible'; p+=100/steps.length; bar.style.width=p+'%'; }
+      catch(e){ spin.remove(); mark.className='mark fail'; mark.style.visibility='visible'; }
     }
-    document.addEventListener('DOMContentLoaded', runSteps);
-  }
-  </script>
-</body>
-</html>
+    sessionStorage.setItem('gng.seenSplash','1');
+    setTimeout(()=>location.replace('./Go-No-Go/'), 180);
+  })();
+}
+</script>
+</body></html>

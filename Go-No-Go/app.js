@@ -1,3 +1,4 @@
+'use strict';
 const $ = (s, r=document)=>r.querySelector(s);
 
 /* Astronomy helpers */
@@ -25,35 +26,41 @@ function ui(){ return {
   start:$('#start'), dur:$('#duration'), save:$('#saveSetup'),
   fov:$('#fov'), scale:$('#scale'), effFL:$('#effFL'),
   fetchWx:$('#fetchWx'), wxStatus:$('#wxStatus'), wx:$('#wx'),
-  moonInfo:$('#moonInfo'),
-  top5:$('#top5'),
-  search:$('#search'), recompute:$('#recompute'), table:$('#table')
+  moonInfo:$('#moonInfo'), top5:$('#top5'), search:$('#search'), recompute:$('#recompute'), table:$('#table'),
+  offlineBtn:$('#offlineCache'), clearOffline:$('#clearOffline'), cacheState:$('#cacheState')
 };}
 
 const scopes=[
-  {id:'sv503', name:"SVBONY SV503 80ED (560mm f/7)", fl:560, ap:80, presets:[0.8, 1.0, 2.0]},
-  {id:'redcat', name:"RedCat 51 (250mm f/4.9)", fl:250, ap:51, presets:[1.0, 2.0]},
-  {id:'edge8', name:"Celestron EdgeHD 8" (2032mm f/10)", fl:2032, ap:203, presets:[0.7, 0.63, 1.0, 2.0]},
-  {id:'custom', name:"Custom…", fl:null, ap:null, presets:[1.0]}
+  {id:'sv503', name:"SVBONY SV503 80ED (560mm f/7)", fl:560, ap:80, presets:[0.8,1.0,2.0]},
+  {id:'gt71',  name:"William Optics GT71 (420mm f/5.9)", fl:420, ap:71, presets:[0.8,1.0,2.0]},
+  {id:'redcat',name:"RedCat 51 (250mm f/4.9)", fl:250, ap:51, presets:[1.0,2.0]},
+  {id:'edge8', name:"Celestron EdgeHD 8" (2032mm f/10)", fl:2032, ap:203, presets:[0.7,0.63,1.0,2.0]},
+  {id:'rasa8', name:"Celestron RASA 8 (400mm f/2)", fl:400, ap:203, presets:[1.0]},
+  {id:'sw150p',name:"SkyWatcher 150P (750mm f/5)", fl:750, ap:150, presets:[1.0,2.0]},
+  {id:'c6',   name:"Celestron C6 / 6SE (1500mm f/10)", fl:1500, ap:150, presets:[0.63,1.0,2.0]},
+  {id:'custom',name:"Custom…", fl:null, ap:null, presets:[1.0]}
 ];
 const cameras=[
-  {name:"ZWO ASI533MC Pro", w:11.31, h:11.31, px:3.76},
-  {name:"Canon T100 / 4000D", w:22.3, h:14.9, px:3.7},
-  {name:"IMX571 APS-C", w:23.5, h:15.7, px:3.76},
+  {name:"ZWO ASI533MC Pro (IMX533)", w:11.31, h:11.31, px:3.76},
+  {name:"ZWO ASI2600 (IMX571 APS-C)", w:23.5, h:15.7, px:3.76},
+  {name:"ZWO ASI6200 (FF 36×24)", w:36.0, h:24.0, px:3.76},
+  {name:"Canon T3i / 600D", w:22.3, h:14.9, px:4.30},
+  {name:"Nikon D750 (FF)", w:35.9, h:24.0, px:5.97},
+  {name:"Sony A7 III (FF)", w:35.8, h:23.8, px:5.94},
   {name:"Custom…", w:null, h:null, px:null}
 ];
 
 let lastWeather=null;
 
 function init(){ const U=ui();
+  document.querySelectorAll('button:not([type])').forEach(b=>b.setAttribute('type','button'));
   scopes.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.name; U.scopeSel.appendChild(o); });
   cameras.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.name; U.camSel.appendChild(o); });
   U.scopeSel.value=0; U.camSel.value=0; applyScope(); applyCam(); renderChips();
   const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset()); U.start.value=now.toISOString().slice(0,16);
   U.tz.textContent=Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const Llat=localStorage.getItem('gng.last.lat'), Llon=localStorage.getItem('gng.last.lon'); if(Llat && Llon){ U.lat.value=Llat; U.lon.value=Llon; autoFetchWeather(); }
-  else { tryGPS(); }
-  loadSaved(); updateOptics(); bind(); updateMoonInfo();
+  const Llat=localStorage.getItem('gng.last.lat'), Llon=localStorage.getItem('gng.last.lon'); if(Llat && Llon){ U.lat.value=Llat; U.lon.value=Llon; autoFetchWeather(); } else { tryGPS(); }
+  loadSaved(); updateOptics(); bind(); updateMoonInfo(); glanceStatus(); updateCacheState();
 }
 
 function bind(){ const U=ui();
@@ -61,15 +68,15 @@ function bind(){ const U=ui();
   U.camSel.addEventListener('change', ()=>{applyCam(); updateOptics();});
   U.scopeFL.addEventListener('input', ()=>{updateOptics();});
   U.optFactor.addEventListener('input', ()=>{ updateOptics(); highlightChip(parseFloat(U.optFactor.value)||1); });
-  U.camW.addEventListener('input', updateOptics);
-  U.camH.addEventListener('input', updateOptics);
-  U.camPx.addEventListener('input', updateOptics);
+  U.camW.addEventListener('input', updateOptics); U.camH.addEventListener('input', updateOptics); U.camPx.addEventListener('input', updateOptics);
   U.gps.addEventListener('click', tryGPS);
   U.fetchWx.addEventListener('click', autoFetchWeather);
   U.recompute.addEventListener('click', computeAll);
   U.save.addEventListener('click', saveSetup);
   U.savePreset.addEventListener('click', ()=>{ const s=scopes[parseInt(U.scopeSel.value,10)]; const factor=parseFloat(U.optFactor.value)||1; localStorage.setItem(`gng.preset.${s.id}`, String(factor)); renderChips(); });
   U.search.addEventListener('input', renderTable);
+  if(U.offlineBtn) U.offlineBtn.addEventListener('click', precacheOffline);
+  if(U.clearOffline) U.clearOffline.addEventListener('click', clearOfflineCache);
   renderTable();
 }
 
@@ -79,17 +86,14 @@ function renderChips(){ const U=ui(); U.chips.innerHTML=''; const s=scopes[parse
   highlightChip(parseFloat(U.optFactor.value)||1);
 }
 function highlightChip(v){ const U=ui(); [...U.chips.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.textContent===`${v}×`)); }
-
 function applyScope(){ const U=ui(); const s=scopes[parseInt(U.scopeSel.value,10)]; if(s.fl){U.scopeFL.value=s.fl;} if(s.ap){U.scopeAp.value=s.ap;} }
 function applyCam(){ const U=ui(); const c=cameras[parseInt(U.camSel.value,10)]; if(c.w){U.camW.value=c.w;} if(c.h){U.camH.value=c.h;} if(c.px){U.camPx.value=c.px;} }
-
 function updateOptics(){ const U=ui(); const fl=parseFloat(U.scopeFL.value)||0; const f=parseFloat(U.optFactor.value)||1; const eff=fl*f;
   const sw=parseFloat(U.camW.value)||0, sh=parseFloat(U.camH.value)||0, px=parseFloat(U.camPx.value)||0;
   U.effFL.textContent = eff>0 ? `Eff. FL: ${eff.toFixed(0)} mm` : 'Eff. FL: —';
   U.fov.textContent = (eff>0 && sw>0 && sh>0) ? `FOV: ${(57.2958*sw/eff).toFixed(1)}° × ${(57.2958*sh/eff).toFixed(1)}°` : 'FOV: —';
   U.scale.textContent = (eff>0 && px>0) ? `Scale: ${(206.265*px/eff).toFixed(2)}″/px` : 'Scale: —';
 }
-
 function saveSetup(){ const U=ui(); const data={scope:{fl:U.scopeFL.value, ap:U.scopeAp.value, sel:U.scopeSel.value, factor:U.optFactor.value},
   cam:{w:U.camW.value, h:U.camH.value, px:U.camPx.value, sel:U.camSel.value},
   loc:{lat:U.lat.value, lon:U.lon.value}, session:{start:U.start.value, dur:U.dur.value}}; localStorage.setItem('gng.setup', JSON.stringify(data)); }
@@ -130,7 +134,6 @@ function glanceStatus(){ const U=ui();
   const avgCloud = clouds.length?(clouds.reduce((a,b)=>a+b,0)/clouds.length):60;
   const s=sunEq(new Date(U.start.value)); const altSun=altFor(s.raH,s.decD,parseFloat(U.lat.value)||0,parseFloat(U.lon.value)||0,new Date(U.start.value));
   const dark = altSun<=-12;
-  // Simple rubric: combine cloud + darkness
   let status='MARGINAL', cls='marginal';
   if(!dark) { status='NO-GO'; cls='nogo'; }
   else if(avgCloud<=35) { status='GO'; cls='go'; }
@@ -155,9 +158,7 @@ function computeTop5(){
   U.top5.innerHTML = scored.length ? scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${o.id}</strong> — ${o.name} • alt ${o.alt.toFixed(0)}° • sep ${o.sep?.toFixed(0)}° • ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="bad">No suitable targets.</li>';
   if(scored.length){ const t=scored[0]; U.topPickName.textContent = t.name; U.topPickMeta.textContent = `alt ${t.alt.toFixed(0)}° • sep ${t.sep?.toFixed(0)}° • ${(t.score*100).toFixed(0)}%`; }
   else { U.topPickName.textContent='—'; U.topPickMeta.textContent=''; }
-  updateMoonInfo();
-  glanceStatus();
-  renderTable();
+  updateMoonInfo(); glanceStatus(); renderTable();
 }
 
 function renderTable(){ const U=ui(); const q=(U.search?.value||'').toLowerCase();
@@ -166,5 +167,31 @@ function renderTable(){ const U=ui(); const q=(U.search?.value||'').toLowerCase(
   U.table.innerHTML=`<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th></tr></thead><tbody>${rows}</tbody></table>`; }
 
 function computeAll(){ updateMoonInfo(); computeTop5(); glanceStatus(); }
+
+// Offline cache
+async function precacheOffline(){
+  try{
+    await navigator.serviceWorker.ready;
+    const res = await fetch('./precache.json', {cache:'no-store'});
+    const files = await res.json();
+    const cache = await caches.open('gng-app-v1');
+    await cache.addAll(files);
+    ui().cacheState.textContent = 'Offline assets stored.';
+  }catch(e){
+    ui().cacheState.textContent = 'Offline caching failed.';
+  }
+}
+async function clearOfflineCache(){
+  const keys = await caches.keys();
+  await Promise.all(keys.map(k => (k.startsWith('gng-') || k==='gng-app-v1') ? caches.delete(k) : null));
+  ui().cacheState.textContent = 'Offline cache cleared.';
+}
+async function updateCacheState(){
+  try{
+    const keys = await caches.keys();
+    const g = keys.filter(k=>k.startsWith('gng-') || k==='gng-app-v1');
+    ui().cacheState.textContent = g.length ? `Offline caches: ${g.join(', ')}` : 'No offline cache yet.';
+  }catch(e){ ui().cacheState.textContent='cache: n/a'; }
+}
 
 document.addEventListener('DOMContentLoaded', ()=>{ init(); });

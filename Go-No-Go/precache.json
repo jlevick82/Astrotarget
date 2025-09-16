@@ -1,0 +1,14 @@
+[
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./app.js",
+  "./collapse.js",
+  "./messier_subset.js",
+  "./favicon.ico",
+  "./assets/logo-128.png",
+  "./assets/logo-256.png",
+  "./assets/logo-512.png",
+  "./assets/logo-1024.webp",
+  "./assets/logo-512.webp"
+]
