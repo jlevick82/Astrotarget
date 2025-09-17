@@ -33,11 +33,11 @@
   // PWA install prompt
   let deferred;
   window.addEventListener('beforeinstallprompt', (e)=>{
-    e.preventDefault();
+    
     deferred = e;
-    btnInstall.disabled = false;
+    btnInstall.disabled = false; btnInstall.style.display='inline-block';
   });
-  btnInstall.disabled = true;
+  btnInstall.disabled = true; btnInstall.style.display='none';
   btnInstall.addEventListener('click', async ()=>{
     if(!deferred) return;
     deferred.prompt();

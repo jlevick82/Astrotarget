@@ -28,3 +28,17 @@ input,select,button{background:#160b0a;border:1px solid #3a201b;color:var(--fg);
 
 /* Combined banner mode */
 .compactCombined #miniMoon, .compactCombined #topPick { display:none; }
+
+/* Header logo */
+.logoHeader { height:32px; width:auto; margin-right:12px; vertical-align:middle; }
+header.bar .container { display:flex; align-items:center; }
+header.bar nav.tools { margin-left:auto; }
+
+/* Splash to header fade */
+.logoHeader { opacity:0; transition: opacity 0.8s ease; }
+body.ready .logoHeader { opacity:1; }
+.splash { transition: opacity 0.6s ease; }
+
+/* Smooth header reveal */
+header.bar { opacity:0; transform:translateY(-6px); transition:opacity .35s ease, transform .35s ease; }
+.header-ready header.bar { opacity:1; transform:translateY(0); }

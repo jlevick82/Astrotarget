@@ -1,5 +1,5 @@
-const APP_CACHE='gng-app-v11';
-const APP_SHELL=['./','./index.html','./styles.css?v=22','./app.v22.js?v=22','./collapse.js?v=21','./messier_subset.js?v=22','./favicon.ico','./assets/logo-1024.webp','./assets/logo-512.webp'];
+const APP_CACHE='gng-app-v13';
+const APP_SHELL=['./','./index.html','./styles.css?v=22.3','./app.v22.js?v=22.3','./collapse.js?v=21','./messier_subset.js?v=22.3','./favicon.ico','./assets/logo-1024.webp','./assets/logo-512.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(APP_CACHE).then(c=>c.addAll(APP_SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>k===APP_CACHE?Promise.resolve():caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{const url=new URL(e.request.url); if(url.origin===location.origin){ e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone(); caches.open(APP_CACHE).then(c=>c.put(e.request,copy)); return res;}))); } else if(url.hostname.includes('open-meteo.com')){ e.respondWith(fetch(e.request).then(res=>{const copy=res.clone(); caches.open(APP_CACHE).then(c=>c.put(e.request,copy)); return res;}).catch(()=>caches.match(e.request))); }});

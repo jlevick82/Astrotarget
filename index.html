@@ -32,7 +32,8 @@ const MIN_BRAND_MS = 2500;
   const elapsed=performance.now()-t0;
   const extra=Math.max(0, MIN_BRAND_MS - elapsed);
   await new Promise(r=>setTimeout(r, extra));
-  location.href='./Go-No-Go/';
+  document.body.classList.add('ready');
+setTimeout(()=>{location.href='./Go-No-Go/';},200);
 })();
 </script>
 </body></html>
