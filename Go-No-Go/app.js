@@ -1,4 +1,4 @@
-window.GNG_VERSION='v21';(function(){'use strict';const $=(s,r=document)=>r.querySelector(s);
+window.GNG_VERSION='v22';(function(){'use strict';const $=(s,r=document)=>r.querySelector(s);
 function toast(msg, ms){ ms=ms||1400; const t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms); }
 function safeBind(el, ev, fn){ try{ if(el) el.addEventListener(ev, fn); } catch(_){} }
 function setUpdatedAt(){ const el=$('#updatedAt'); if(el){ const now=new Date(); el.textContent='Updated: '+ now.toLocaleString(); } }

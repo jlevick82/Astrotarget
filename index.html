@@ -12,9 +12,27 @@
   </div>
 </section>
 <script>
-const files=['./Go-No-Go/index.html','./Go-No-Go/styles.css?v=21','./Go-No-Go/app.js?v=21','./Go-No-Go/collapse.js?v=21','./Go-No-Go/messier_subset.js?v=21','./Go-No-Go/assets/logo-1024.webp'];
+const files=['./Go-No-Go/index.html','./Go-No-Go/styles.css?v=22','./Go-No-Go/app.js?v=22','./Go-No-Go/messier_subset.js?v=22','./Go-No-Go/assets/logo-1024.webp'];
 const dbg=document.getElementById('debug');const bar=document.getElementById('pbar');
-(async()=>{for(let i=0;i<files.length;i++){const f=files[i];try{const r=await fetch(f,{cache:'no-store'});if(!r.ok)throw 0;dbg.innerHTML+='✅ '+f+'<br>';}catch(_){dbg.innerHTML+='❌ '+f+'<br>';}bar.style.width=Math.round((i+1)/files.length*100)+'%';}
-dbg.innerHTML+='<br>Done. Redirecting...';setTimeout(()=>{location.href='./Go-No-Go/';},450);})();
+const MIN_BRAND_MS = 2500;
+(async()=>{
+  const t0=performance.now();
+  function setStatus(t){ if(dbg){ dbg.textContent = t; } }
+  for(let i=0;i<files.length;i++){
+    const f=files[i];
+    try{
+      setStatus('loading: '+f);
+      await fetch(f,{cache:'reload'});
+    }catch(e){
+      setStatus('failed: '+f);
+    }
+    if(bar) bar.style.width=Math.round((i+1)/files.length*100)+'%';
+  }
+  setStatus('ready');
+  const elapsed=performance.now()-t0;
+  const extra=Math.max(0, MIN_BRAND_MS - elapsed);
+  await new Promise(r=>setTimeout(r, extra));
+  location.href='./Go-No-Go/';
+})();
 </script>
 </body></html>
