@@ -24,3 +24,5 @@ input,select,button{background:#160b0a;border:1px solid #3a201b;color:var(--fg);
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#102438;border:1px solid #1f3a55;color:#cfe4ff;padding:8px 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.35);z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease}
 .toast.show{opacity:1}
 .foot{padding:var(--pad);color:var(--muted);text-align:center;border-top:1px solid var(--edge)}
+.verchip{margin-left:auto;font:600 12px/1 system-ui;color:var(--muted);opacity:.8}
+@media (max-width:600px){.verchip{display:none}}
