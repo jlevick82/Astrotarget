@@ -1,12 +1,14 @@
 
+/* v23.0: robust banner generator */
 function composeBannerSummary(status, avg, vis, dark){
-  try{
-    const parts = [status+' – Clouds ~'+Math.round(avg)+'%','Vis '+Math.round(vis)+'km', dark ? 'Astro dark' : 'Too bright'];
-    var m=document.getElementById('miniMoon'); if(m&&m.textContent) parts.push(m.textContent);
-    var n=document.getElementById('topPickName'),t=document.getElementById('topPickMeta');
-    if(n&&t&&t.textContent) parts.push(n.textContent+': '+t.textContent);
-    return parts.join(' · ');
-  }catch(e){return status;}
+  const parts = [];
+  parts.push(status + ' – Clouds ~' + Math.round(avg) + '%');
+  parts.push('Vis ' + Math.round(vis) + 'km');
+  parts.push(dark ? 'Astro dark' : 'Too bright');
+  var m = document.getElementById('miniMoon'); if(m && m.textContent) parts.push(m.textContent);
+  var n = document.getElementById('topPickName'), t = document.getElementById('topPickMeta');
+  if(n && t && t.textContent) parts.push(n.textContent + ': ' + t.textContent);
+  return parts.join(' · ');
 }
 
 window.GNG_VERSION='v21';(function(){'use strict';const $=(s,r=document)=>r.querySelector(s);
