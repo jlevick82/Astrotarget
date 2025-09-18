@@ -1,3 +1,5 @@
+(function(){
+'use strict';
 
 /* v23.1: robust banner generator */
 function composeBannerSummary(status, avg, vis, dark){
