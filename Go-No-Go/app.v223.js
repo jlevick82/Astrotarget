@@ -85,5 +85,5 @@ function refreshPresetList(){const U=ui(); const sel=U.presetList; if(!sel) retu
 function saveNamedPreset(){const U=ui(); if(!U.presetName || !U.presetName.value.trim()) { alert('Enter a preset name'); return; } const list=getNamedPresets(); const obj=currentSetupObj(); obj.name=U.presetName.value.trim(); const idx=list.findIndex(p=>p.name.toLowerCase()===obj.name.toLowerCase()); if(idx>=0) list[idx]=obj; else list.push(obj); setNamedPresets(list); refreshPresetList();}
 function loadNamedPreset(){const U=ui(); const sel=U.presetList; if(!sel || !sel.value) return; const list=getNamedPresets(); const i=parseInt(sel.value,10); if(Number.isFinite(i) && list[i]){ applySetupObj(list[i]); }}
 function deleteNamedPreset(){const U=ui(); const sel=U.presetList; if(!sel || !sel.value) return; const list=getNamedPresets(); const i=parseInt(sel.value,10); if(Number.isFinite(i)){ list.splice(i,1); setNamedPresets(list); refreshPresetList(); }}
-})();
+}();
 
