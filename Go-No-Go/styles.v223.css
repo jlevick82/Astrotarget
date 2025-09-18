@@ -25,16 +25,7 @@ input,select,button{background:#160b0a;border:1px solid #3a201b;color:var(--fg);
 .toast.show{opacity:1}
 .foot{padding:var(--pad);color:var(--muted);text-align:center;border-top:1px solid var(--edge)}
 .logoHeader{height:36px;width:auto;margin-right:12px}
-@media (min-width: 1024px){ .logoHeader{height:36px;width:auto;margin-right:12px} }
-
-/* v22.6 aesthetic tune */
-header.bar{position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,rgba(8,11,16,.94),rgba(8,11,16,.88));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid #1e293b}
-.logoHeader{height:36px;width:auto;margin-right:12px}
-@media(min-width:768px){.logoHeader{height:36px;width:auto;margin-right:12px}}
-header.bar .tools{gap:10px}
-.badge{letter-spacing:.3px}
-/* Single-line banner readability */
-#summary{white-space:normal;margin-bottom:6px}
-#summary strong{letter-spacing:.2px}
-
 @media(min-width:1024px){.logoHeader{height:44px}}
+.splash .logo{width:360px;height:auto}
+@media(min-width:640px){.splash .logo{width:460px}}
+@media(min-width:1024px){.splash .logo{width:560px}}

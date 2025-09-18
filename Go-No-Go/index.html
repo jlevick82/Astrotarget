@@ -3,7 +3,7 @@
 <meta name="theme-color" content="#0b0f14"><title>Go / No-Go</title>
 <link rel="icon" href="favicon.ico"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.v223.css">
 </head><body>
-<header class="bar"><div class="container"><img class="logoHeader" src="assets/logo-256.png" alt="AstroTarget"><nav class="tools"><div id="chipRow" class="chips"></div></nav></div></header>
+<header class="bar"><div class="container"><img class="logoHeader" src="assets/logo-256.png" alt="AstroTarget"><nav class="tools"></nav></div></header>
 <section class="info">
   <div class="container">
     <div class="left">
@@ -99,17 +99,8 @@
     </div>
   </div>
 </section>
-<footer class="foot"><span>v22.8</span></footer>
+<footer class="foot"><span>v22.9</span></footer>
 <script src="messier_subset.js?v=21"></script><script src="app.v223.js"></script><script src="collapse.js?v=21"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js?v=21').catch(()=>{});});}</script>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-<script>
-(function moveChips(){
-  const dst = document.getElementById('chipRow'); if(!dst) return;
-  const maybe = Array.from(document.querySelectorAll('.chip, .modechip, .pill, .tag, .kbtn'));
-  if(maybe.length) { maybe.forEach(el=>dst.appendChild(el)); }
-})();
-</script>
-
 </body></html>
