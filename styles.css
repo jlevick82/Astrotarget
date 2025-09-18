@@ -4,3 +4,18 @@ body{margin:0;background:#000;color:#e7edf5;font-family:system-ui,Segoe UI,Robot
 .bar{height:10px;background:#122131;border-radius:8px;overflow:hidden;margin-top:16px}
 .bar>i{display:block;height:100%;width:0;background:#2f80ed;transition:width .15s}
 .dbg{color:#8aa5c8;font-size:12px;max-width:840px;margin:10px auto;line-height:1.35}
+
+/* v22.5 logo sizing */
+.splash .logo{width:280px;height:auto}
+@media (min-width: 640px){ .splash .logo{width:340px} }
+@media (min-width: 1024px){ .splash .logo{width:420px} }
+
+/* v22.6 splash logo scale */
+.splash .logo{width:320px}
+@media(min-width:640px){.splash .logo{width:400px}}
+@media(min-width:1024px){.splash .logo{width:480px}}
+
+/* v22.7 splash logo scale */
+.splash .logo{width:360px;height:auto}
+@media(min-width:640px){.splash .logo{width:460px}}
+@media(min-width:1024px){.splash .logo{width:560px}}
