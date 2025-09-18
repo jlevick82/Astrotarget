@@ -1,15 +1,17 @@
+window.GNG_VERSION='v21';(function(){'use strict';
 
+/* v23.3: robust banner generator (inside IIFE) */
 function composeBannerSummary(status, avg, vis, dark){
-  try{
-    const parts = [status+' – Clouds ~'+Math.round(avg)+'%','Vis '+Math.round(vis)+'km', dark ? 'Astro dark' : 'Too bright'];
-    var m=document.getElementById('miniMoon'); if(m&&m.textContent) parts.push(m.textContent);
-    var n=document.getElementById('topPickName'),t=document.getElementById('topPickMeta');
-    if(n&&t&&t.textContent) parts.push(n.textContent+': '+t.textContent);
-    return parts.join(' · ');
-  }catch(e){return status;}
+  const parts = [];
+  parts.push(status + ' – Clouds ~' + Math.round(avg) + '%');
+  parts.push('Vis ' + Math.round(vis) + 'km');
+  parts.push(dark ? 'Astro dark' : 'Too bright');
+  var m=document.getElementById('miniMoon'); if(m&&m.textContent) parts.push(m.textContent);
+  var n=document.getElementById('topPickName'),t=document.getElementById('topPickMeta');
+  if(n&&t&&t.textContent) parts.push(n.textContent+': '+t.textContent);
+  return parts.join(' · ');
 }
-
-window.GNG_VERSION='v21';(function(){'use strict';const $=(s,r=document)=>r.querySelector(s);
+const $=(s,r=document)=>r.querySelector(s);
 function toast(msg, ms){ ms=ms||1400; const t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms); }
 function safeBind(el, ev, fn){ try{ if(el) el.addEventListener(ev, fn); } catch(_){} }
 function setUpdatedAt(){ const el=$('#updatedAt'); if(el){ const now=new Date(); el.textContent='Updated: '+ now.toLocaleString(); } }
