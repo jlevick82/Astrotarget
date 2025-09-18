@@ -1,7 +1,6 @@
-(function(){
-'use strict';
+window.GNG_VERSION='v21';(function(){'use strict';
 
-/* v23.1: robust banner generator */
+/* v23.3: robust banner generator (inside IIFE) */
 function composeBannerSummary(status, avg, vis, dark){
   const parts = [];
   parts.push(status + ' – Clouds ~' + Math.round(avg) + '%');
@@ -12,8 +11,7 @@ function composeBannerSummary(status, avg, vis, dark){
   if(n&&t&&t.textContent) parts.push(n.textContent+': '+t.textContent);
   return parts.join(' · ');
 }
-
-window.GNG_VERSION='v21';(function(){'use strict';const $=(s,r=document)=>r.querySelector(s);
+const $=(s,r=document)=>r.querySelector(s);
 function toast(msg, ms){ ms=ms||1400; const t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms); }
 function safeBind(el, ev, fn){ try{ if(el) el.addEventListener(ev, fn); } catch(_){} }
 function setUpdatedAt(){ const el=$('#updatedAt'); if(el){ const now=new Date(); el.textContent='Updated: '+ now.toLocaleString(); } }
