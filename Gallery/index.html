@@ -1,4 +1,18 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#0b0f14"><title>Astro Gallery</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=21"></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#0b0f14"><title>Astro Gallery</title><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css?v=21"><link rel="stylesheet" href="../Go-No-Go/styles.v223.css">
+</head><body>
+
+<header class="bar">
+  <div class="container">
+    <img class="logoHeader" src="../Go-No-Go/assets/logo-256.webp" alt="AstroTarget">
+    <nav class="tools">
+      <button class="btn" id="gNight">Night</button>
+      <button class="btn" id="gDark">Dark</button>
+      <button class="btn" id="gInstall">Install</button>
+      <a class="btn" href="../Go-No-Go/">Go / No-Go</a>
+    </nav>
+  </div>
+</header>
+
 <header><nav class="left"><a href="../Go-No-Go/">Home</a></nav><h1>Astro Gallery</h1><div class="right"><div id="go-no-go" class="pill">Ready</div></div></header>
 <section class="controls"><div class="row"><label>GitHub Raw Base URL</label><input id="baseUrl" type="url" placeholder="https://raw.githubusercontent.com/<user>/<repo>/<branch>/images/full/"><button id="saveBase" type="button">Save</button><button id="testPath" type="button">Test</button></div>
   <p class="hint">Example: https://raw.githubusercontent.com/USER/REPO/BRANCH/images/full/</p>
@@ -8,3 +22,17 @@
 <template id="cardTpl"><article class="card"><div class="thumb"><img alt="" loading="lazy"><div class="missing">No image yet</div></div><footer></footer></article></template>
 <footer class="app-footer"><a href="../Go-No-Go/">Back to Home</a><span>v21</span></footer>
 <script src="config.js?v=21"></script><script src="app.js?v=21"></script></body></html>
+<script>
+// theme hook for gallery
+(function(){
+  const root = document.documentElement;
+  const setTheme = t => (t==='night'? root.classList.add('night'): root.classList.remove('night'));
+  setTheme(localStorage.getItem('gng.theme') || 'dark');
+  document.getElementById('gNight').onclick = ()=>{ localStorage.setItem('gng.theme','night'); setTheme('night'); };
+  document.getElementById('gDark').onclick = ()=>{ localStorage.setItem('gng.theme','dark'); setTheme('dark'); };
+  // PWA install (optional)
+  let deferred; window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferred=e; document.getElementById('gInstall').disabled=false; });
+  document.getElementById('gInstall').disabled=true;
+  document.getElementById('gInstall').onclick = async ()=>{ if(!deferred) return; deferred.prompt(); await deferred.userChoice; deferred=null; };
+})();
+</script>
