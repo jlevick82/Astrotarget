@@ -3,467 +3,428 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Nightly Go/No-Go</title>
-<meta name="theme-color" content="#0f1420"/>
-
+<title>Nightly Go/No-Go — AstroTarget</title>
+<meta name="theme-color" content="#0b1020"/>
 <style>
 :root{
-  --bg:#0f1420;--card:#172030;--edge:#243247;--text:#e8eefb;--muted:#a8b3c9;
-  --accent:#3b82f6;--good:#1faa6b;--warn:#f59e0b;--bad:#ef4444;
-  --pill:#1d283a;--pill-edge:#2b3a52;
+  --bg:#0b1020; --card:#111a28; --edge:#233245;
+  --text:#dfe9ff; --muted:#9ab0cc; --accent:#63a3ff;
+  --pill:#0f1724; --pill-edge:#223149;
+  --good:#1a6a3a; --warn:#a27a20; --bad:#9a2b2b;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
-.container{max-width:980px;margin:0 auto;padding:16px}
-header.hdr{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:8px 0 6px}
-.hrow{display:flex;align-items:center;gap:12px}
-.appicon{width:32px;height:32px;border-radius:8px;background:#000 url('https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png') center/cover;box-shadow:0 0 0 1px #0006, 0 8px 24px #000a}
-h1{margin:0;font-size:20px;letter-spacing:.3px}
-.badge{display:inline-block;font-weight:800;padding:12px 14px;border-radius:14px;min-width:82px;text-align:center;letter-spacing:.6px}
-.badge.go{background:#0f2b1f;border:1px solid #1a6a45;color:#8ff0c7}
-.badge.marginal{background:#2b2610;border:1px solid #927217;color:#ffe08a}
-.badge.nogo{background:#351416;border:1px solid #7a1a1f;color:#ff9898}
-.btn{appearance:none;border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);padding:10px 14px;border-radius:14px;font-weight:600}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif;
+}
+.wrap{max-width:980px;margin:0 auto;padding:20px 14px 80px}
+
+/* header */
+.hdr{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.hdr .brand{font-weight:800;font-size:28px;letter-spacing:.2px}
+.hdr .sub{opacity:.7;font-weight:600;margin-left:4px}
+.hdr .actions{margin-left:auto;display:flex;gap:12px}
+.btn{appearance:none;border:1px solid var(--pill-edge);background:var(--pill);
+  color:var(--text); padding:10px 14px;border-radius:14px;font-weight:600}
 .btn:active{transform:translateY(1px)}
-.controls{display:flex;gap:10px;flex-wrap:wrap}
-.banner{background:linear-gradient(180deg,#1a2537,#161f30);border:1px solid var(--edge);padding:14px;border-radius:14px;margin:10px 0 14px}
-.banner small{color:var(--muted)}
-.grid{display:grid;grid-template-columns:1fr;gap:14px}
-@media(min-width:720px){.grid{grid-template-columns:repeat(3,1fr)}}
-.card{background:var(--card);border:1px solid var(--edge);border-radius:14px}
-.card .head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
-.card .head h3{margin:0;font-size:16px}
-.card .toggle{border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);border-radius:10px;padding:6px 10px;font-weight:700}
-.card .body{padding:14px;border-top:1px solid var(--edge)}
-.collapsed .body{display:none}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.kv > div{background:#0f1420;border:1px solid var(--edge);border-radius:10px;padding:10px}
-.kv .big{font-size:28px;font-weight:800}
-.kv .tag{color:var(--muted);font-size:13px;margin-top:6px}
+.badge{display:inline-block;padding:8px 12px;border-radius:12px;border:1px solid}
+.badge.go{background:#0c1a13;border-color:#1b5f3a;color:#a3ffce}
+.badge.marginal{background:#1c1609;border-color:#8b6a1a;color:#ffe29e}
+.badge.nogo{background:#1b0f10;border-color:#8f2f2f;color:#ffc5c5}
+.appicon{width:42px;height:42px;border-radius:10px;background:#0002;object-fit:cover}
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--edge);background:#0f1420;color:var(--text)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chips .chip{border:1px solid var(--pill-edge);background:var(--pill);padding:8px 10px;border-radius:12px;font-weight:700}
-.chips .active{outline:2px solid var(--accent)}
-.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px}
+/* cards */
+.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px;margin:14px 0}
+.card h3{margin:0 0 10px 0;font-size:18px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.big{font-size:30px;font-weight:800}
+.tag{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--pill);border:1px solid var(--pill-edge);color:var(--muted);font-weight:600}
+.smalllabel{font-size:12px;color:var(--muted);margin-bottom:4px}
 
-.list{background:var(--card);border:1px solid var(--edge);border-radius:14px}
-.list .head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
-.list .body{padding:14px;border-top:1px solid var(--edge)}
-.list ol{margin:0;padding-left:20px}
-.list li{margin:6px 0}
-.list li .bad{color:#ffb4b4}
-.table{overflow:auto;border:1px solid var(--edge);border-radius:14px}
-table{width:100%;border-collapse:collapse;min-width:620px}
-th,td{padding:10px;border-bottom:1px solid var(--edge);text-align:left}
-th{color:var(--muted);font-weight:700}
-tfoot td{color:var(--muted)}
+/* chips */
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);
+  padding:10px 14px;border-radius:14px;font-weight:700;cursor:pointer;opacity:.95;
+  transition:transform .06s ease, box-shadow .12s ease}
+.chip:active{transform:translateY(1px)}
+.chip.active{background:var(--accent);color:#0b1020;border-color:transparent;box-shadow:0 0 0 2px #0005 inset}
 
-footer{color:var(--muted);text-align:center;margin:24px 0 40px}
+/* table */
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 10px;border-bottom:1px solid var(--edge);text-align:left}
+thead th{color:var(--muted);font-weight:700}
 
-#toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:rgba(20,24,34,.98);color:#fff;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:9999;font-weight:600}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* toast */
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
+  background:#0f1a2a; border:1px solid var(--edge); color:var(--text);
+  padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
 
-.compact .banner,.compact .card .body{padding:10px}
-.compact .input, .compact select{padding:10px}
-.compact .badge{padding:10px 12px}
-.night{--accent:#60a5fa}
+/* compact */
+.compact .optional{display:none}
+.compact .card{padding:12px}
+.compact .kv{gap:10px}
+
+/* night (red safe) */
+.night{
+  --bg:#0b0706; --card:#130b09; --edge:#2b1a14;
+  --text:#ffd9c7; --muted:#ffbba3; --accent:#ff7a45;
+  --pill:#1a0f0c; --pill-edge:#2b1a14;
+}
+.night .badge.go{background:#111f18;border-color:#2e7e52;color:#a6ffd6}
+.night .badge.marginal{background:#2c1e0a;border-color:#9a6a16;color:#ffe6a6}
+.night .badge.nogo{background:#2a1212;border-color:#a33;color:#ffbaba}
+
+/* banner */
+.banner{display:flex;gap:12px;align-items:center}
+.banner .txt{flex:1}
+.banner time{color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
-<div id="toast" role="status" aria-live="polite"></div>
-
-<div class="container">
+<div class="wrap">
   <header class="hdr">
-    <div class="hrow">
-      <div class="appicon" aria-hidden="true"></div>
-      <div>
-        <h1>Nightly Go/No-Go <span id="ver" style="opacity:.65;font-weight:700"></span></h1>
-        <div class="meta"><span id="badge" class="badge nogo">NO GO</span></div>
-      </div>
+    <img id="logo" class="appicon" alt="AstroTarget"/>
+    <div>
+      <div class="brand">Nightly <span class="sub">Go/No-Go</span> <span id="ver" class="sub">v25.6</span></div>
     </div>
-    <div class="controls">
+    <div class="actions">
       <button id="btnInstall" class="btn">Install</button>
-      <button id="btnCompact" class="btn">Compact</button>
+      <button id="btnCompact" class="btn">Compact off</button>
       <button id="btnNight" class="btn">Night</button>
     </div>
   </header>
 
-  <div class="banner">
-    <div id="bannerText" style="font-weight:700">—</div>
-    <small id="updated">Updated —</small>
-  </div>
-
-  <!-- Combined sky card -->
-  <section id="card-sky" class="card">
-    <div class="head">
-      <h3>Sky conditions</h3>
-      <button class="toggle" aria-expanded="true">▾</button>
+  <section class="card" id="statusCard">
+    <div class="banner">
+      <span id="badge" class="badge">—</span>
+      <div id="bannerText" class="txt">—</div>
+      <time id="updated">Updated —</time>
     </div>
-    <div class="body">
-      <div class="kv">
-        <div>
-          <div class="big" id="astroYes">Yes</div>
-          <div class="tag" id="astroVal">Sun alt —</div>
-        </div>
-        <div>
-          <div class="big" id="moonPct">—</div>
-          <div class="tag" id="moonAlt">Alt —</div>
-        </div>
+  </section>
+
+  <section class="card" id="sky">
+    <h3>Sky conditions</h3>
+    <div class="kv">
+      <div>
+        <div class="smalllabel">Astronomical dark</div>
+        <div class="big" id="astroYes">—</div>
+        <div class="tag" id="astroVal">Sun alt —</div>
       </div>
-      <div style="margin-top:14px">
-        <label style="display:block;margin-bottom:6px">Clouds (avg)</label>
-        <input id="clouds" type="range" min="0" max="100" value="60" class="input"/>
-        <div class="meta" style="margin-top:6px">Use <strong>Calculate</strong> to auto-fill from weather. Slider overrides clouds only.</div>
+      <div>
+        <div class="smalllabel">Moon illum</div>
+        <div class="big" id="moonPct">—</div>
+        <div class="tag" id="moonAlt">Alt —</div>
       </div>
     </div>
   </section>
 
-  <section id="card-setup" class="card" style="margin-top:14px">
-    <div class="head">
-      <h3>Quick setup</h3>
-      <button class="toggle" aria-expanded="true">▾</button>
-    </div>
-    <div class="body">
-      <div class="row">
-        <div>
-          <label>Latitude (°)</label>
-          <input id="lat" class="input" placeholder="37.16557"/>
-        </div>
-        <div>
-          <label>Longitude (°)</label>
-          <input id="lon" class="input" placeholder="-76.56839"/>
-        </div>
+  <section class="card" id="cloudsCard">
+    <h3>Clouds (avg)</h3>
+    <input id="clouds" type="range" min="0" max="100" value="40" style="width:100%"/>
+    <div class="tag">Use <button id="btnCalc" class="btn" style="padding:4px 10px;margin:0 6px">Calculate</button> to auto-fill from weather. Slider overrides clouds.</div>
+  </section>
+
+  <section class="card" id="quick">
+    <h3>Quick setup</h3>
+    <div class="kv">
+      <div>
+        <div class="smalllabel">Latitude (°)</div>
+        <input id="lat" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
       </div>
-      <div class="actions">
-        <button id="btnGPS" class="btn">Use GPS</button>
-        <button id="btnDemo" class="btn">Demo</button>
-        <button id="btnCalc" class="btn">Calculate</button>
+      <div>
+        <div class="smalllabel">Longitude (°)</div>
+        <input id="lon" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button id="btnGPS" class="btn">Use GPS</button>
+      <button id="btnDemo" class="btn optional">Demo</button>
+      <button id="btnRecompute" class="btn">Calculate</button>
+    </div>
+  </section>
+
+  <section class="card" id="gear">
+    <h3>Gear</h3>
+    <div class="kv">
+      <div>
+        <div class="smalllabel">Scope</div>
+        <select id="scope" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
+      </div>
+      <div>
+        <div class="smalllabel">Reducer / Barlow</div>
+        <div id="chips" class="chips"></div>
+      </div>
+      <div>
+        <div class="smalllabel">Camera</div>
+        <select id="camera" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
+      </div>
+      <div>
+        <div class="smalllabel">FOV &amp; Scale</div>
+        <div class="tag" id="fov">FOV —</div>
+        <div class="tag" id="scale" style="margin-top:10px">Scale —</div>
       </div>
     </div>
   </section>
 
-  <section id="card-gear" class="card" style="margin-top:14px">
-    <div class="head">
-      <h3>Gear</h3>
-      <button class="toggle" aria-expanded="true">▾</button>
-    </div>
-    <div class="body">
-      <div class="row">
-        <div>
-          <label>Scope</label>
-          <select id="scopeSel" class="input"></select>
-        </div>
-        <div>
-          <label>Reducer / Barlow</label>
-          <div id="chips" class="chips"></div>
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <div>
-          <label>Camera</label>
-          <select id="camSel" class="input"></select>
-        </div>
-        <div>
-          <label>FOV &amp; Scale</label>
-          <div style="display:grid;gap:8px">
-            <div class="input" id="fov" style="display:block">FOV —</div>
-            <div class="input" id="scale" style="display:block">Scale —</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <label>Equipment profile</label>
-        <div class="actions" style="margin-top:6px">
-          <input id="profileName" placeholder="e.g. Edge8 + 533MC + 0.7x" class="input" style="flex:1;min-width:200px"/>
-          <button id="btnSaveProfile" class="btn">Save</button>
-          <select id="profileList" class="input" style="max-width:240px"></select>
-          <button id="btnDeleteProfile" class="btn">Delete</button>
-        </div>
-      </div>
-    </div>
+  <section class="card" id="top5">
+    <h3>Top 5 Recommendations</h3>
+    <ol id="topList" style="margin:6px 0 0 18px"></ol>
   </section>
 
-  <section id="card-top5" class="list" style="margin-top:14px">
-    <div class="head">
-      <h3>Top 5 Recommendations</h3>
-      <button class="toggle" aria-expanded="true">▾</button>
-    </div>
-    <div class="body">
-      <ol id="top5List"><li class="bad">Set location first</li></ol>
-    </div>
+  <section class="card optional" id="catalog">
+    <h3>Catalog (subset)</h3>
+    <input id="q" placeholder="Search by ID / name / type" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text);margin-bottom:10px"/>
+    <div id="table"></div>
   </section>
 
-  <section id="card-cat" class="card table" style="margin-top:14px">
-    <div class="head">
-      <h3>Catalog (subset)</h3>
-      <button class="toggle" aria-expanded="true">▾</button>
-    </div>
-    <div class="body">
-      <table>
-        <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th></tr></thead>
-        <tbody id="tableBody"></tbody>
-        <tfoot><tr><td colspan="5">Catalog subset</td></tr></tfoot>
-      </table>
-    </div>
-  </section>
-
-  <footer>© AstroTarget — single-file build</footer>
+  <div id="toast" role="status" aria-live="polite"></div>
 </div>
 
 <script>
-/* Nightly Go/No-Go — v25.6 single-file module */
-(() => {
-  'use strict';
-
-  // ---------- Utils
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
-  const d2r = x => x*Math.PI/180, r2d = x => x*180/Math.PI;
-
-  const toast = (msg, ms=1400) => {
-    const t = $('#toast'); if(!t) return;
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), ms);
-  };
-
-  // ---------- Simple astro helpers
-  function jd(d){return d.getTime()/86400000+2440587.5;}
-  function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15;}
-  function lst(d,lon){return(gmst(d)+lon/15+24)%24;}
-  function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));const lam=L0+C,eps=23.439291-0.0130042*T;const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lamD:lam};}
-  function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon};}
-  function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA));}
-
-  // ---------- Data
-  const scopes = [
-    {id:'sv503', name:'SVBONY SV503 80ED (560mm f/7)', fl:560, ap:80, presets:[0.8,1.0,2.0]},
-    {id:'gt71',  name:'William Optics GT71 (420mm f/5.9)', fl:420, ap:71, presets:[0.8,1.0,2.0]},
-    {id:'redcat',name:'RedCat 51 (250mm f/4.9)', fl:250, ap:51, presets:[1.0,2.0]},
-    {id:'fra400',name:'Askar FRA400 (400mm f/5.6)', fl:400, ap:72, presets:[0.7,0.8,1.0,2.0]},
-    {id:'edge8', name:'Celestron EdgeHD 8 (2032mm f/10)', fl:2032, ap:203, presets:[0.7,0.63,1.0,2.0]},
-    {id:'custom',name:'Custom', fl:null, ap:null, presets:[1.0]}
-  ];
-  const cameras = [
-    {name:'ZWO ASI533MC Pro (IMX533)', w:11.31, h:11.31, px:3.76},
-    {name:'ZWO ASI2600 (IMX571 APS-C)', w:23.5, h:15.7, px:3.76},
-    {name:'Canon T3i / 600D', w:22.3, h:14.9, px:4.30},
-    {name:'Custom', w:null, h:null, px:null}
-  ];
-
-  const TH = { alt_min:30, alt_best:55, cloud_good:25, cloud_bad:65, vis_good:15, vis_bad:8, wind_good:10, wind_bad:25 };
-
-  // ---------- State
-  let WX = null;   // {cloud, vis, wind, rh, updated}
-  let AUTO = true; // auto-calc weather -> slider sync
-
-  // ---------- DOM refs
-  const dom = {
-    ver: $('#ver'),
-    badge: $('#badge'),
-    bannerText: $('#bannerText'),
-    updated: $('#updated'),
-    nightBtn: $('#btnNight'),
-    compactBtn: $('#btnCompact'),
-    installBtn: $('#btnInstall'),
-    lat: $('#lat'), lon: $('#lon'),
-    calc: $('#btnCalc'), demo: $('#btnDemo'), gps: $('#btnGPS'),
-    scope: $('#scopeSel'), chips: $('#chips'), cam: $('#camSel'),
-    fov: $('#fov'), scale: $('#scale'),
-    cloudsSlider: $('#clouds'),
-    astroYes: $('#astroYes'), astroVal: $('#astroVal'),
-    moonPctVal: $('#moonPct'), moonAltVal: $('#moonAlt'),
-    top5: $('#top5List'), table: $('#tableBody'),
-    profileName: $('#profileName'), profileList: $('#profileList'),
-    btnSaveProfile: $('#btnSaveProfile'), btnDeleteProfile: $('#btnDeleteProfile')
-  };
-
-  // ---------- Version
-  function showVersion(){ dom.ver.textContent='v25.6'; }
-
-  // ---------- Weather
-  async function fetchWeather(lat, lon){
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,wind_speed_10m,relative_humidity_2m&timezone=auto`;
-    const r = await fetch(url,{cache:'no-store'});
-    const j = await r.json();
-    const take=3, avg=a=>a.reduce((p,c)=>p+c,0)/a.length;
-    const cc=j.hourly.cloud_cover.slice(0,take);
-    const vs=j.hourly.visibility.slice(0,take).map(v=>v/1000);
-    const wd=j.hourly.wind_speed_10m.slice(0,take);
-    const rh=j.hourly.relative_humidity_2m.slice(0,take);
-    WX={cloud:Math.round(avg(cc)),vis:Math.round(avg(vs)),wind:Math.round(avg(wd)),rh:Math.round(avg(rh)),updated:new Date()};
-    if(AUTO) dom.cloudsSlider.value=String(WX.cloud);
-    dom.updated.textContent='Updated '+new Date().toLocaleTimeString();
-    toast('Weather updated');
-    return WX;
-  }
-
-  // ---------- Optics + UI helpers
-  function renderScopeAndCam(){
-    scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;dom.scope.appendChild(o)});
-    cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;dom.cam.appendChild(o)});
-    dom.scope.value='0'; dom.cam.value='0'; renderChips(); updateOptics();
-  }
-  function renderChips(){
-    dom.chips.innerHTML='';
-    const s=scopes[parseInt(dom.scope.value,10)];
-    s.presets.forEach(f=>{
-      const b=document.createElement('button');b.textContent=f+'x';b.className='chip';
-      b.addEventListener('click',()=>{dom.chips.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');updateOptics(f);computeAll()});
-      dom.chips.appendChild(b);
-    });
-    dom.chips.querySelector('button')?.classList.add('active');
-  }
-  function updateOptics(factor){
-    const s=scopes[parseInt(dom.scope.value,10)];
-    const c=cameras[parseInt(dom.cam.value,10)];
-    const f=factor||parseFloat(dom.chips.querySelector('.active')?.textContent)||1;
-    if(!s||!c||!s.fl||!c.w||!c.h||!c.px){dom.fov.textContent='FOV —';dom.scale.textContent='Scale —';return;}
-    const eff=s.fl*f, fovX=57.2958*c.w/eff, fovY=57.2958*c.h/eff, scale=206.265*c.px/eff;
-    dom.fov.textContent=`FOV ${fovX.toFixed(1)}° × ${fovY.toFixed(1)}°`;
-    dom.scale.textContent=`Scale ${scale.toFixed(2)}″/px`;
-  }
-
-  // ---------- Profiles
-  function loadProfiles(){ try{return JSON.parse(localStorage.getItem('gng.profiles'))||[]}catch(_){return[]} }
-  function saveProfiles(list){ localStorage.setItem('gng.profiles', JSON.stringify(list)); }
-  function currentProfileObj(){
-    return {
-      name: dom.profileName.value.trim() || '',
-      scopeSel: dom.scope.value,
-      factor: dom.chips.querySelector('.active')?.textContent || '1x',
-      camSel: dom.cam.value
-    };
-  }
-  function applyProfile(p){
-    dom.scope.value=p.scopeSel; renderChips();
-    const f=p.factor.replace('x',''); const btn=[...dom.chips.querySelectorAll('button')].find(b=>b.textContent===p.factor);
-    dom.chips.querySelectorAll('button').forEach(b=>b.classList.remove('active')); btn?.classList.add('active');
-    dom.cam.value=p.camSel; updateOptics(parseFloat(f)); computeAll();
-  }
-  function refreshProfileList(){
-    const list=loadProfiles(); const cur=dom.profileList.value;
-    dom.profileList.innerHTML='<option value="">Load profile…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
-    dom.profileList.value=cur||'';
-  }
-
-  // ---------- Status + targets
-  function computeStatus(){
-    const lat=parseFloat(dom.lat.value), lon=parseFloat(dom.lon.value);
-    if(!Number.isFinite(lat)||!Number.isFinite(lon)) return {status:'MARGINAL', cls:'marginal',cloud:0,vis:12};
-    const now=new Date(); const s=sunEq(now); const sunAlt=altFor(s.raH,s.decD,lat,lon,now); const dark=(sunAlt<=-12);
-    const m=moonEq(now); const moonAlt=altFor(m.raH,m.decD,lat,lon,now); const phase=(m.lonD-s.lamD+360)%360; const illum=(1-Math.cos(d2r(phase)))/2;
-    dom.moonPctVal.textContent=Math.round(illum*100)+'%'; dom.moonAltVal.textContent='Alt '+Math.round(moonAlt)+'°';
-    dom.astroYes.textContent=dark?'Yes':'No'; dom.astroVal.textContent='Sun alt '+sunAlt.toFixed(1)+'°';
-
-    const cloud=AUTO&&WX?WX.cloud:parseInt(dom.cloudsSlider.value,10)||0;
-    const vis=WX?WX.vis:12; const wind=WX?WX.wind:12;
-
-    let status='GO', cls='go', reasons=[];
-    if(!dark){status='NO GO';cls='nogo';reasons.push('Twilight');}
-    if(cloud>=TH.cloud_bad){status='NO GO';cls='nogo';reasons.push('Clouds');}
-    else if(cloud>TH.cloud_good&&status==='GO'){status='MARGINAL';cls='marginal';reasons.push('Clouds');}
-    if(status!=='NO GO'){
-      if(vis<TH.vis_bad){status='NO GO';cls='nogo';reasons.push('Visibility');}
-      else if(vis<TH.vis_good&&status==='GO'){status='MARGINAL';cls='marginal';reasons.push('Visibility');}
-    }
-    if(status!=='NO GO'){
-      if(wind>=TH.wind_bad){status='NO GO';cls='nogo';reasons.push('Wind');}
-      else if(wind>TH.wind_good&&status==='GO'){status='MARGINAL';cls='marginal';reasons.push('Wind');}
-    }
-    dom.bannerText.textContent=`${status} — Clouds ~${cloud}% · Vis ${vis} km${dark?' · Astro dark':''}`;
-    dom.badge.textContent=status; dom.badge.className='badge '+cls;
-    return {status,cls,cloud,vis};
-  }
-
-  const MSET=[
-    {id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.71,dec:41.3},
-    {id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.55,dec:30.7},
-    {id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.99,dec:22.7},
-    {id:'M57',name:'Ring Nebula',type:'PN',ra:18.89,dec:33.0},
-    {id:'M13',name:'Hercules Globular',type:'GC',ra:16.70,dec:36.5}
-  ];
-  function renderTop5(){
-    const lat=parseFloat(dom.lat.value), lon=parseFloat(dom.lon.value);
-    if(!Number.isFinite(lat)||!Number.isFinite(lon)){dom.top5.innerHTML='<li class="bad">Set location first</li>';return;}
-    const now=new Date();
-    const rows=MSET.map(o=>({o,alt:altFor(o.ra,o.dec,lat,lon,now)})).filter(r=>r.alt>=TH.alt_min).sort((a,b)=>b.alt-a.alt).slice(0,5);
-    dom.top5.innerHTML=rows.length?rows.map((r,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${r.o.id}</strong> — ${r.o.name} — alt ${Math.round(r.alt)}°</li>`).join(''):'<li class="bad">No suitable targets.</li>';
-    dom.table.innerHTML=MSET.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td></tr>`).join('');
-  }
-  function computeAll(){ updateOptics(); computeStatus(); renderTop5(); toast('Targets updated'); }
-
-  // ---------- Collapse persistence
-  function bindCollapsers(){
-    $$('.card,.list').forEach(sec=>{
-      const key='gng.collapse.'+sec.id; const btn=sec.querySelector('.toggle');
-      const want=localStorage.getItem(key)==='closed'; if(want){sec.classList.add('collapsed');btn.setAttribute('aria-expanded','false');btn.textContent='▸';}
-      btn.addEventListener('click',()=>{
-        const open=sec.classList.toggle('collapsed');
-        const isClosed=sec.classList.contains('collapsed');
-        btn.textContent=isClosed?'▸':'▾'; btn.setAttribute('aria-expanded', String(!isClosed));
-        localStorage.setItem(key, isClosed?'closed':'open');
-      });
-    });
-  }
-
-  // ---------- Bindings
-  function bind(){
-    dom.compactBtn?.addEventListener('click',()=>{
-      document.documentElement.classList.toggle('compact');
-      dom.compactBtn.textContent=document.documentElement.classList.contains('compact')?'Compact off':'Compact';
-    });
-    dom.nightBtn?.addEventListener('click',()=>{
-      document.documentElement.classList.toggle('night');
-      dom.nightBtn.textContent=document.documentElement.classList.contains('night')?'Blue':'Night';
-    });
-
-    dom.scope.addEventListener('change',()=>{renderChips();updateOptics();computeAll()});
-    dom.cam.addEventListener('change',()=>{updateOptics();computeAll()});
-    dom.cloudsSlider.addEventListener('input',()=>{AUTO=false;computeAll()});
-
-    dom.demo.addEventListener('click',()=>{
-      dom.lat.value='37.16557'; dom.lon.value='-76.56839'; AUTO=true;
-      fetchWeather(37.16557,-76.56839).then(computeAll);
-    });
-    dom.gps.addEventListener('click',async()=>{
-      try{
-        const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
-        dom.lat.value=pos.coords.latitude.toFixed(5); dom.lon.value=pos.coords.longitude.toFixed(5); AUTO=true;
-        await fetchWeather(parseFloat(dom.lat.value),parseFloat(dom.lon.value)); computeAll(); toast('GPS set');
-      }catch(e){toast('GPS failed')}
-    });
-    dom.calc.addEventListener('click',async()=>{
-      const lat=parseFloat(dom.lat.value), lon=parseFloat(dom.lon.value);
-      if(Number.isFinite(lat)&&Number.isFinite(lon)){AUTO=true; try{await fetchWeather(lat,lon)}catch(_){}} computeAll();
-    });
-
-    // Profiles
-    dom.btnSaveProfile.addEventListener('click',()=>{
-      const obj=currentProfileObj(); if(!obj.name){toast('Name required');return;}
-      const list=loadProfiles(); const i=list.findIndex(p=>p.name.toLowerCase()===obj.name.toLowerCase());
-      if(i>=0) list[i]=obj; else list.push(obj); saveProfiles(list); refreshProfileList(); toast('Profile saved');
-    });
-    dom.profileList.addEventListener('change',()=>{
-      const v=dom.profileList.value; if(!v) return; const list=loadProfiles(); const p=list[parseInt(v,10)]; if(p) applyProfile(p); toast('Profile loaded');
-    });
-    dom.btnDeleteProfile.addEventListener('click',()=>{
-      const v=dom.profileList.value; if(!v) return; const list=loadProfiles(); list.splice(parseInt(v,10),1); saveProfiles(list); refreshProfileList(); toast('Profile deleted');
-    });
-  }
-
-  // ---------- Init
-  function init(){
-    showVersion(); renderScopeAndCam(); bind(); bindCollapsers(); refreshProfileList(); computeAll();
-  }
-  document.addEventListener('DOMContentLoaded', init);
+/* ========= version, logo, compact, night ========= */
+document.getElementById('ver').textContent='v25.6';
+(()=>{ // logo with fallback
+  const lg=document.getElementById('logo');
+  const primary='https://raw.githubusercontent.com/jlevick82/Astrotarget/refs/heads/main/images/logo-256.png';
+  const fallback='https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png';
+  lg.src=primary; lg.onerror=()=>{ if(lg.src!==fallback) lg.src=fallback; };
 })();
+
+const btnCompact=document.getElementById('btnCompact');
+const btnNight=document.getElementById('btnNight');
+function applyToggles(){
+  const compact=localStorage.getItem('gng.compact')==='1';
+  const night=localStorage.getItem('gng.night')==='1';
+  document.documentElement.classList.toggle('compact',compact);
+  document.documentElement.classList.toggle('night',night);
+  btnCompact.textContent= compact?'Compact on':'Compact off';
+  btnNight.textContent= night?'Blue':'Night';
+}
+btnCompact.addEventListener('click',()=>{localStorage.setItem('gng.compact', localStorage.getItem('gng.compact')==='1'?'0':'1');applyToggles();});
+btnNight.addEventListener('click',()=>{localStorage.setItem('gng.night', localStorage.getItem('gng.night')==='1'?'0':'1');applyToggles();});
+applyToggles();
+
+/* ========= toast ========= */
+function toast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400)}
+
+/* ========= DOM refs ========= */
+const dom={
+  badge:document.getElementById('badge'),
+  bannerText:document.getElementById('bannerText'),
+  updated:document.getElementById('updated'),
+  astroYes:document.getElementById('astroYes'),
+  astroVal:document.getElementById('astroVal'),
+  moonPct:document.getElementById('moonPct'),
+  moonAlt:document.getElementById('moonAlt'),
+  clouds:document.getElementById('clouds'),
+  lat:document.getElementById('lat'),
+  lon:document.getElementById('lon'),
+  scope:document.getElementById('scope'),
+  camera:document.getElementById('camera'),
+  chips:document.getElementById('chips'),
+  fov:document.getElementById('fov'),
+  scale:document.getElementById('scale'),
+  topList:document.getElementById('topList'),
+  q:document.getElementById('q'),
+  table:document.getElementById('table'),
+  btnCalc:document.getElementById('btnCalc'),
+  btnGPS:document.getElementById('btnGPS'),
+  btnDemo:document.getElementById('btnDemo'),
+  btnRecompute:document.getElementById('btnRecompute'),
+};
+
+/* ========= data ========= */
+const scopes=[
+  {name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1,2]},
+  {name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1,2]},
+  {name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1,2]},
+  {name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1,2]},
+  {name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1,2]},
+  {name:'Custom',fl:600,ap:80,presets:[1]}
+];
+const cameras=[
+  {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
+  {name:'ZWO ASI2600 (APS-C)',w:23.5,h:15.7,px:3.76},
+  {name:'Canon R6',w:35.9,h:23.9,px:6.56}
+];
+const MESSIER=[
+  {id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.71,dec:41.3},
+  {id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.99,dec:22.7},
+  {id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.55,dec:30.7},
+  {id:'M57',name:'Ring Nebula',type:'PN',ra:18.89,dec:33.0},
+  {id:'M13',name:'Hercules Globular',type:'GC',ra:16.70,dec:36.5},
+  {id:'M45',name:'Pleiades',type:'OC',ra:3.79,dec:24.1}
+];
+
+/* ========= astro math ========= */
+const d2r=x=>x*Math.PI/180, r2d=x=>x*180/Math.PI;
+const jd=d=>d.getTime()/86400000+2440587.5;
+function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
+function lst(d,lon){return(gmst(d)+lon/15+24)%24}
+function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));const lam=L0+C,eps=23.439291-0.0130042*T;const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lamD:lam}}
+function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon}}
+function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
+function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
+
+/* ========= state & helpers ========= */
+let lastWx=null; // {cloud, vis}
+function setUpdated(){dom.updated.textContent='Updated '+new Date().toLocaleTimeString()}
+
+function updateOptics(factor){
+  const s=scopes[parseInt(dom.scope.value,10)]||scopes[0];
+  const cam=cameras[parseInt(dom.camera.value,10)]||cameras[0];
+  const f=(factor ?? parseFloat(document.querySelector('#chips .chip.active')?.textContent||'1x'))||1;
+  const eff=s.fl*f;
+  const fx=(57.2958*cam.w/eff).toFixed(1), fy=(57.2958*cam.h/eff).toFixed(1);
+  const scale=(206.265*cam.px/eff).toFixed(2);
+  dom.fov.textContent=`FOV ${fx}° × ${fy}°`;
+  dom.scale.textContent=`Scale ${scale}"/px`;
+}
+
+function renderChips(){
+  dom.chips.innerHTML='';
+  const s=scopes[parseInt(dom.scope.value,10)];
+  s.presets.forEach(f=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='chip'; b.textContent=f+'x';
+    b.addEventListener('click',()=>{
+      dom.chips.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); updateOptics(f); computeAll();
+    },{passive:true});
+    dom.chips.appendChild(b);
+  });
+  dom.chips.querySelector('button')?.classList.add('active');
+}
+
+function hydrateSelectors(){
+  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;dom.scope.appendChild(o)});
+  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;dom.camera.appendChild(o)});
+  dom.scope.value=0; dom.camera.value=0; renderChips(); updateOptics(1);
+}
+
+function computeSky(){
+  const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
+  const now=new Date();
+  const s=sunEq(now), m=moonEq(now);
+  const sunAlt=altFor(s.raH,s.decD,lat,lon,now);
+  const dark = sunAlt <= -12;
+  const mAlt = altFor(m.raH,m.decD,lat,lon,now);
+  const phase=(m.lonD - s.lamD + 360)%360;
+  const illum=Math.round((1-Math.cos(d2r(phase)))/2*100);
+
+  dom.astroYes.textContent = dark ? 'Yes' : 'No';
+  dom.astroVal.textContent = 'Sun alt ' + sunAlt.toFixed(1) + '°';
+  dom.moonPct.textContent = illum + '%';
+  dom.moonAlt.textContent = 'Alt ' + mAlt.toFixed(0) + '°';
+  return {dark, illum, sunAlt, mAlt, m, s};
+}
+
+function computeStatus(){
+  const {dark}=computeSky();
+  const cloud = Math.round(parseFloat(dom.clouds.value)||0);
+  const vis = lastWx?.vis ?? 10;
+  let status='MARGINAL', cls='marginal';
+  if(!dark || cloud>=60) { status='NO-GO'; cls='nogo'; }
+  else if(cloud<=25) { status='GO'; cls='go'; }
+  dom.badge.textContent=status;
+  dom.badge.className='badge '+cls;
+  dom.bannerText.textContent = `${status} — Clouds ~${cloud}% · Vis ${vis} km` + (dark?' · Astro dark':'');
+  setUpdated();
+}
+
+function computeTop5(){
+  const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
+  const now=new Date(); const s=sunEq(now), m=moonEq(now);
+  const mid=new Date(now.getTime()+90*60*1000);
+  const mEq=moonEq(mid); const mInfo={raH:mEq.raH,decD:mEq.decD,illum:(1-Math.cos(d2r(((mEq.lonD - s.lamD + 360)%360))))/2};
+  function scoreTarget(o){
+    const alt=altFor(o.ra,o.dec,lat,lon,mid);
+    if(alt<35) return {score:0,alt,sep:0};
+    const clouds = Math.round(parseFloat(dom.clouds.value)||40);
+    const cloudScore = 1 - Math.max(0,(clouds-25)/(60-25));
+    const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
+    let sepFactor = 1- Math.max(0,(sep-20)/(45-20)); sepFactor = 1-sepFactor;
+    const moonScore = Math.max(0, sepFactor*(1-mInfo.illum));
+    const altScore = alt>=60?1: Math.max(0,(alt-35)/(60-35));
+    const score = Math.max(0, 0.35*altScore + 0.25*cloudScore + 0.25*moonScore + 0.15*0.7);
+    return {score,alt,sep};
+  }
+  const rows=MESSIER.map(o=>{
+    const r=scoreTarget(o); return {...o,alt:r.alt,sep:r.sep,score:r.score};
+  }).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
+
+  dom.topList.innerHTML = rows.length
+    ? rows.map((o,i)=>`<li><strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100|0)}%</li>`).join('')
+    : '<li class="bad">No suitable targets.</li>';
+}
+
+function renderTable(){
+  const q=(dom.q.value||'').toLowerCase();
+  const rows=MESSIER.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q));
+  dom.table.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th></tr></thead>
+    <tbody>${rows.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td></tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function computeAll(){ computeSky(); computeStatus(); computeTop5(); renderTable(); }
+
+/* ========= weather fetch ========= */
+async function fetchWeather(){
+  const lat=parseFloat(dom.lat.value), lon=parseFloat(dom.lon.value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ toast('Set location'); return; }
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility&timezone=auto`;
+    const r=await fetch(url,{cache:'no-store'}); const j=await r.json();
+    const cc=(j.hourly?.cloud_cover||[]).slice(0,3);
+    const vis=(j.hourly?.visibility||[]).slice(0,3).map(x=>x/1000);
+    const cloudAvg = cc.length ? Math.round(cc.reduce((a,b)=>a+b,0)/cc.length) : 40;
+    const visAvg = vis.length ? Math.round(vis.reduce((a,b)=>a+b,0)/vis.length) : 10;
+    lastWx={cloud:cloudAvg, vis:visAvg};
+    dom.clouds.value=String(cloudAvg);
+    toast('Targets updated');
+    computeAll();
+  }catch(e){
+    toast('Weather failed');
+  }
+}
+
+/* ========= events ========= */
+document.addEventListener('DOMContentLoaded',()=>{
+  hydrateSelectors();
+  dom.lat.value = localStorage.getItem('gng.lat') || '';
+  dom.lon.value = localStorage.getItem('gng.lon') || '';
+  dom.clouds.value = localStorage.getItem('gng.cloud') || '40';
+
+  ['input','change'].forEach(ev=>{
+    dom.clouds.addEventListener(ev,()=>{localStorage.setItem('gng.cloud',dom.clouds.value); computeAll();},{passive:true});
+    dom.q.addEventListener(ev,renderTable,{passive:true});
+    dom.scope.addEventListener(ev,()=>{renderChips(); updateOptics(); computeAll();},{passive:true});
+    dom.camera.addEventListener(ev,()=>{updateOptics(); computeAll();},{passive:true});
+    dom.lat.addEventListener(ev,()=>{localStorage.setItem('gng.lat',dom.lat.value);},{passive:true});
+    dom.lon.addEventListener(ev,()=>{localStorage.setItem('gng.lon',dom.lon.value);},{passive:true});
+  });
+
+  dom.btnCalc.addEventListener('click',fetchWeather);
+  dom.btnRecompute.addEventListener('click',()=>{computeAll(); toast('Targets updated')});
+  dom.btnDemo.addEventListener('click',()=>{dom.lat.value='37.16557'; dom.lon.value='-76.56839'; fetchWeather();});
+  dom.btnGPS.addEventListener('click',async()=>{
+    try{
+      dom.btnGPS.disabled=true;
+      const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
+      dom.lat.value=pos.coords.latitude.toFixed(5);
+      dom.lon.value=pos.coords.longitude.toFixed(5);
+      localStorage.setItem('gng.lat',dom.lat.value);
+      localStorage.setItem('gng.lon',dom.lon.value);
+      fetchWeather();
+    }catch(_){ toast('GPS failed'); }
+    finally{ dom.btnGPS.disabled=false; }
+  });
+
+  computeAll();
+});
 </script>
 </body>
 </html>
-```0
