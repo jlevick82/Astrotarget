@@ -2,500 +2,531 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Nightly Go/No-Go — AstroTarget (single file)</title>
-<meta name="theme-color" content="#0b1622">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nightly Go/No-Go</title>
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" href="favicon.ico">
 <style>
 :root{
-  --bg:#0b1622;--card:#152234;--edge:#22344a;--muted:#8aa2c0;--text:#d9e6f2;--good:#1f8b4c;--warn:#b58a00;--bad:#b54949;--pill:#223246;
-  --blue:#2f6fed;--purple:#7b61ff;--amber:#e6a700;--red:#ff5c5c;--shadow:0 6px 20px rgba(0,0,0,.35);
+  --bg:#0b1220; --card:#111a2b; --edge:#263247; --ink:#e7eefc; --mut:#9fb0cc;
+  --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --accent:#3b82f6;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif}
-a{color:#9cc3ff}
-.wrap{max-width:980px;margin:0 auto;padding:20px 14px 80px}
-.hdr{display:flex;align-items:center;gap:14px;margin:6px 0 8px}
-.hdr .logo{width:40px;height:40px;border-radius:9px;background:#000 url('https://cdn.jsdelivr.net/gh/jlevick82/Astrotarget@main/assets/logo-256.png') center/cover no-repeat;box-shadow:var(--shadow)}
-.hdr h1{font-size:34px;line-height:1;margin:0 8px 0 0;font-weight:800;letter-spacing:.5px}
-.hdr .v{opacity:.6;font-size:14px;margin-top:8px}
-.actions{margin-left:auto;display:flex;gap:10px}
-.btn{background:var(--pill);border:1px solid var(--edge);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
-.btn:hover{filter:brightness(1.1)}
-.badge{display:inline-flex;align-items:center;gap:10px;border-radius:14px;padding:14px 16px;border:1px solid var(--edge);background:var(--card)}
-.badge .dot{width:42px;height:42px;border-radius:10px;display:inline-grid;place-items:center;font-weight:800}
-.dot.go{background:rgba(31,139,76,.15);color:#76e4a1;border:1px solid #205f3e}
-.dot.nogo{background:rgba(181,73,73,.15);color:#ff9f9f;border:1px solid #7d3333}
-.dot.marginal{background:rgba(229,176,43,.13);color:#ffd772;border:1px solid #6f5415}
-.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px 14px;margin:14px 0;box-shadow:var(--shadow)}
-.card h3{margin:2px 2px 12px;font-size:18px;letter-spacing:.2px}
-.grid{display:grid;gap:14px}
-.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.kv{background:rgba(0,0,0,.15);border:1px solid var(--edge);border-radius:12px;padding:12px 12px}
-.kv .k{opacity:.7;font-size:14px}
-.kv .v{font-size:28px;font-weight:800;margin-top:2px}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.row .grow{flex:1}
-input,select{width:100%;background:#0f1a2a;border:1px solid var(--edge);color:var(--text);border-radius:12px;padding:12px 12px}
-small.muted{opacity:.7}
-.pills{display:flex;gap:10px;flex-wrap:wrap}
-.pill{border:1px solid var(--edge);background:#0f1a2a;padding:10px 14px;border-radius:12px;cursor:pointer}
-.pill.active{outline:2px solid #3c7cff}
-.tbl{overflow:auto;border-radius:14px;border:1px solid var(--edge)}
-table{width:100%;border-collapse:collapse;background:#0f1a2a}
-th,td{padding:12px;border-bottom:1px solid #1b2a3f;text-align:left;white-space:nowrap}
-th{position:sticky;top:0;background:#132034;z-index:1}
-td.center{text-align:center}
-img.thumb{width:86px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--edge)}
-tfoot td{padding:10px}
-.footer{opacity:.6;margin-top:28px;text-align:center}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+a{color:#9cc1ff;text-decoration:none}
+h1,h2,h3{margin:.2rem 0 1rem}
+.wrap{max-width:980px;margin:0 auto;padding:20px}
+header{display:flex;align-items:center;gap:18px;margin:6px 0 16px}
+.logo{width:40px;height:40px;border-radius:8px;background:#000 url('assets/logo-256.png') center/cover no-repeat}
+.title{flex:1}
+.title h1{font-size:clamp(28px,7vw,44px);line-height:1.02;margin:0}
+.sub{opacity:.7}
+.hdr-actions{display:flex;gap:.6rem;align-items:center}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:54px;height:38px;padding:0 .8rem;border-radius:12px;font-weight:700}
+.badge.go{background:#0e4726;color:#aef3c6;border:1px solid #0f6c38}
+.badge.marginal{background:#46370c;color:#ffe8a3;border:1px solid #6f540f}
+.badge.nogo{background:#5a0d0d;color:#ffc3c3;border:1px solid #7d1212}
+.btn{background:#1a2440;border:1px solid var(--edge);color:var(--ink);padding:.6rem .9rem;border-radius:.9rem}
+.btn:active{transform:translateY(1px)}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+.card{position:relative;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.card .chev{position:absolute;top:.75rem;right:.75rem}
+h3{margin:0 0 10px;font-size:1.12rem}
+.stat{font-size:2.1rem;line-height:1.1;margin:.2rem 0 .6rem}
+.kv{display:flex;gap:8px;align-items:center;color:var(--mut)}
+.kv small{display:inline-block;padding:.35rem .6rem;background:#0f172a;border:1px solid var(--edge);border-radius:.6rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+input,select,button{font-size:1rem;line-height:1.1;padding:.75rem 1rem;height:3rem;border-radius:.8rem;background:#0f172a;color:var(--ink);border:1px solid var(--edge)}
+select{min-height:3rem}
+label{display:block;margin:.2rem 0 .4rem;color:var(--mut)}
+.segment{display:flex;gap:.6rem;flex-wrap:wrap}
+.segment .pill{min-width:72px;justify-content:center;display:inline-flex;align-items:center;height:3rem;padding:0 1rem;border-radius:1rem;border:1px solid var(--edge);background:#0f172a}
+.segment .pill.active{outline:2px solid var(--accent)}
+.list{margin:0;padding-left:1.1rem}
+.list li{margin:.25rem 0}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-top:1px solid var(--edge);padding:.6rem .4rem;text-align:left}
+footer{opacity:.6;text-align:center;margin:28px 0}
 
-/* Toasts */
-.toast{position:fixed;inset:auto 50% 18px auto;transform:translateX(-50%);min-width:220px;max-width:90vw;background:#0f1a2a;border:1px solid var(--edge);padding:12px 14px;border-radius:12px;display:none;box-shadow:var(--shadow);font-weight:600}
-.toast.show{display:block;animation:pop .16s ease-out}
-.toast.success{background:#112347;border-color:#274fda;color:#dfe7ff}
-.toast.info{background:#1a1235;border-color:#6b57ff;color:#ede9ff}
-.toast.warn{background:#2a230a;border-color:#e6a700;color:#ffe9a6}
-.toast.error{background:#2a1111;border-color:#ff5c5c;color:#ffd7d7}
-@keyframes pop{from{transform:translate(-50%,20px);opacity:.0}to{transform:translate(-50%,0);opacity:1}}
-.note{color:#9cc3ff}
+/* status banner */
+.banner{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px 16px}
+.banner .line{flex:1;color:#cfe2ff}
+.banner .updated a{font-weight:600}
 
-/* collapsible */
-.card[data-collapsible]{position:relative}
-.card .toggle{position:absolute;right:10px;top:10px;border:1px solid var(--edge);background:#0f1a2a;border-radius:10px;padding:6px 9px;cursor:pointer}
-.card.collapsed .body{display:none}
-.card.collapsed{padding-bottom:8px}
+/* toast */
+#toast{
+  position:fixed;right:16px;bottom:16px;left:auto;transform:translateY(120%);opacity:.95;
+  background:#0f172a;color:#fff;border-radius:.9rem;border-left:5px solid var(--edge);
+  padding:.8rem 1rem;z-index:9999;box-shadow:0 14px 36px rgba(0,0,0,.35);
+  transition:transform .25s ease, opacity .25s ease
+}
+#toast.show{transform:translateY(0)}
+#toast.ok{border-color:var(--ok)}
+#toast.warn{border-color:var(--warn)}
+#toast.err{border-color:var(--bad)}
+
+/* clouds card wide */
+.card[data-id="clouds"]{grid-column:1/-1}
+
+/* small bump for very small screens */
+@media (max-width:420px){
+  body{font-size:clamp(16px,3.9vw,18px)}
+  .stat{font-size:2.3rem}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="hdr">
-    <div class="logo" id="logoBox" aria-label="AstroTarget"></div>
-    <div>
-      <h1>Nightly<br>Go/No-Go <span class="v" id="ver">v26.0</span></h1>
+
+  <header>
+    <div class="logo" id="logo"></div>
+    <div class="title">
+      <h1>Nightly<br>Go/No-Go</h1>
+      <div class="sub">v26.1</div>
     </div>
-    <div class="actions">
+    <div class="hdr-actions">
       <button class="btn" id="btnInstall">Install</button>
       <button class="btn" id="btnCompact">Compact off</button>
       <button class="btn" id="btnNight">Night</button>
     </div>
   </header>
 
-  <section class="card" id="statusCard" data-collapsible>
-    <button class="toggle" aria-expanded="true">▾</button>
-    <div class="body">
-      <div class="badge" id="statusBadge">
-        <span class="dot go" id="statusDot">GO</span>
-        <div class="grow" id="statusText">GO — Clouds ~2% · Vis 12 km · Astro dark</div>
-        <a id="updatedAt" class="note" href="#now">Updated —</a>
-      </div>
-    </div>
+  <section class="banner card" id="statusCard">
+    <span class="badge" id="statusBadge">—</span>
+    <div class="line" id="summary">Loading…</div>
+    <div class="updated"><a href="#" id="updatedAt">Updated —</a></div>
   </section>
 
-  <section class="grid cols-2">
-    <div class="card" data-collapsible>
-      <button class="toggle" aria-expanded="true">▾</button>
-      <div class="body">
-        <h3>Sky conditions</h3>
-        <div class="grid cols-2">
-          <div class="kv"><div class="k">Astronomical dark</div><div class="v" id="astroDark">—</div><div class="k" id="sunAlt">Sun alt —</div></div>
-          <div class="kv"><div class="k">Moon illum</div><div class="v" id="moonIllum">—</div><div class="k" id="moonAlt">Alt —</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" id="cloudCard" data-collapsible>
-      <button class="toggle" aria-expanded="true">▾</button>
-      <div class="body">
-        <h3>Clouds (avg)</h3>
-        <input id="cloudRange" type="range" min="0" max="100" step="1" value="5">
-        <div class="row" style="margin-top:10px;align-items:center">
-          <button class="btn" id="btnUseWx">Use</button>
-          <button class="btn" id="btnCalc">Calculate</button>
-          <div class="grow"></div>
-          <small class="muted" id="cloudSource">to auto-fill from weather. Slider overrides clouds.</small>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="card" data-collapsible>
-    <button class="toggle" aria-expanded="true">▾</button>
-    <div class="body">
-      <h3>Quick setup</h3>
-      <div class="grid cols-3">
-        <div><label>Latitude (°)<input id="lat" inputmode="decimal"></label></div>
-        <div><label>Longitude (°)<input id="lon" inputmode="decimal"></label></div>
-        <div><label>Hours <input id="hours" type="number" min="1" max="10" value="3"></label></div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn" id="btnGPS">Use GPS</button>
-        <button class="btn" id="btnDemo">Demo</button>
-        <button class="btn" id="btnRecalc">Calculate Now</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="card" data-collapsible id="gearCard">
-    <button class="toggle" aria-expanded="true">▾</button>
-    <div class="body">
-      <h3>Gear</h3>
-      <div class="grid cols-2">
-        <div>
-          <label>Scope
-            <select id="scopeSel"></select>
-          </label>
-        </div>
-        <div>
-          <label>Reducer / Barlow</label>
-          <div class="pills" id="factorPills"></div>
-        </div>
-        <div>
-          <label>Camera
-            <select id="camSel"></select>
-          </label>
-        </div>
-        <div>
-          <label>FOV &amp; Scale</label>
-          <div class="kv"><div class="k" id="fov">FOV —</div><div class="k" id="scale">Scale —</div></div>
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <input id="presetName" placeholder="Preset name…" class="grow">
-        <button class="btn" id="btnSavePreset">Save</button>
-        <select id="presetList" style="max-width:220px"></select>
-        <button class="btn" id="btnDeletePreset">Delete</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="card" data-collapsible>
-    <button class="toggle" aria-expanded="true">▾</button>
-    <div class="body">
-      <h3>Top 5 Recommendations</h3>
-      <ol id="top5" style="margin:0 0 4px 20px"></ol>
-    </div>
-  </section>
-
-  <section class="card" data-collapsible>
-    <button class="toggle" aria-expanded="true">▾</button>
-    <div class="body">
-      <h3>Catalog (subset)</h3>
-      <div class="row" style="margin-bottom:10px">
-        <input id="search" class="grow" placeholder="Search by ID / name / type">
-      </div>
-      <div class="tbl" id="tblBox"></div>
-    </div>
-  </section>
-
-  <section class="card" data-collapsible>
-    <button class="toggle" aria-expanded="true">▾</button>
-    <div class="body">
-      <h3>Gallery</h3>
+  <section class="grid">
+    <div class="card" data-id="sky" id="skyCard">
+      <h3>Sky conditions</h3>
       <div class="row">
-        <input id="imgBase" class="grow" placeholder="CDN base (optional) — leave blank to use repo default">
-        <button class="btn" id="btnSaveBase">Save</button>
-        <button class="btn" id="btnTestBase">Test</button>
+        <div>
+          <div class="stat" id="astroDarkTxt">—</div>
+          <div class="kv"><small id="sunAltTxt">Sun alt —</small></div>
+        </div>
+        <div>
+          <div class="stat" id="moonPctTxt">—</div>
+          <div class="kv"><small id="moonAltTxt">Alt —</small></div>
+        </div>
       </div>
-      <small class="muted">Default: <span class="note">jsDelivr → jlevick82/Astrotarget@main/images/full/</span></small>
+      <div class="row" style="margin-top:.6rem">
+        <div>
+          <label>Humidity</label>
+          <div class="stat" id="humidStat">—</div>
+        </div>
+        <div>
+          <label>Transparency</label>
+          <div class="stat" id="transpStat">—</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:.6rem">
+        <div>
+          <label>Seeing</label>
+          <div class="stat" id="seeingStat">—</div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+
+    <div class="card" data-id="clouds">
+      <h3>Clouds (avg)</h3>
+      <input type="range" id="cloudSlider" min="0" max="100" value="40" style="width:100%">
+      <div class="segment" style="margin-top:.6rem">
+        <button class="pill" id="useWx">Use</button>
+        <button class="pill" id="calcBtn">Calculate</button>
+        <small style="align-self:center;color:var(--mut)">From Open-Meteo (hourly) · slider overrides</small>
+      </div>
     </div>
   </section>
 
-  <div class="footer">© AstroTarget — single-file build</div>
+  <section class="card" id="quick">
+    <h3>Quick setup</h3>
+    <div class="row">
+      <div><label>Latitude (°)</label><input id="lat" inputmode="decimal" placeholder="lat"></div>
+      <div><label>Longitude (°)</label><input id="lon" inputmode="decimal" placeholder="lon"></div>
+      <div><label>Hours</label><input id="hours" inputmode="numeric" value="3"></div>
+      <div style="display:flex;gap:.6rem;align-items:end">
+        <button class="btn" id="gpsBtn">Use GPS</button>
+        <button class="btn" id="demoBtn">Demo</button>
+        <button class="btn" id="recompute">Calculate Now</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="gear">
+    <h3>Gear</h3>
+    <div class="row">
+      <div>
+        <label>Scope</label>
+        <select id="scopeSel"></select>
+      </div>
+      <div>
+        <label>Reducer / Barlow</label>
+        <div class="segment" id="optSeg"></div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:.6rem">
+      <div>
+        <label>Camera</label>
+        <select id="camSel"></select>
+      </div>
+      <div>
+        <label>FOV &amp; Scale</label>
+        <div class="kv"><small id="fovTxt">FOV —</small> <small id="scaleTxt">Scale —</small></div>
+      </div>
+    </div>
+    <div class="segment" style="margin-top:.8rem">
+      <button class="btn" id="saveNamed">Save</button>
+      <select id="presetList" class="btn" style="min-width:220px"><option>Load preset…</option></select>
+      <button class="btn" id="deleteNamed">Delete</button>
+    </div>
+  </section>
+
+  <section class="card" id="top">
+    <h3>Top 5 Recommendations</h3>
+    <ol class="list" id="top5"><li>—</li></ol>
+  </section>
+
+  <section class="card" id="catalog">
+    <h3>Catalog (subset)</h3>
+    <input id="search" placeholder="Search by ID / name / type" style="width:100%;margin-bottom:.6rem">
+    <div id="table">—</div>
+  </section>
+
+  <footer>© AstroTarget — single-file build</footer>
+
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ======= small utilities ======= */
-const $ = (s,r=document)=>r.querySelector(s);
-const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
-function toast(msg,type='success',ms=1500){
-  const t=$('#toast'); t.textContent=msg; t.className='toast '+type+' show';
-  clearTimeout(toast._to); toast._to=setTimeout(()=>t.classList.remove('show'),ms);
-}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+/* ---------- data ---------- */
+const scopes=[{id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,opts:[0.8,1.0,2.0]},
+{id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,opts:[0.8,1.0,2.0]},
+{id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,opts:[1.0,2.0]},
+{id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,opts:[0.7,0.8,1.0,2.0]},
+{id:'esprit100',name:'SkyWatcher Esprit 100 (550mm f/5.5)',fl:550,ap:100,opts:[0.77,0.8,1.0,2.0]},
+{id:'samy135',name:'Samyang 135mm f/2',fl:135,ap:67,opts:[1.0,2.0]},
+{id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,opts:[0.7,0.63,1.0,2.0]},
+{id:'c925',name:'Celestron C9.25 (2350mm f/10)',fl:2350,ap:235,opts:[0.7,0.63,1.0,2.0]},
+{id:'c11',name:'Celestron C11 (2800mm f/10)',fl:2800,ap:279,opts:[0.7,0.63,1.0,2.0]},
+{id:'rasa8',name:'Celestron RASA 8 (400mm f/2)',fl:400,ap:203,opts:[1.0]},
+{id:'sw150p',name:'SkyWatcher 150P (750mm f/5)',fl:750,ap:150,opts:[1.0,2.0]},
+{id:'c6',name:'Celestron C6 / 6SE (1500mm f/10)',fl:1500,ap:150,opts:[0.63,1.0,2.0]},
+{id:'custom',name:'Custom',fl:null,ap:null,opts:[1.0]}];
+
+const cameras=[{name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
+{name:'ZWO ASI2600 (IMX571 APS-C)',w:23.5,h:15.7,px:3.76},
+{name:'ZWO ASI6200 (Full Frame)',w:36.0,h:24.0,px:3.76},
+{name:'ZWO ASI294MM',w:19.1,h:13.0,px:4.63},
+{name:'ZWO ASI1600MM',w:17.7,h:13.4,px:3.80},
+{name:'ZWO ASI183MC',w:13.2,h:8.8,px:2.40},
+{name:'Canon T3i / 600D',w:22.3,h:14.9,px:4.30},
+{name:'Canon R6',w:35.9,h:23.9,px:6.56},
+{name:'Nikon D750',w:35.9,h:24.0,px:5.97},
+{name:'Nikon Z6',w:35.9,h:23.9,px:5.94},
+{name:'Sony A7 III',w:35.8,h:23.8,px:5.94},
+{name:'Custom',w:null,h:null,px:null}];
+
+const DEFAULT_THRESH={alt_min:35,alt_best:60,cloud_good:25,cloud_bad:60,wind_good:10,wind_bad:25,humid_good:35,humid_bad:85,vis_good:15,vis_bad:8,moon_tight:20,moon_loose:45,weights:{alt:0.35,cloud:0.25,moon:0.25,met:0.15}};
+let TH = JSON.parse(localStorage.getItem('gng.thresholds')||'null')||DEFAULT_THRESH;
+let lastWx=null;
+
+const MESSIER_SUBSET=[
+ {id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.71,dec:41.3},
+ {id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.55,dec:30.7},
+ {id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.99,dec:22.7},
+ {id:'M57',name:'Ring Nebula',type:'PN',ra:18.89,dec:33.0},
+ {id:'M13',name:'Hercules Globular',type:'GC',ra:16.70,dec:36.5},
+ {id:'M45',name:'Pleiades',type:'OC',ra:3.79,dec:24.1}
+];
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+function toast(msg,ms=1400,kind='ok'){const t=$("#toast"); if(!t) return; t.className=''; t.textContent=msg; t.classList.add('show',kind); setTimeout(()=>t.classList.remove('show'),ms);}
+function d2r(x){return x*Math.PI/180} function r2d(x){return x*180/Math.PI}
 function jd(d){return d.getTime()/86400000+2440587.5}
-const d2r=x=>x*Math.PI/180, r2d=x=>x*180/Math.PI;
 function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
 function lst(d,lon){return(gmst(d)+lon/15+24)%24}
 function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));const lam=L0+C,eps=23.439291-0.0130042*T;const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lamD:lam}}
 function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon}}
-function altAt(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
-function sepDeg(ra1,dec1,ra2,dec2){const a1=d2r(dec1),a2=d2r(dec2),dRA=d2r((ra1-ra2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
+function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
+function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
 
-/* ======= simple data ======= */
-const SCOPES=[
-  {id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1.0,2.0]},
-  {id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1.0,2.0]},
-  {id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1.0,2.0]},
-  {id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1.0,2.0]},
-  {id:'custom',name:'Custom',fl:null,ap:null,presets:[1.0]}
-];
-const CAMERAS=[
-  {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
-  {name:'ZWO ASI2600 (IMX571 APS-C)',w:23.5,h:15.7,px:3.76},
-  {name:'Canon T3i / 600D',w:22.3,h:14.9,px:4.30},
-  {name:'Custom',w:null,h:null,px:null}
-];
-/* small subset (extend later) */
-const MESSIER_SUBSET=[
-  {id:'M31', name:'Andromeda Galaxy', type:'GX', ra:0.712, dec:41.3},
-  {id:'M33', name:'Triangulum Galaxy', type:'GX', ra:1.556, dec:30.7},
-  {id:'M27', name:'Dumbbell Nebula', type:'PN', ra:19.99, dec:22.7},
-  {id:'M57', name:'Ring Nebula', type:'PN', ra:18.89, dec:33.0},
-  {id:'M13', name:'Hercules Globular', type:'GC', ra:16.70, dec:36.5},
-  {id:'C14', name:'Double Cluster', type:'OC', ra:2.34, dec:57.1}
-];
-
-/* ======= state ======= */
-let THRESH={alt_min:35,alt_best:60,cloud_good:25,cloud_bad:60,moon_tight:20,moon_loose:45,
-  weights:{alt:.35,cloud:.25,moon:.25,met:.15}};
-let lastWeather=null;
-
-/* ======= gallery mapping ======= */
-function repoBase(){
-  const user=localStorage.getItem('gallery.base');
-  if(user && /https?:\/\//.test(user)) return user.replace(/\/+$/,'/') ;
-  return 'https://cdn.jsdelivr.net/gh/jlevick82/Astrotarget@main/images/full/';
-}
-function fileForId(id){
-  id=String(id||'').trim();
-  const m=id.match(/^M(\d{1,3})$/i); if(m) return 'm'+(+m[1])+'.jpg';
-  const c=id.match(/^C(\d{1,3})$/i); if(c) return 'c'+(+c[1])+'.jpg';
-  return null;
-}
-function imgUrlForId(id){
-  const f=fileForId(id); if(!f) return '';
-  return repoBase()+f;
+/* banner composer */
+function composeBannerSummary(status, avg, vis, dark, sunAltDeg, moonAltDeg, moonPct){
+  const parts=[];
+  parts.push(status+' — Clouds ~'+Math.round(avg)+'%');
+  if(Number.isFinite(vis)) parts.push('Vis '+Math.round(vis)+' km');
+  parts.push(dark?'Astro dark':'Too bright');
+  if(Number.isFinite(sunAltDeg)) parts.push('Sun alt '+Math.round(sunAltDeg)+'°');
+  if(Number.isFinite(moonAltDeg)) parts.push('Moon '+Math.round(moonPct*100)+'% • alt '+Math.round(moonAltDeg)+'°');
+  return parts.join(' · ');
 }
 
-/* ======= UI helpers ======= */
-function setPills(list,val,host,onPick){
-  host.innerHTML='';
+/* ---------- UI refs ---------- */
+function ui(){return{
+  statusBadge:$('#statusBadge'), summary:$('#summary'), updatedAt:$('#updatedAt'),
+  lat:$('#lat'), lon:$('#lon'), hours:$('#hours'), gpsBtn:$('#gpsBtn'), demoBtn:$('#demoBtn'),
+  scopeSel:$('#scopeSel'), camSel:$('#camSel'), optSeg:$('#optSeg'),
+  fovTxt:$('#fovTxt'), scaleTxt:$('#scaleTxt'),
+  cloudSlider:$('#cloudSlider'), useWx:$('#useWx'), calcBtn:$('#calcBtn'),
+  top5:$('#top5'), search:$('#search'), table:$('#table'),
+  astroDarkTxt:$('#astroDarkTxt'), sunAltTxt:$('#sunAltTxt'), moonPctTxt:$('#moonPctTxt'), moonAltTxt:$('#moonAltTxt'),
+  humidStat:$('#humidStat'), transpStat:$('#transpStat'), seeingStat:$('#seeingStat'),
+  saveNamed:$('#saveNamed'), presetList:$('#presetList'), deleteNamed:$('#deleteNamed'),
+  btnInstall:$('#btnInstall'), btnCompact:$('#btnCompact'), btnNight:$('#btnNight'), recompute:$('#recompute')
+}}
+/* ---------- storage ---------- */
+function getNamed(){try{return JSON.parse(localStorage.getItem('gng.named'))||[]}catch{ return []}}
+function setNamed(list){localStorage.setItem('gng.named',JSON.stringify(list))}
+
+/* ---------- init ---------- */
+document.addEventListener('DOMContentLoaded',init);
+async function init(){
+  const U=ui();
+  // Populate selects
+  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;U.scopeSel.appendChild(o)});
+  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;U.camSel.appendChild(o)});
+  U.scopeSel.value=0; U.camSel.value=0; renderOptButtons(); updateOptics();
+
+  // user location
+  const Llat=localStorage.getItem('gng.lat'), Llon=localStorage.getItem('gng.lon');
+  if(Llat&&Llon){U.lat.value=Llat;U.lon.value=Llon}else{tryGPS()}
+
+  // bind
+  U.scopeSel.addEventListener('change',()=>{renderOptButtons();updateOptics();computeAll();toast('Gear updated',900,'ok')});
+  U.camSel.addEventListener('change',()=>{updateOptics();computeAll();toast('Camera updated',900,'ok')});
+  U.cloudSlider.addEventListener('input',()=>{computeAll()});
+  U.useWx.addEventListener('click',()=>{autoFetchWeather(true)});
+  U.calcBtn.addEventListener('click',()=>{computeAll();toast('Targets updated',1000,'ok')});
+  U.recompute.addEventListener('click',()=>{computeAll();toast('Targets updated',1000,'ok')});
+  U.gpsBtn.addEventListener('click',tryGPS);
+  U.demoBtn.addEventListener('click',()=>{U.lat.value='37.1656';U.lon.value='-76.5684';computeAll();toast('Demo location',900,'ok')});
+  U.search.addEventListener('input',renderTable);
+  U.saveNamed.addEventListener('click',savePreset);
+  U.presetList.addEventListener('change',loadPreset);
+  U.deleteNamed.addEventListener('click',deletePreset);
+
+  // PWA + modes
+  bindHeaderTools();
+
+  // first compute
+  computeAll();
+  autoFetchWeather(false);
+}
+
+/* ---------- header tools ---------- */
+function bindHeaderTools(){
+  const U=ui();
+  let def=null;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();def=e;U.btnInstall.disabled=false});
+  U.btnInstall.addEventListener('click',async()=>{ if(!def){toast('Install not available',1200,'warn');return;}
+    try{def.prompt();await def.userChoice;toast('Install prompt shown',900,'ok')}catch{toast('Install failed',1200,'err')}finally{def=null;U.btnInstall.disabled=true}
+  });
+  const compact = localStorage.getItem('gng.compact')==='1';
+  document.documentElement.classList.toggle('compact',compact);
+  U.btnCompact.textContent = compact ? 'Compact on' : 'Compact off';
+  U.btnCompact.addEventListener('click',()=>{
+    const now=!document.documentElement.classList.contains('compact');
+    document.documentElement.classList.toggle('compact',now);
+    localStorage.setItem('gng.compact',now?'1':'0');
+    U.btnCompact.textContent = now ? 'Compact on' : 'Compact off';
+  });
+  const night = localStorage.getItem('gng.night')==='1';
+  document.body.classList.toggle('night',night);
+  U.btnNight.textContent = night ? 'Blue' : 'Night';
+  U.btnNight.addEventListener('click',()=>{
+    const n=!document.body.classList.contains('night');
+    document.body.classList.toggle('night',n);
+    localStorage.setItem('gng.night',n?'1':'0');
+    U.btnNight.textContent = n ? 'Blue' : 'Night';
+  });
+}
+
+/* ---------- optics FOV ---------- */
+function renderOptButtons(){
+  const U=ui(); U.optSeg.innerHTML='';
+  const s=scopes[+U.scopeSel.value]; const custom=JSON.parse(localStorage.getItem('gng.opt.'+s.id)||'null');
+  const list=(custom&&Array.isArray(custom))?custom:s.opts;
   list.forEach(v=>{
-    const b=document.createElement('button');
-    b.className='pill'+(v===val?' active':'');
-    b.textContent=(v===1?'1x':v+'x');
-    b.addEventListener('click',()=>{onPick(v)});
-    host.appendChild(b);
+    const b=document.createElement('button'); b.className='pill'; b.textContent=(v===1?'1x':(v+'x'));
+    b.addEventListener('click',()=>{ Array.from(U.optSeg.children).forEach(x=>x.classList.remove('active')); b.classList.add('active'); updateOptics(v) });
+    U.optSeg.appendChild(b);
   });
+  if(U.optSeg.firstChild) U.optSeg.firstChild.classList.add('active');
 }
-function setStatus(status,summary){
-  const dot=$('#statusDot'); const t=$('#statusText');
-  let cls='go',txt='GO';
-  if(status==='NO-GO'){cls='nogo';txt='NO-GO'}
-  else if(status==='MARGINAL'){cls='marginal';txt='MARGINAL'}
-  dot.className='dot '+cls; dot.textContent=txt;
-  t.textContent=summary;
-}
-
-/* ======= save/load named presets ======= */
-function getNamed(){try{return JSON.parse(localStorage.getItem('gng.named'))||[]}catch(_){return[]}}
-function putNamed(list){localStorage.setItem('gng.named',JSON.stringify(list))}
-function refreshNamedUI(){
-  const sel=$('#presetList'); const list=getNamed();
-  sel.innerHTML='<option value="">Load preset…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+function updateOptics(selFactor){
+  const U=ui(); const s=scopes[+U.scopeSel.value], c=cameras[+U.camSel.value];
+  const factor = selFactor || parseFloat((U.optSeg.querySelector('.active')||{}).textContent||'1x') || 1;
+  const fl = (s.fl||0)*factor;
+  const sw=c.w||0, sh=c.h||0, px=c.px||0;
+  if(fl>0&&sw>0&&sh>0){U.fovTxt.textContent=`FOV ${(57.2958*sw/fl).toFixed(1)}° × ${(57.2958*sh/fl).toFixed(1)}°`;}
+  else U.fovTxt.textContent='FOV —';
+  if(fl>0&&px>0){U.scaleTxt.textContent=`Scale ${(206.265*px/fl).toFixed(2)}"/px`;} else U.scaleTxt.textContent='Scale —';
 }
 
-/* ======= core compute ======= */
-function currentSetup(){
-  const scope=SCOPES[$('#scopeSel').value|0];
-  const factor = parseFloat($('#factorPills').dataset.value||'1');
-  const cam = CAMERAS[$('#camSel').value|0];
-  return {scope, factor, cam,
-    lat: parseFloat($('#lat').value)||0,
-    lon: parseFloat($('#lon').value)||0,
-    hours: parseInt($('#hours').value,10)||3,
-    cloud: $('#cloudRange').value|0
-  };
-}
-function updateFOV(){
-  const {scope,factor,cam}=currentSetup();
-  const fl=(scope.fl||0)*factor;
-  const fovX = (fl>0 && cam.w)? (57.2958*cam.w/fl).toFixed(1)+'°' : '—';
-  const fovY = (fl>0 && cam.h)? (57.2958*cam.h/fl).toFixed(1)+'°' : '—';
-  const scale = (fl>0 && cam.px)? (206.265*cam.px/fl).toFixed(2)+'"/px' : '—';
-  $('#fov').textContent = `FOV ${fovX} × ${fovY}`;
-  $('#scale').textContent = `Scale ${scale}`;
-}
-function recompute(){
-  const S=currentSetup();
-  const start=new Date();
-  const mid=new Date(start.getTime()+S.hours*0.5*3600*1000);
-  const su=sunEq(mid), mo=moonEq(mid);
-  const sunAlt=altAt(su.raH,su.decD,S.lat,S.lon,mid);
-  const moonAlt=altAt(mo.raH,mo.decD,S.lat,S.lon,mid);
-  const phase=(mo.lonD-su.lamD+360)%360;
-  const illum=Math.round((1-Math.cos(d2r(phase)))/2*100);
-  $('#astroDark').textContent = sunAlt<=-12 ? 'Yes' : 'No';
-  $('#sunAlt').textContent = 'Sun alt '+sunAlt.toFixed(1)+'°';
-  $('#moonIllum').textContent = illum+'%';
-  $('#moonAlt').textContent = 'Alt '+moonAlt.toFixed(0)+'°';
-
-  // simple status
-  const clouds=S.cloud|0;
-  let status='MARGINAL';
-  if(sunAlt>-12) status='NO-GO';
-  else if(clouds<=THRESH.cloud_good) status='GO';
-  else if(clouds>=THRESH.cloud_bad) status='NO-GO';
-  setStatus(status,`${
-    status==='GO'?'GO':'NO-GO'===status?'NO-GO':'MARGINAL'
-  } — Clouds ~${clouds}% · Vis ${visFromWx()} km · ${sunAlt<=-12?'Astro dark':'Too bright'}`);
-
-  computeTop5(S, mid, {raH:mo.raH,decD:mo.decD,illum:illum/100});
-  renderTable();
-  $('#updatedAt').textContent='Updated '+new Date().toLocaleTimeString();
-  toast('Targets updated','success',1000);
-}
-function visFromWx(){
-  if(!lastWeather||!lastWeather.hourly||!lastWeather.hourly.visibility) return 12;
-  const km=(lastWeather.hourly.visibility[0]||12000)/1000;
-  return Math.round(km);
-}
-function scoreTarget(o,mid,lat,lon,mInfo,clouds){
-  const alt=altAt(o.ra,o.dec,lat,lon,mid);
-  if(alt<THRESH.alt_min) return {score:0,alt,sep:null};
-  const cloudAvg=clouds;
-  const cloudScore=1-((cloudAvg-THRESH.cloud_good)/(THRESH.cloud_bad-THRESH.cloud_good));
-  const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
-  const moonPenalty = Math.max(0,(THRESH.moon_loose - Math.max(sep,THRESH.moon_tight))/(THRESH.moon_loose-THRESH.moon_tight)) * mInfo.illum;
-  const altScore=alt>=THRESH.alt_best?1:((alt-THRESH.alt_min)/(THRESH.alt_best-THRESH.alt_min));
-  const score=clamp(THRESH.weights.alt*altScore + THRESH.weights.cloud*clamp(cloudScore,0,1) + THRESH.weights.moon*(1-moonPenalty),0,1);
-  return {score,alt,sep};
-}
-function computeTop5(S,mid,mInfo){
-  const list=MESSIER_SUBSET.map(o=>{
-    const r=scoreTarget(o,mid,S.lat,S.lon,mInfo,S.cloud|0);
-    return {...o,alt:r.alt,sep:r.sep,score:r.score};
-  }).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-  $('#top5').innerHTML = list.map((o,i)=>`<li>${i===0?'★ ':''}<b>${o.id}</b> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${(o.sep||0).toFixed(0)}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('');
-}
-
-/* ======= catalog table with thumbs ======= */
-function renderTable(){
-  const q=($('#search').value||'').toLowerCase();
-  const rows=MESSIER_SUBSET.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q))
-    .map(o=>{
-      const url=imgUrlForId(o.id);
-      const img=url?`<a href="${url}" target="_blank" title="Open full"><img class="thumb" loading="lazy" src="${url}" alt="${o.id}"></a>`:'—';
-      return `<tr>
-        <td>${o.id}</td><td>${o.name}</td><td>${o.type}</td>
-        <td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td>
-        <td class="center">${img}</td>
-      </tr>`;
-    }).join('');
-  $('#tblBox').innerHTML = `<table><thead><tr>
-    <th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
-    <tbody>${rows}</tbody></table>`;
-}
-
-/* ======= weather ======= */
-async function fetchWeather(){
-  const lat=parseFloat($('#lat').value), lon=parseFloat($('#lon').value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ toast('Set lat/lon','warn'); return; }
+/* ---------- weather ---------- */
+async function autoFetchWeather(applyClouds){
+  const U=ui(); const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){toast('Set latitude/longitude',1400,'warn');return}
   try{
-    const u=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility&timezone=auto`;
-    const r=await fetch(u); lastWeather=await r.json();
-    const cc=(lastWeather?.hourly?.cloud_cover?.[0])|0;
-    $('#cloudRange').value=cc;
-    $('#cloudSource').textContent='From Open-Meteo (hourly) · slider overrides';
-    toast('Weather updated','info');
-  }catch(e){ toast('Weather failed','error',1400); }
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,temperature_2m&timezone=auto`;
+    const r=await fetch(url); const j=await r.json(); lastWx=j;
+    if(applyClouds && j?.hourly?.cloud_cover?.length){ const v=Math.round(j.hourly.cloud_cover[0]); U.cloudSlider.value = String(v); }
+    computeAll();
+    toast('Weather updated',1000,'ok');
+  }catch{toast('Weather failed',1400,'err')}
 }
 
-/* ======= event wiring ======= */
-function hydrate(){
-  // collapsibles
-  $$('.card[data-collapsible]').forEach(c=>{
-    const btn=$('.toggle',c);
-    btn.addEventListener('click',()=>{
-      const open=!c.classList.toggle('collapsed');
-      btn.textContent=open?'▾':'▸';
-    });
-  });
+/* ---------- status + scoring ---------- */
+function glanceStatus(){
+  const U=ui();
+  // clouds avg (use slider as current avg)
+  const avg = parseFloat(U.cloudSlider.value)||60;
 
-  // populate selects
-  SCOPES.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;$('#scopeSel').appendChild(o);});
-  CAMERAS.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;$('#camSel').appendChild(o);});
-  $('#scopeSel').value=0; $('#camSel').value=0;
+  const start=new Date();
+  const s=sunEq(start), m=moonEq(start);
+  const lat=parseFloat(U.lat.value)||0, lon=parseFloat(U.lon.value)||0;
+  const sunAlt=altFor(s.raH,s.decD,lat,lon,start);
+  const moonAlt=altFor(m.raH,m.decD,lat,lon,start);
+  const dark = sunAlt<=-12;
 
-  // factor pills
-  function setFactor(v){ $('#factorPills').dataset.value=v; setPills(SCOPES[$('#scopeSel').value|0].presets, v, $('#factorPills'), nv=>{ setFactor(nv); updateFOV(); recompute(); }); }
-  setFactor(SCOPES[0].presets[0]);
+  let status='MARGINAL', cls='marginal';
+  if(!dark){status='NO-GO';cls='nogo'}
+  else if(avg<=TH.cloud_good){status='GO';cls='go'}
+  else if(avg>=TH.cloud_bad){status='NO-GO';cls='nogo'}
 
-  // handlers
-  $('#scopeSel').addEventListener('change',()=>{ setFactor(SCOPES[$('#scopeSel').value|0].presets[0]); updateFOV(); recompute(); });
-  $('#camSel').addEventListener('change',()=>{ updateFOV(); recompute(); });
-  $('#cloudRange').addEventListener('input',()=>{ recompute(); });
-  $('#search').addEventListener('input',renderTable);
-  $('#btnRecalc').addEventListener('click',recompute);
-  $('#btnCalc').addEventListener('click',()=>{ fetchWeather().then(recompute); });
-  $('#btnUseWx').addEventListener('click',()=>{ fetchWeather().then(recompute); });
+  const visKm = lastWx?.hourly?.visibility ? Math.round((lastWx.hourly.visibility[0]||0)/1000) : NaN;
 
-  $('#btnGPS').addEventListener('click',async()=>{
-    try{
-      const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
-      $('#lat').value=pos.coords.latitude.toFixed(5);
-      $('#lon').value=pos.coords.longitude.toFixed(5);
-      toast('GPS set','success'); fetchWeather().then(recompute);
-    }catch(_){ toast('GPS failed','error',1400); }
-  });
-  $('#btnDemo').addEventListener('click',()=>{
-    $('#lat').value=37.16557; $('#lon').value=-76.56839; $('#cloudRange').value=6; toast('Demo location','info'); recompute();
-  });
+  if(U.statusBadge){U.statusBadge.textContent=status;U.statusBadge.className='badge '+cls}
+  if(U.summary){
+    const phase=(m.lonD - s.lamD + 360)%360;
+    const illum=(1-Math.cos(d2r(phase)))/2;
+    U.summary.textContent = composeBannerSummary(status, avg, visKm, dark, sunAlt, moonAlt, illum);
+  }
 
-  // named presets
-  refreshNamedUI();
-  $('#btnSavePreset').addEventListener('click',()=>{
-    const name=($('#presetName').value||'').trim(); if(!name){toast('Enter a preset name','warn'); return;}
-    const list=getNamed(); const obj={name, scopeSel:$('#scopeSel').value, camSel:$('#camSel').value, factor:parseFloat($('#factorPills').dataset.value)};
-    const i=list.findIndex(p=>p.name.toLowerCase()===name.toLowerCase()); if(i>=0) list[i]=obj; else list.push(obj);
-    putNamed(list); refreshNamedUI(); toast('Preset saved','success');
-  });
-  $('#presetList').addEventListener('change',()=>{
-    const i=$('#presetList').value|0; const p=getNamed()[i]; if(!p) return;
-    $('#scopeSel').value=p.scopeSel; $('#camSel').value=p.camSel; $('#factorPills').dataset.value=p.factor;
-    setPills(SCOPES[$('#scopeSel').value|0].presets, p.factor, $('#factorPills'), nv=>{ $('#factorPills').dataset.value=nv; updateFOV(); recompute(); });
-    updateFOV(); recompute(); toast('Preset loaded','info');
-  });
-  $('#btnDeletePreset').addEventListener('click',()=>{
-    const i=$('#presetList').value; if(!i){toast('Pick a preset','warn'); return;}
-    const list=getNamed(); list.splice(i,1); putNamed(list); refreshNamedUI(); toast('Preset deleted','warn');
-  });
+  // Sky card metrics
+  $('#astroDarkTxt').textContent = dark ? 'Yes' : 'No';
+  $('#sunAltTxt').textContent = 'Sun alt ' + Math.round(sunAlt) + '°';
+  const phase=(m.lonD - s.lamD + 360)%360;
+  const illum=(1-Math.cos(d2r(phase)))/2;
+  $('#moonPctTxt').textContent = Math.round(illum*100) + '%';
+  $('#moonAltTxt').textContent = 'Alt ' + Math.round(moonAlt) + '°';
 
-  // base URL controls
-  $('#btnSaveBase').addEventListener('click',()=>{
-    const v=$('#imgBase').value.trim(); if(v) localStorage.setItem('gallery.base',v); else localStorage.removeItem('gallery.base');
-    renderTable(); toast('Gallery base saved','success');
-  });
-  $('#btnTestBase').addEventListener('click',()=>{ window.open(imgUrlForId('M31')||repoBase(),'_blank') });
+  const rh = lastWx?.hourly?.relative_humidity_2m ? (lastWx.hourly.relative_humidity_2m[0]||NaN) : NaN;
+  $('#humidStat').textContent = Number.isFinite(rh)? (Math.round(rh)+'%') : '—';
 
-  // compact / night toggles (visual only)
-  const root=document.documentElement;
-  $('#btnCompact').addEventListener('click',()=>{
-    const on = !root.classList.toggle('compact');
-    $('#btnCompact').textContent = on?'Compact off':'Compact on';
-    toast(on?'Compact mode off':'Compact mode on','info');
-  });
-  $('#btnNight').addEventListener('click',()=>{
-    const dark = !root.classList.toggle('night-off');
-    $('#btnNight').textContent = dark?'Night':'Blue';
-  });
+  const vis = lastWx?.hourly?.visibility ? (lastWx.hourly.visibility[0]||NaN)/1000 : NaN;
+  const transp = (!Number.isFinite(vis)||!Number.isFinite(rh))? null
+     : (vis>=20&&rh<=40?'Excellent': vis>=15&&rh<=55?'Good': vis>=10&&rh<=70?'Fair':'Poor');
+  $('#transpStat').textContent = transp||'—';
 
-  // initial
-  $('#lat').value = localStorage.getItem('lat')||'37.16557';
-  $('#lon').value = localStorage.getItem('lon')||'-76.56839';
-  $('#hours').value = localStorage.getItem('hours')||'3';
-  $('#imgBase').value = localStorage.getItem('gallery.base')||'';
-  updateFOV(); renderTable(); recompute();
-
-  // persist basics
-  ['lat','lon','hours'].forEach(id=>$( '#'+id ).addEventListener('input',()=>localStorage.setItem(id,$('#'+id).value)));
+  const wind = lastWx?.hourly?.wind_speed_10m ? (lastWx.hourly.wind_speed_10m[0]||NaN) : NaN;
+  const seeing = !Number.isFinite(wind)? null : (wind<=6?'Excellent':wind<=10?'Good':wind<=18?'Fair':'Poor');
+  $('#seeingStat').textContent = seeing||'—';
 }
 
-/* ======= boot ======= */
-document.addEventListener('DOMContentLoaded',hydrate);
+function scoreTarget(o,mid,lat,lon,mInfo){
+  const alt=altFor(o.ra,o.dec,lat,lon,mid);
+  if(alt<TH.alt_min) return {score:0,alt,sep:null};
+  const clouds=parseFloat(ui().cloudSlider.value)||60;
+  const cloudScore=1-((clouds-TH.cloud_good)/Math.max(1,TH.cloud_bad-TH.cloud_good)); // 1→0
+  const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
+  let sepFactor = 1-((sep-TH.moon_tight)/Math.max(1,TH.moon_loose-TH.moon_tight));
+  sepFactor = 1-Math.max(0,Math.min(1,sepFactor));
+  const moonScore = Math.max(0,Math.min(1, sepFactor*(1-mInfo.illum)));
+
+  const rh= lastWx?.hourly?.relative_humidity_2m ? (lastWx.hourly.relative_humidity_2m[0]||50) : 50;
+  const vis = lastWx?.hourly?.visibility ? ((lastWx.hourly.visibility[0]||10000)/1000) : 10;
+  const wind = lastWx?.hourly?.wind_speed_10m ? (lastWx.hourly.wind_speed_10m[0]||15) : 15;
+
+  const windScore=1-((wind-TH.wind_good)/Math.max(1,TH.wind_bad-TH.wind_good));
+  const rhScore=1-((rh-TH.humid_good)/Math.max(1,TH.humid_bad-TH.humid_good));
+  const visScore=(vis-TH.vis_bad)/Math.max(1,TH.vis_good-TH.vis_bad);
+  const metScore=Math.max(0,Math.min(1,(windScore+rhScore+visScore)/3));
+
+  const altScore = alt>=TH.alt_best?1:Math.max(0,Math.min(1,(alt-TH.alt_min)/Math.max(1,TH.alt_best-TH.alt_min)));
+  const W=TH.weights;
+  const score=Math.max(0,Math.min(1,W.alt*altScore+W.cloud*cloudScore+W.moon*moonScore+W.met*metScore));
+  return {score,alt,sep}
+}
+
+function computeTop5(){
+  const U=ui();
+  const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){U.top5.innerHTML='<li class="bad">Set location first</li>'; return;}
+  const start=new Date(); const hours=parseInt(U.hours.value,10)||3;
+  const mid=new Date(start.getTime()+hours*0.5*3600*1000);
+  const s=sunEq(mid); const m=moonEq(mid);
+  const altSun=altFor(s.raH,s.decD,lat,lon,mid); if(altSun>-12){U.top5.innerHTML='<li class="bad">Astronomical darkness not reached.</li>'; return;}
+  const mInfo={raH:m.raH,decD:m.decD,illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2};
+  const scored=MESSIER_SUBSET.map(o=>{const r=scoreTarget(o,mid,lat,lon,mInfo);return{id:o.id,name:o.name,type:o.type,alt:r.alt,sep:r.sep,score:r.score}}).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
+  U.top5.innerHTML = scored.length? scored.map((o,i)=>`<li>${i===0?'★ ':''}<b>${o.id}</b> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep?o.sep.toFixed(0):'—'}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="bad">No suitable targets.</li>';
+}
+
+/* ---------- catalog + gallery thumbs ---------- */
+function galleryBase(){ return 'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/'; }
+function thumbUrl(id){ const base=galleryBase(); if(!base) return ''; const low=(id||'').toLowerCase(); return base + low + '.jpg'; }
+function renderTable(){
+  const U=ui(); const q=(U.search.value||'').toLowerCase();
+  const rows=MESSIER_SUBSET.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q)).map(o=>{
+    const id=o.id.toLowerCase(); const url=thumbUrl(id);
+    const cellImg=url?(`<a target="_blank" href="${url}" title="Open full-res"><img alt="${o.id}" src="${url}" style="width:76px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--edge)"></a>`):'—';
+    return `<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td><td>${cellImg}</td></tr>`;
+  }).join('');
+  U.table.innerHTML = `<table class="table"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* ---------- presets ---------- */
+function currentSetup(){
+  const U=ui();
+  return {name:'', scope:{sel:U.scopeSel.value,factor:(U.optSeg.querySelector('.active')||{textContent:'1x'}).textContent.replace('x','')},
+          cam:{sel:U.camSel.value}, loc:{lat:U.lat.value,lon:U.lon.value}};
+}
+function refreshPresetList(){
+  const U=ui(); const list=getNamed();
+  U.presetList.innerHTML='<option value="">Load preset…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+}
+function savePreset(){
+  const name = prompt('Preset name?'); if(!name) return;
+  const list=getNamed(); const obj=currentSetup(); obj.name=name.trim();
+  const idx=list.findIndex(p=>p.name.toLowerCase()===obj.name.toLowerCase());
+  if(idx>=0) list[idx]=obj; else list.push(obj); setNamed(list); refreshPresetList(); toast('Preset saved',900,'ok');
+}
+function loadPreset(){
+  const U=ui(); if(!U.presetList.value) return; const list=getNamed(); const i=+U.presetList.value; const p=list[i]; if(!p) return;
+  U.scopeSel.value=p.scope.sel; renderOptButtons();
+  Array.from(U.optSeg.children).forEach(x=>{x.classList.toggle('active',x.textContent.replace('x','')===String(p.scope.factor))});
+  U.camSel.value=p.cam.sel; U.lat.value=p.loc.lat; U.lon.value=p.loc.lon; updateOptics(); computeAll(); toast('Preset loaded',900,'ok');
+}
+function deletePreset(){
+  const U=ui(); if(!U.presetList.value) return; const list=getNamed(); list.splice(+U.presetList.value,1); setNamed(list); refreshPresetList(); toast('Preset deleted',900,'ok');
+}
+
+/* ---------- compute all ---------- */
+function computeAll(){
+  localStorage.setItem('gng.lat',ui().lat.value||'');
+  localStorage.setItem('gng.lon',ui().lon.value||'');
+  glanceStatus(); computeTop5(); renderTable(); $('#updatedAt').textContent='Updated '+new Date().toLocaleTimeString();
+}
+
+/* ---------- GPS ---------- */
+async function tryGPS(){
+  const U=ui();
+  try{
+    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
+    U.lat.value=pos.coords.latitude.toFixed(5); U.lon.value=pos.coords.longitude.toFixed(5);
+    localStorage.setItem('gng.lat',U.lat.value); localStorage.setItem('gng.lon',U.lon.value);
+    autoFetchWeather(true); toast('GPS set',900,'ok');
+  }catch{toast('GPS failed',1200,'err')}
+}
+
+/* kick preset list */
+refreshPresetList();
 </script>
 </body>
 </html>
