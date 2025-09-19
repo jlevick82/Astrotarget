@@ -14,57 +14,62 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif;
-}
-.wrap{max-width:980px;margin:0 auto;padding:20px 14px 80px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:18px 14px 80px}
 
 /* header */
-.hdr{display:flex;align-items:center;gap:14px;margin-bottom:10px}
-.hdr .brand{font-weight:800;font-size:28px;letter-spacing:.2px}
-.hdr .sub{opacity:.7;font-weight:600;margin-left:4px}
-.hdr .actions{margin-left:auto;display:flex;gap:12px}
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.logoBox{width:36px;height:36px;border-radius:9px;overflow:hidden;border:1px solid var(--edge);flex:0 0 36px}
+.appicon{width:100%;height:100%;object-fit:cover;background:#0002}
+.title{display:flex;flex-direction:column}
+.brand{font-weight:800;font-size:26px;letter-spacing:.2px;line-height:1}
+.sub{opacity:.7;font-weight:600}
+.actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
 .btn{appearance:none;border:1px solid var(--pill-edge);background:var(--pill);
-  color:var(--text); padding:10px 14px;border-radius:14px;font-weight:600}
+  color:var(--text); padding:9px 12px;border-radius:12px;font-weight:600}
 .btn:active{transform:translateY(1px)}
-.badge{display:inline-block;padding:8px 12px;border-radius:12px;border:1px solid}
+.badge{display:inline-block;padding:7px 10px;border-radius:11px;border:1px solid}
 .badge.go{background:#0c1a13;border-color:#1b5f3a;color:#a3ffce}
 .badge.marginal{background:#1c1609;border-color:#8b6a1a;color:#ffe29e}
 .badge.nogo{background:#1b0f10;border-color:#8f2f2f;color:#ffc5c5}
-.appicon{width:42px;height:42px;border-radius:10px;background:#0002;object-fit:cover}
 
 /* cards */
-.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px;margin:14px 0}
-.card h3{margin:0 0 10px 0;font-size:18px}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.big{font-size:30px;font-weight:800}
-.tag{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--pill);border:1px solid var(--pill-edge);color:var(--muted);font-weight:600}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:14px;margin:12px 0;overflow:hidden}
+.card .head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--edge)}
+.card .head h3{margin:0;font-size:18px}
+.toggle{margin-left:auto; width:34px;height:28px;border-radius:10px;border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);font-weight:900}
+.body{padding:14px}
+.collapsed .body{display:none}
+
+/* layout bits */
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big{font-size:28px;font-weight:800}
+.tag{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--pill);border:1px solid var(--pill-edge);color:var(--muted);font-weight:600}
 .smalllabel{font-size:12px;color:var(--muted);margin-bottom:4px}
 
 /* chips */
-.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);
-  padding:10px 14px;border-radius:14px;font-weight:700;cursor:pointer;opacity:.95;
-  transition:transform .06s ease, box-shadow .12s ease}
-.chip:active{transform:translateY(1px)}
-.chip.active{background:var(--accent);color:#0b1020;border-color:transparent;box-shadow:0 0 0 2px #0005 inset}
+  padding:9px 12px;border-radius:12px;font-weight:700;cursor:pointer}
+.chip.active{background:var(--accent);color:#0b1020;border-color:transparent}
 
 /* table */
 table{width:100%;border-collapse:collapse}
-th,td{padding:12px 10px;border-bottom:1px solid var(--edge);text-align:left}
+th,td{padding:10px;border-bottom:1px solid var(--edge);text-align:left}
 thead th{color:var(--muted);font-weight:700}
 
 /* toast */
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
-  background:#0f1a2a; border:1px solid var(--edge); color:var(--text);
+  background:#0f1a2a;border:1px solid var(--edge);color:var(--text);
   padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.show{opacity:1}
 
 /* compact */
 .compact .optional{display:none}
-.compact .card{padding:12px}
-.compact .kv{gap:10px}
+.compact .card .head{padding:10px}
+.compact .body{padding:10px}
+.compact .kv{gap:8px}
 
 /* night (red safe) */
 .night{
@@ -77,17 +82,17 @@ thead th{color:var(--muted);font-weight:700}
 .night .badge.nogo{background:#2a1212;border-color:#a33;color:#ffbaba}
 
 /* banner */
-.banner{display:flex;gap:12px;align-items:center}
-.banner .txt{flex:1}
+.banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.banner .txt{flex:1;min-width:240px}
 .banner time{color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hdr">
-    <img id="logo" class="appicon" alt="AstroTarget"/>
-    <div>
-      <div class="brand">Nightly <span class="sub">Go/No-Go</span> <span id="ver" class="sub">v25.6</span></div>
+    <div class="logoBox"><img id="logo" class="appicon" alt="AstroTarget"/></div>
+    <div class="title">
+      <div class="brand">Nightly Go/No-Go <span id="ver" class="sub">v25.7</span></div>
     </div>
     <div class="actions">
       <button id="btnInstall" class="btn">Install</button>
@@ -97,101 +102,125 @@ thead th{color:var(--muted);font-weight:700}
   </header>
 
   <section class="card" id="statusCard">
-    <div class="banner">
-      <span id="badge" class="badge">—</span>
-      <div id="bannerText" class="txt">—</div>
-      <time id="updated">Updated —</time>
+    <div class="head"><h3>Status</h3><button class="toggle" data-t="statusCard">▾</button></div>
+    <div class="body">
+      <div class="banner">
+        <span id="badge" class="badge">—</span>
+        <div id="bannerText" class="txt">—</div>
+        <time id="updated">Updated —</time>
+      </div>
     </div>
   </section>
 
   <section class="card" id="sky">
-    <h3>Sky conditions</h3>
-    <div class="kv">
-      <div>
-        <div class="smalllabel">Astronomical dark</div>
-        <div class="big" id="astroYes">—</div>
-        <div class="tag" id="astroVal">Sun alt —</div>
-      </div>
-      <div>
-        <div class="smalllabel">Moon illum</div>
-        <div class="big" id="moonPct">—</div>
-        <div class="tag" id="moonAlt">Alt —</div>
+    <div class="head"><h3>Sky conditions</h3><button class="toggle" data-t="sky">▾</button></div>
+    <div class="body">
+      <div class="kv">
+        <div>
+          <div class="smalllabel">Astronomical dark</div>
+          <div class="big" id="astroYes">—</div>
+          <div class="tag" id="astroVal">Sun alt —</div>
+        </div>
+        <div>
+          <div class="smalllabel">Moon illum</div>
+          <div class="big" id="moonPct">—</div>
+          <div class="tag" id="moonAlt">Alt —</div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="card" id="cloudsCard">
-    <h3>Clouds (avg)</h3>
-    <input id="clouds" type="range" min="0" max="100" value="40" style="width:100%"/>
-    <div class="tag">Use <button id="btnCalc" class="btn" style="padding:4px 10px;margin:0 6px">Calculate</button> to auto-fill from weather. Slider overrides clouds.</div>
+    <div class="head"><h3>Clouds (avg)</h3><button class="toggle" data-t="cloudsCard">▾</button></div>
+    <div class="body">
+      <input id="clouds" type="range" min="0" max="100" value="40" style="width:100%"/>
+      <div class="tag">Use <button id="btnCalc" class="btn" style="padding:4px 10px;margin:0 6px">Calculate</button> to auto-fill from weather. Slider overrides clouds.</div>
+    </div>
   </section>
 
   <section class="card" id="quick">
-    <h3>Quick setup</h3>
-    <div class="kv">
-      <div>
-        <div class="smalllabel">Latitude (°)</div>
-        <input id="lat" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+    <div class="head"><h3>Quick setup</h3><button class="toggle" data-t="quick">▾</button></div>
+    <div class="body">
+      <div class="kv">
+        <div>
+          <div class="smalllabel">Latitude (°)</div>
+          <input id="lat" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+        </div>
+        <div>
+          <div class="smalllabel">Longitude (°)</div>
+          <input id="lon" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+        </div>
       </div>
-      <div>
-        <div class="smalllabel">Longitude (°)</div>
-        <input id="lon" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button id="btnGPS" class="btn">Use GPS</button>
+        <button id="btnDemo" class="btn optional">Demo</button>
+        <button id="btnRecompute" class="btn">Calculate</button>
       </div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:12px">
-      <button id="btnGPS" class="btn">Use GPS</button>
-      <button id="btnDemo" class="btn optional">Demo</button>
-      <button id="btnRecompute" class="btn">Calculate</button>
     </div>
   </section>
 
   <section class="card" id="gear">
-    <h3>Gear</h3>
-    <div class="kv">
-      <div>
-        <div class="smalllabel">Scope</div>
-        <select id="scope" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
+    <div class="head"><h3>Gear</h3><button class="toggle" data-t="gear">▾</button></div>
+    <div class="body">
+      <div class="kv">
+        <div>
+          <div class="smalllabel">Scope</div>
+          <select id="scope" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
+        </div>
+        <div>
+          <div class="smalllabel">Reducer / Barlow</div>
+          <div id="chips" class="chips"></div>
+        </div>
+        <div>
+          <div class="smalllabel">Camera</div>
+          <select id="camera" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
+        </div>
+        <div>
+          <div class="smalllabel">FOV &amp; Scale</div>
+          <div class="tag" id="fov">FOV —</div>
+          <div class="tag" id="scale" style="margin-top:10px">Scale —</div>
+        </div>
       </div>
-      <div>
-        <div class="smalllabel">Reducer / Barlow</div>
-        <div id="chips" class="chips"></div>
-      </div>
-      <div>
-        <div class="smalllabel">Camera</div>
-        <select id="camera" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
-      </div>
-      <div>
-        <div class="smalllabel">FOV &amp; Scale</div>
-        <div class="tag" id="fov">FOV —</div>
-        <div class="tag" id="scale" style="margin-top:10px">Scale —</div>
+
+      <!-- named setup presets -->
+      <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
+        <input id="presetName" placeholder="Preset name" style="flex:1;min-width:160px;padding:9px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+        <button id="btnSavePreset" class="btn">Save preset</button>
+        <select id="presetList" style="flex:1;min-width:180px;padding:9px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)">
+          <option value="">Load preset…</option>
+        </select>
+        <button id="btnDeletePreset" class="btn">Delete</button>
       </div>
     </div>
   </section>
 
   <section class="card" id="top5">
-    <h3>Top 5 Recommendations</h3>
-    <ol id="topList" style="margin:6px 0 0 18px"></ol>
+    <div class="head"><h3>Top 5 Recommendations</h3><button class="toggle" data-t="top5">▾</button></div>
+    <div class="body"><ol id="topList" style="margin:6px 0 0 18px"></ol></div>
   </section>
 
   <section class="card optional" id="catalog">
-    <h3>Catalog (subset)</h3>
-    <input id="q" placeholder="Search by ID / name / type" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text);margin-bottom:10px"/>
-    <div id="table"></div>
+    <div class="head"><h3>Catalog (subset)</h3><button class="toggle" data-t="catalog">▾</button></div>
+    <div class="body">
+      <input id="q" placeholder="Search by ID / name / type" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text);margin-bottom:10px"/>
+      <div id="table"></div>
+    </div>
   </section>
 
   <div id="toast" role="status" aria-live="polite"></div>
 </div>
 
 <script>
-/* ========= version, logo, compact, night ========= */
-document.getElementById('ver').textContent='v25.6';
-(()=>{ // logo with fallback
+/* ===== version & logo ===== */
+document.getElementById('ver').textContent='v25.7';
+(()=>{ // load logo reliably; hide if all fail
   const lg=document.getElementById('logo');
-  const primary='https://raw.githubusercontent.com/jlevick82/Astrotarget/refs/heads/main/images/logo-256.png';
-  const fallback='https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png';
-  lg.src=primary; lg.onerror=()=>{ if(lg.src!==fallback) lg.src=fallback; };
+  const p1='https://jlevick82.github.io/Astrotarget/images/logo-256.png';
+  const p2='https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png';
+  lg.src=p1; lg.onerror=()=>{ if(lg.src!==p2){lg.src=p2}else{lg.style.display='none'} };
 })();
 
+/* ===== compact & night ===== */
 const btnCompact=document.getElementById('btnCompact');
 const btnNight=document.getElementById('btnNight');
 function applyToggles(){
@@ -206,10 +235,23 @@ btnCompact.addEventListener('click',()=>{localStorage.setItem('gng.compact', loc
 btnNight.addEventListener('click',()=>{localStorage.setItem('gng.night', localStorage.getItem('gng.night')==='1'?'0':'1');applyToggles();});
 applyToggles();
 
-/* ========= toast ========= */
+/* ===== collapsible cards ===== */
+document.querySelectorAll('.toggle').forEach(b=>{
+  const id=b.dataset.t, sec=document.getElementById(id);
+  const saved=localStorage.getItem('gng.collapse.'+id);
+  if(saved==='closed') sec.classList.add('collapsed');
+  b.textContent = sec.classList.contains('collapsed')?'▸':'▾';
+  b.addEventListener('click',()=>{
+    sec.classList.toggle('collapsed');
+    b.textContent = sec.classList.contains('collapsed')?'▸':'▾';
+    localStorage.setItem('gng.collapse.'+id, sec.classList.contains('collapsed')?'closed':'open');
+  });
+});
+
+/* ===== toast ===== */
 function toast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400)}
 
-/* ========= DOM refs ========= */
+/* ===== DOM refs ===== */
 const dom={
   badge:document.getElementById('badge'),
   bannerText:document.getElementById('bannerText'),
@@ -233,16 +275,20 @@ const dom={
   btnGPS:document.getElementById('btnGPS'),
   btnDemo:document.getElementById('btnDemo'),
   btnRecompute:document.getElementById('btnRecompute'),
+  presetName:document.getElementById('presetName'),
+  presetList:document.getElementById('presetList'),
+  btnSavePreset:document.getElementById('btnSavePreset'),
+  btnDeletePreset:document.getElementById('btnDeletePreset'),
 };
 
-/* ========= data ========= */
+/* ===== data ===== */
 const scopes=[
-  {name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1,2]},
-  {name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1,2]},
-  {name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1,2]},
-  {name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1,2]},
-  {name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1,2]},
-  {name:'Custom',fl:600,ap:80,presets:[1]}
+  {id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1,2]},
+  {id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1,2]},
+  {id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1,2]},
+  {id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1,2]},
+  {id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1,2]},
+  {id:'custom',name:'Custom',fl:600,ap:80,presets:[1]}
 ];
 const cameras=[
   {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
@@ -258,7 +304,7 @@ const MESSIER=[
   {id:'M45',name:'Pleiades',type:'OC',ra:3.79,dec:24.1}
 ];
 
-/* ========= astro math ========= */
+/* ===== astro math ===== */
 const d2r=x=>x*Math.PI/180, r2d=x=>x*180/Math.PI;
 const jd=d=>d.getTime()/86400000+2440587.5;
 function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
@@ -268,14 +314,17 @@ function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%3
 function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
 function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
 
-/* ========= state & helpers ========= */
+/* ===== state & helpers ===== */
 let lastWx=null; // {cloud, vis}
 function setUpdated(){dom.updated.textContent='Updated '+new Date().toLocaleTimeString()}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function load(k,def){try{const v=localStorage.getItem(k); return v?JSON.parse(v):def}catch(_){return def}}
 
+/* optics */
 function updateOptics(factor){
   const s=scopes[parseInt(dom.scope.value,10)]||scopes[0];
   const cam=cameras[parseInt(dom.camera.value,10)]||cameras[0];
-  const f=(factor ?? parseFloat(document.querySelector('#chips .chip.active')?.textContent||'1x'))||1;
+  const active=dom.chips.querySelector('.chip.active'); const f= factor ?? (active?parseFloat(active.textContent):1);
   const eff=s.fl*f;
   const fx=(57.2958*cam.w/eff).toFixed(1), fy=(57.2958*cam.h/eff).toFixed(1);
   const scale=(206.265*cam.px/eff).toFixed(2);
@@ -298,12 +347,35 @@ function renderChips(){
   dom.chips.querySelector('button')?.classList.add('active');
 }
 
-function hydrateSelectors(){
-  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;dom.scope.appendChild(o)});
-  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;dom.camera.appendChild(o)});
-  dom.scope.value=0; dom.camera.value=0; renderChips(); updateOptics(1);
+/* named presets */
+function listPresets(){return load('gng.named',[])}
+function writePresets(l){save('gng.named',l)}
+function refreshPresetList(){
+  const l=listPresets();
+  const cur=dom.presetList.value;
+  dom.presetList.innerHTML='<option value="">Load preset…</option>'+l.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+  if(cur) dom.presetList.value=cur;
+}
+function currentSetupObj(){
+  return {
+    name:(dom.presetName.value||''),
+    scope:{sel:dom.scope.value, factor:(dom.chips.querySelector('.chip.active')?.textContent||'1x')},
+    camera:{sel:dom.camera.value},
+    loc:{lat:dom.lat.value, lon:dom.lon.value}
+  };
+}
+function applySetupObj(o){
+  if(!o) return;
+  if(o.scope){dom.scope.value=o.scope.sel; renderChips();
+    const chip=[...dom.chips.querySelectorAll('.chip')].find(c=>c.textContent===o.scope.factor);
+    chip?.click();
+  }
+  if(o.camera){dom.camera.value=o.camera.sel}
+  if(o.loc){dom.lat.value=o.loc.lat; dom.lon.value=o.loc.lon}
+  updateOptics(); computeAll();
 }
 
+/* sky & status */
 function computeSky(){
   const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
   const now=new Date();
@@ -320,7 +392,6 @@ function computeSky(){
   dom.moonAlt.textContent = 'Alt ' + mAlt.toFixed(0) + '°';
   return {dark, illum, sunAlt, mAlt, m, s};
 }
-
 function computeStatus(){
   const {dark}=computeSky();
   const cloud = Math.round(parseFloat(dom.clouds.value)||0);
@@ -334,11 +405,12 @@ function computeStatus(){
   setUpdated();
 }
 
+/* targets */
 function computeTop5(){
   const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
-  const now=new Date(); const s=sunEq(now), m=moonEq(now);
+  const now=new Date(); const s=sunEq(now), mEq=moonEq(now);
   const mid=new Date(now.getTime()+90*60*1000);
-  const mEq=moonEq(mid); const mInfo={raH:mEq.raH,decD:mEq.decD,illum:(1-Math.cos(d2r(((mEq.lonD - s.lamD + 360)%360))))/2};
+  const m=moonEq(mid); const mInfo={raH:m.raH,decD:m.decD,illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2};
   function scoreTarget(o){
     const alt=altFor(o.ra,o.dec,lat,lon,mid);
     if(alt<35) return {score:0,alt,sep:0};
@@ -359,7 +431,6 @@ function computeTop5(){
     ? rows.map((o,i)=>`<li><strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100|0)}%</li>`).join('')
     : '<li class="bad">No suitable targets.</li>';
 }
-
 function renderTable(){
   const q=(dom.q.value||'').toLowerCase();
   const rows=MESSIER.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q));
@@ -368,10 +439,9 @@ function renderTable(){
     <tbody>${rows.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td></tr>`).join('')}</tbody>
   </table>`;
 }
-
 function computeAll(){ computeSky(); computeStatus(); computeTop5(); renderTable(); }
 
-/* ========= weather fetch ========= */
+/* ===== weather fetch ===== */
 async function fetchWeather(){
   const lat=parseFloat(dom.lat.value), lon=parseFloat(dom.lon.value);
   if(!Number.isFinite(lat)||!Number.isFinite(lon)){ toast('Set location'); return; }
@@ -386,18 +456,23 @@ async function fetchWeather(){
     dom.clouds.value=String(cloudAvg);
     toast('Targets updated');
     computeAll();
-  }catch(e){
-    toast('Weather failed');
-  }
+  }catch(e){ toast('Weather failed'); }
 }
 
-/* ========= events ========= */
+/* ===== events ===== */
 document.addEventListener('DOMContentLoaded',()=>{
-  hydrateSelectors();
+  // populate selects
+  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;dom.scope.appendChild(o)});
+  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;dom.camera.appendChild(o)});
+  dom.scope.value=0; dom.camera.value=0; renderChips(); updateOptics(1);
+
+  // restore state
   dom.lat.value = localStorage.getItem('gng.lat') || '';
   dom.lon.value = localStorage.getItem('gng.lon') || '';
   dom.clouds.value = localStorage.getItem('gng.cloud') || '40';
+  refreshPresetList();
 
+  // listeners
   ['input','change'].forEach(ev=>{
     dom.clouds.addEventListener(ev,()=>{localStorage.setItem('gng.cloud',dom.clouds.value); computeAll();},{passive:true});
     dom.q.addEventListener(ev,renderTable,{passive:true});
@@ -423,8 +498,27 @@ document.addEventListener('DOMContentLoaded',()=>{
     finally{ dom.btnGPS.disabled=false; }
   });
 
+  // preset actions
+  dom.btnSavePreset.addEventListener('click',()=>{
+    const name=(dom.presetName.value||'').trim();
+    if(!name){toast('Enter preset name'); return;}
+    const l=listPresets(); const obj=currentSetupObj(); obj.name=name;
+    const i=l.findIndex(p=>p.name.toLowerCase()===name.toLowerCase());
+    if(i>=0) l[i]=obj; else l.push(obj);
+    writePresets(l); refreshPresetList(); toast('Preset saved');
+  });
+  dom.presetList.addEventListener('change',()=>{
+    const l=listPresets(); const i=parseInt(dom.presetList.value,10);
+    if(Number.isFinite(i) && l[i]) applySetupObj(l[i]);
+  });
+  dom.btnDeletePreset.addEventListener('click',()=>{
+    const i=parseInt(dom.presetList.value,10); if(!Number.isFinite(i)) return;
+    const l=listPresets(); l.splice(i,1); writePresets(l); refreshPresetList(); toast('Preset deleted');
+  });
+
   computeAll();
 });
 </script>
 </body>
 </html>
+```0
