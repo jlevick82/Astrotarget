@@ -1,20 +1,400 @@
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Astrotarget</title>
-<link rel="icon" href="favicon.ico"><link rel="stylesheet" href="styles.css?v=21">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#000"></head>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nightly Go/No-Go — GitHub Test Build (v7.3-gp)</title>
+<style>
+  :root{
+    --bg:#0c1220; --panel:#121a2b; --card:#0f1729; --muted:#7da0ff; --fg:#ecf2ff;
+    --ok:#23d18b; --hold:#facc15; --nog:#ef4444; --accent:#60a5fa;
+    --chip:#17233d; --chip-b:#1f2d4b;
+  }
+  html,body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Arial,sans-serif;margin:0;padding:0}
+  .wrap{max-width:980px;margin:0 auto;padding:18px}
+  h1{font-size:28px;margin:4px 0 12px 0}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{background:#17233d;color:#dbe8ff;border:1px solid #203055;border-radius:12px;padding:10px 14px;font-weight:600;letter-spacing:.2px;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .card{background:linear-gradient(180deg,#111a2c 0%, #0d1527 100%);border:1px solid #1c2a4a;border-radius:16px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .kpi .c{background:var(--chip);border:1px solid var(--chip-b);border-radius:14px;padding:12px}
+  .muted{color:#a7b7df}
+  .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 12px;border:1px solid #1e2a48;background:#13203d;color:#cfe0ff;font-weight:700}
+  .badge{font-weight:800;letter-spacing:.3px}
+  .ok{background:rgba(35,209,139,.12);border-color:#1f5c45;box-shadow:0 0 40px rgba(35,209,139,.18)}
+  .hold{background:rgba(250,204,21,.12);border-color:#5b4a12;box-shadow:0 0 40px rgba(250,204,21,.18)}
+  .nog{background:rgba(239,68,68,.12);border-color:#5b1414;box-shadow:0 0 40px rgba(239,68,68,.18)}
+  label{display:block;margin:10px 0 6px 2px;color:#c7d7ff;font-size:13px}
+  input,select{width:100%;background:#0d162b;color:#e7efff;border:1px solid #1d2a48;border-radius:10px;padding:10px 12px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .sec{margin-top:16px}
+  .target{background:#0b1426;border:1px solid #1a2747;border-radius:16px;padding:12px;margin:10px 0}
+  .title{font-weight:800;font-size:18px}
+  .imgwrap{position:relative;background:#050a16;border-radius:12px;border:1px solid #1a2747;overflow:hidden;margin-top:10px}
+  .imgwrap img{width:100%;display:block;opacity:.95}
+  .fov{position:absolute;border:3px solid #ffffffcc;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.35);}
+  .note{font-size:12px;color:#a3b4db;margin-top:6px}
+  .row-right{margin-left:auto}
+  small{font-size:12px}
+  .fav{cursor:pointer}
+
+  /* v25.1 sticky merged header & modes */
+  .hdr{position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,#0c1220f0,#0c1220d0);backdrop-filter:blur(6px);border-bottom:1px solid #1c2a4a}
+  .hdr-inner{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:12px}
+  .logoHeader{height:36px;width:auto;border-radius:8px;filter:drop-shadow(0 0 4px rgba(96,165,250,.2))}
+  @media(min-width:1024px){ .logoHeader{height:44px} }
+  .brand .titleline{font-weight:800;font-size:18px}
+  .brand .why{font-size:12px;margin-top:2px}
+  .hdr-tools{margin-left:auto;display:flex;gap:10px}
+  /* Night mode colors (red-safe): */
+  body.night { --fg:#f3e7e0; --muted:#eabfb9; --bg:#070606; --card:#121010; --edge:#2a1c1c; --accent:#ff5a3c; }
+  body.night a{ color:#ffb3a6 }
+  body.night .hdr{ background:linear-gradient(180deg,#100909f0,#100909d0); border-bottom:1px solid #2a1c1c }
+  /* Compact mode: hide non-essential cards */
+  body.compact .card[data-aux="1"]{ display:none }
+  body.compact .gallery, body.compact #gear, body.compact #catalog{ display:none }
+  /* Hide duplicate inline controls row if present */
+  .top-controls-dup{ display:none !important }
+  /* Status card: don’t repeat tiny badge/why line (mirrored in header) */
+  #statusRow .badge{ display:none }
+  #statusRow .muted#statusWhy{ display:none }
+
+</style>
+</head>
 <body>
-<section class="splash" id="stage">
-  <div>
-    <img class="logo" src="assets/logo-1024.png" alt="Astrotarget">
-    <div class="bar"><i id="pbar"></i></div>
-    <div class="dbg" id="debug"></div>
+<header class="hdr">
+  <div class="hdr-inner">
+    <img class="logoHeader" src="assets/logo-256.png" alt="AstroTarget">
+    <div class="brand">
+      <div class="titleline">Nightly Go/No-Go <small id="ver">v25.1</small></div>
+      <div class="why muted"><span id="statusTextHdr">Hold</span> — <span id="statusWhyHdr">clouds ≥ slider</span></div>
+    </div>
+    <nav class="hdr-tools">
+      <button class="btn" id="installBtnHdr">Install</button>
+      <button class="btn" id="compactBtnHdr" aria-pressed="false" title="Compact view">Compact</button>
+      <button class="btn" id="nightBtnHdr">Night</button>
+    </nav>
   </div>
-</section>
+</header>
+
+<div class="wrap" style="padding-top:72px">
+  <h1>Nightly Go/No-Go <small>v7.3-gp</small></h1>
+  <div class="row top-controls-dup"><button class="btn" id="installBtn">Install (PWA)</button><button class="btn" id="nightBtn">Night Mode</button></div>
+
+  <div id="statusRow" class="card hold" style="margin-top:14px;display:flex;align-items:center;gap:12px;justify-content:space-between;">
+    <div>
+      <div class="badge" id="statusText">Hold</div>
+      <div class="muted" id="statusWhy">clouds ≥ slider</div>
+    </div>
+    <div class="row-right muted"><span id="updated">Updated —</span></div>
+  </div>
+
+  <div class="sec card">
+    <div class="kpi">
+      <div class="c"><div class="muted">Astronomical dark</div><div id="kpiDark">—</div></div>
+      <div class="c"><div class="muted">Moon</div><div id="kpiMoon">—</div></div>
+      <div class="c"><div class="muted">Clouds (avg)</div><div><input type="range" min="0" max="100" value="60" id="cloudSlider"/> <span id="cloudVal">60%</span></div></div>
+      <div class="c"><div class="muted">Local time</div><div id="kpiLocal">—</div></div>
+    </div>
+  </div>
+
+  <div class="sec card">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="badge">Quick setup</div>
+      <div class="muted">Auto-calc <input type="checkbox" id="autocalc" checked></div>
+    </div>
+    <div class="grid3">
+      <div><label>Latitude (°)</label><input id="lat" type="number" step="0.0001" placeholder="37.1000"></div>
+      <div><label>Longitude (°)</label><input id="lon" type="number" step="0.0001" placeholder="-76.5200"></div>
+      <div><label>Bortle</label>
+        <select id="bortle">
+          <option>7</option><option>6</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px;gap:10px">
+      <button class="btn" id="gpsBtn">Use GPS</button>
+      <button class="btn" id="demoBtn">Demo</button>
+      <button class="btn" id="calcBtn">Calculate Now</button>
+    </div>
+  </div>
+
+  <div class="sec card">
+    <div class="badge">Gear</div>
+    <div class="grid3">
+      <div><label>Manufacturer</label>
+        <select id="manu">
+          <option value="">— select manufacturer —</option>
+          <option>SVBONY</option><option>Sharpstar</option><option>William Optics</option><option>Sky-Watcher</option>
+        </select>
+      </div>
+      <div><label>Model</label><select id="model"><option value="">— select model —</option></select></div>
+      <div><label>Reducer / Barlow</label>
+        <select id="rb"><option value="1.0">1.0</option><option value="0.8">0.8</option><option value="1.4">1.4</option></select>
+      </div>
+    </div>
+    <div class="grid3">
+      <div><label>Focal length (mm)</label><input id="fl" type="number" step="1" placeholder="560"></div>
+      <div><label>Pixel size (µm)</label><input id="px" type="number" step="0.01" placeholder="3.76"></div>
+      <div><label>Sensor: <small>(width × height mm)</small></label>
+        <select id="sensor">
+          <option value="">— choose —</option>
+          <option value="11.31x11.31@3.76">ASI533MC Pro • 11.31×11.31 • 3.76µm</option>
+          <option value="23.5x15.6@3.76">APS‑C 26MP (IMX571) • 23.5×15.6 • 3.76µm</option>
+          <option value="36x24@5.94">Full‑frame 24MP • 36×24 • 5.94µm</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="gap:10px;margin-top:10px">
+      <button class="btn" id="applyModel">Apply Model</button>
+      <div class="pill">Scale:&nbsp;<span id="scale">—</span>&nbsp;"/px</div>
+      <div class="pill">FOV:&nbsp;<span id="fov">—</span></div>
+    </div>
+  </div>
+
+  <div class="sec card">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="badge">Targets</div>
+      <div class="muted">Images: <code id="imgBaseLabel">repo: set below</code></div>
+    </div>
+    <div class="row" style="gap:8px;margin:8px 0 4px 0">
+      <input id="imgBase" style="flex:1" placeholder="https://raw.githubusercontent.com/USER/REPO/main/images/full/">
+      <button class="btn" id="saveBase">Save base</button>
+    </div>
+    <div id="targets"></div>
+  </div>
+
+  <div class="sec muted" style="text-align:center">© You — GitHub Pages test build. Works best over HTTPS (GPS enabled).</div>
+</div>
+
 <script>
-const files=['./Go-No-Go/index.html','./Go-No-Go/styles.css?v=21','./Go-No-Go/app.js?v=21','./Go-No-Go/collapse.js?v=21','./Go-No-Go/messier_subset.js?v=21','./Go-No-Go/assets/logo-1024.png'];
-const dbg=document.getElementById('debug');const bar=document.getElementById('pbar');
-(async()=>{for(let i=0;i<files.length;i++){const f=files[i];try{const r=await fetch(f,{cache:'no-store'});if(!r.ok)throw 0;dbg.innerHTML+='✅ '+f+'<br>';}catch(_){dbg.innerHTML+='❌ '+f+'<br>';}bar.style.width=Math.round((i+1)/files.length*100)+'%';}
-dbg.innerHTML+='<br>Done. Redirecting...';setTimeout(()=>{location.href='./Go-No-Go/';},450);})();
+// ---------- tiny store ----------
+const LS = {
+  get(k, d=null){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d }catch{ return d } },
+  set(k, v){ localStorage.setItem(k, JSON.stringify(v)) }
+};
+
+// --------- demo targets (few) ---------
+const TARGETS = [
+  {id:"m31", name:"M31 · Andromeda", type:"Galaxy", ra: 0.712, dec: 41.269, size:"190'×60'", img:"m31.jpg"},
+  {id:"m33", name:"M33 · Triangulum", type:"Galaxy", ra: 1.545, dec: 30.660, size:"70'×40'", img:"m33.jpg"},
+  {id:"m45", name:"M45 · Pleiades", type:"Cluster", ra: 0.589, dec: 24.117, size:"110'×110'", img:"m45.jpg"},
+  {id:"c14", name:"C14 · Double Cluster", type:"Cluster", ra: 0.574, dec: 57.15, size:"60'×30'", img:"c14.jpg"},
+  {id:"c33", name:"C33 · Eastern Veil", type:"Emission", ra: 20.928, dec: 30.733, size:"75'×8'", img:"c33.jpg"},
+  {id:"c11", name:"C11 · Bubble", type:"Emission", ra: 23.347, dec: 61.12, size:"15'×8'", img:"c11.jpg"}
+];
+
+// --------- models ----------
+const MODELS = {
+  "SVBONY":[
+    {label:"SV503 80ED · 560mm", fl:560},
+    {label:"SV503 102ED · 714mm", fl:714}
+  ],
+  "Sharpstar":[
+    {label:"Sharpstar 76EDPH · 342mm", fl:342}
+  ],
+  "William Optics":[
+    {label:"RedCat 51 · 250mm", fl:250}
+  ],
+  "Sky-Watcher":[
+    {label:"Evostar 80ED · 600mm", fl:600}
+  ]
+};
+
+// ---------- helpers ----------
+const $ = (s)=>document.querySelector(s);
+function fmtTime(d){ return d.toLocaleString([], {hour:'2-digit', minute:'2-digit'}) }
+function updateTimestamp(){ $('#kpiLocal').textContent = new Date().toLocaleString(); $('#updated').textContent='Updated '+new Date().toLocaleTimeString(); }
+function setStatus(kind, why){
+  const row = $('#statusRow'); row.classList.remove('ok','hold','nog'); row.classList.add(kind);
+  const text = (kind==='ok'?'Go':kind==='nog'?'No Go':'Hold');
+  $('#statusText').textContent = text;
+  $('#statusWhy').textContent = why||'';
+  const hdrT=$('#statusTextHdr'), hdrW=$('#statusWhyHdr');
+  if(hdrT) hdrT.textContent = text;
+  if(hdrW) hdrW.textContent = why||'';
+}
+
+// ---------- FOV math ----------
+function computeScale(px_um, fl_mm){ // arcsec/px
+  return (206.265 * px_um) / fl_mm;
+}
+function fovDegrees(width_mm, height_mm, fl_mm){ // degrees width × height
+  const w = 57.296 * (width_mm / fl_mm);
+  const h = 57.296 * (height_mm / fl_mm);
+  return [w, h];
+}
+
+// ---------- UI wiring ----------
+const state = {
+  lat: LS.get('lat', 37.10),
+  lon: LS.get('lon', -76.52),
+  bortle: LS.get('bortle', 7),
+  clouds: LS.get('clouds', 60),
+  manu: LS.get('manu','SVBONY'),
+  modelIdx: LS.get('modelIdx', 0),
+  reducer: LS.get('reducer', 0.8),
+  px: LS.get('px', 3.76),
+  sensor: LS.get('sensor', '11.31x11.31@3.76'),
+  fl: LS.get('fl', 560),
+  imgBase: LS.get('imgBase','')
+};
+
+function restore(){
+  $('#lat').value = state.lat; $('#lon').value = state.lon;
+  $('#bortle').value = state.bortle;
+  $('#cloudSlider').value = state.clouds; $('#cloudVal').textContent = state.clouds+'%';
+  $('#manu').value = state.manu; fillModels(); $('#model').selectedIndex = state.modelIdx;
+  $('#rb').value = String(state.reducer);
+  $('#px').value = state.px;
+  $('#sensor').value = state.sensor;
+  $('#fl').value = state.fl;
+  $('#imgBase').value = state.imgBase; $('#imgBaseLabel').textContent = state.imgBase?('repo: '+state.imgBase):'repo: not set';
+}
+
+function fillModels(){
+  const list = MODELS[$('#manu').value] || [];
+  const sel = $('#model'); sel.innerHTML = '<option value="">— select model —</option>';
+  list.forEach((m,i)=>{
+    const o = document.createElement('option'); o.value=i; o.textContent=m.label; sel.appendChild(o);
+  });
+}
+
+function saveBase(){
+  state.imgBase = $('#imgBase').value.trim();
+  LS.set('imgBase', state.imgBase);
+  $('#imgBaseLabel').textContent = state.imgBase?('repo: '+state.imgBase):'repo: not set';
+  renderTargets();
+}
+
+// Calculate
+function calculate(){
+  // persist
+  state.lat = parseFloat($('#lat').value||state.lat); LS.set('lat', state.lat);
+  state.lon = parseFloat($('#lon').value||state.lon); LS.set('lon', state.lon);
+  state.bortle = parseInt($('#bortle').value||state.bortle); LS.set('bortle', state.bortle);
+  state.clouds = parseInt($('#cloudSlider').value); LS.set('clouds', state.clouds);
+  state.px = parseFloat($('#px').value||state.px); LS.set('px', state.px);
+  state.fl = parseFloat($('#fl').value||state.fl); LS.set('fl', state.fl);
+  state.reducer = parseFloat($('#rb').value||state.reducer); LS.set('reducer', state.reducer);
+  state.sensor = $('#sensor').value || state.sensor; LS.set('sensor', state.sensor);
+  state.manu = $('#manu').value; LS.set('manu', state.manu);
+  state.modelIdx = $('#model').selectedIndex; LS.set('modelIdx', state.modelIdx);
+
+  // scale + fov
+  const [wmm,hmm] = (state.sensor.split('@')[0]||'11.31x11.31').split('x').map(parseFloat);
+  const effFL = state.fl * state.reducer;
+  const scale = computeScale(state.px, effFL); // arcsec/px
+  const [fw,fh] = fovDegrees(wmm, hmm, effFL);
+  $('#scale').textContent = scale.toFixed(2);
+  $('#fov').textContent = `${fw.toFixed(2)}° × ${fh.toFixed(2)}°`;
+
+  // status: simple rule using clouds threshold 50%
+  const why = `clouds ${state.clouds}%`;
+  let kind = 'ok'; if (state.clouds>=70) kind='nog'; else if (state.clouds>=40) kind='hold';
+  setStatus(kind, why);
+
+  updateTimestamp();
+  renderTargets();
+}
+
+function renderTargets(){
+  const root = $('#targets'); root.innerHTML='';
+  const base = state.imgBase;
+  TARGETS.forEach(t=>{
+    const card = document.createElement('div'); card.className='target';
+    card.innerHTML = `<div class="title">${t.name} — <span class="muted">${t.type}</span></div>
+      <div class="muted">≥30° tonight: <span>8.5 h</span></div>
+      <div class="imgwrap"><img src="${base? (base + t.id.replace(/m|c/,'') + '.jpg') : ''}" alt="${t.name}" onerror="this.style.opacity=.3; this.alt='image not set'">
+        <div class="fov" data-id="${t.id}"></div>
+        <div style="position:absolute;right:8px;bottom:8px" class="pill">${document.getElementById('fov').textContent}</div>
+      </div>
+      <div class="note">Scaled vs object ${t.size}</div>`;
+    root.appendChild(card);
+  });
+  // place FOV overlays proportional to image box
+  setTimeout(()=>{
+    document.querySelectorAll('.imgwrap').forEach(box=>{
+      const img = box.querySelector('img');
+      const fov = box.querySelector('.fov');
+      const rect = box.getBoundingClientRect();
+      // Use square sensor vs box size; assume image area inset
+      const W = box.clientWidth-20, H = Math.min(W*0.62, 320);
+      box.style.height = H+'px';
+      // Compute overlay size fraction vs image box — use current FOV degrees text to derive ratio vs 2.5° reference
+      const txt = document.getElementById('fov').textContent;
+      const deg = parseFloat(txt); // width
+      const ref = 2.5; // arbitrary reference scaling
+      const frac = Math.min(0.85, Math.max(0.15, ref/deg));
+      const ow = Math.floor((box.clientWidth-24)*frac);
+      const oh = ow; // square (533)
+      fov.style.width = ow+'px'; fov.style.height = oh+'px';
+      fov.style.left = Math.floor((box.clientWidth-ow)/2)+'px';
+      fov.style.top = Math.floor((H-oh)/2)+'px';
+    });
+  }, 60);
+}
+
+// events
+$('#cloudSlider').addEventListener('input', e=>{ $('#cloudVal').textContent = e.target.value+'%'; if($('#autocalc').checked) calculate(); });
+$('#calcBtn').addEventListener('click', calculate);
+$('#demoBtn').addEventListener('click', ()=>{ $('#lat').value=37.10; $('#lon').value=-76.52; calculate(); });
+$('#gpsBtn').addEventListener('click', ()=>{
+  if (!('geolocation' in navigator)){ alert('Geolocation not available in this browser'); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    $('#lat').value = pos.coords.latitude.toFixed(4);
+    $('#lon').value = pos.coords.longitude.toFixed(4);
+    calculate();
+  }, err=>{
+    alert('GPS failed (needs HTTPS or permission). Use GitHub Pages.');
+  });
+});
+$('#manu').addEventListener('change', ()=>{ fillModels(); if($('#autocalc').checked) calculate(); });
+$('#model').addEventListener('change', ()=>{ if($('#autocalc').checked) { const m=MODELS[$('#manu').value][$('#model').selectedIndex-1]; if(m){ $('#fl').value=m.fl; } calculate(); } });
+$('#rb').addEventListener('change', ()=>$('#autocalc').checked && calculate());
+$('#px').addEventListener('input', ()=>$('#autocalc').checked && calculate());
+$('#sensor').addEventListener('change', ()=>$('#autocalc').checked && calculate());
+$('#fl').addEventListener('input', ()=>$('#autocalc').checked && calculate());
+$('#saveBase').addEventListener('click', saveBase);
+
+// PWA install prompt placeholder (optional)
+let deferredPrompt; window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; });
+$('#installBtn').addEventListener('click', async()=>{ if(deferredPrompt){ deferredPrompt.prompt(); } else { alert('Open via HTTPS (GitHub Pages) to install.'); } });
+
+// init
+restore(); calculate();
+</script>
+<script>
+// v25.1 header wiring
+(() => {
+  const $ = (s, r=document) => r.querySelector(s);
+  const nightHdr = $('#nightBtnHdr');
+  const instHdr = $('#installBtnHdr');
+  const compactHdr = $('#compactBtnHdr');
+
+  if (nightHdr && $('#nightBtn')) nightHdr.addEventListener('click', () => $('#nightBtn').click());
+  if (instHdr && $('#installBtn')) instHdr.addEventListener('click', () => $('#installBtn').click());
+
+  // Compact mode: remember in localStorage
+  const key = 'gng.single.compact';
+  const applyCompact = (on) => {
+    document.body.classList.toggle('compact', !!on);
+    if (compactHdr) compactHdr.setAttribute('aria-pressed', on ? 'true' : 'false');
+    localStorage.setItem(key, on ? '1' : '0');
+  };
+  if (compactHdr) {
+    compactHdr.addEventListener('click', () => applyCompact(!(document.body.classList.contains('compact'))));
+  }
+  const saved = localStorage.getItem(key) === '1';
+  applyCompact(saved);
+
+  // Night mode mirror: respect any existing body.night your page toggles
+  const obs = new MutationObserver(() => {
+    // future room for syncing header styles if needed
+  });
+  obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
 </script>
 </body></html>
