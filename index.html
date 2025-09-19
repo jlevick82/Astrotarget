@@ -4,8 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>AstroTarget — Nightly Go/No-Go</title>
-<link rel="icon" href="favicon.ico">
-<link rel="icon" type="image/png" href="assets/favicon.png" sizes="64x64">
+<link rel="icon" href="assets/favicon.png" sizes="64x64">
 <link rel="apple-touch-icon" href="assets/logo-256.png">
 <style>
 :root{--bg:#0b0f1a;--card:#121a2a;--edge:#22314f;--fg:#e6eefc;--muted:#9fb3d1;--accent:#60a5fa;--good:#16a34a;--warn:#f59e0b;--bad:#ef4444}
@@ -20,10 +19,10 @@ a{color:#8ecbff;text-decoration:none}
 .brand .titleline{font-weight:800;font-size:18px}
 .brand .why{font-size:12px;margin-top:2px;opacity:.9}
 .hdr-tools{margin-left:auto;display:flex;gap:10px}
-.btn{background:#0e1728;border:1px solid var(--edge);padding:8px 12px;border-radius:12px;color:var(--fg)}
+.btn{background:#0e1728;border:1px solid var(--edge);padding:8px 12px;border-radius:12px;color:var(--fg);cursor:pointer}
 .btn:hover{filter:brightness(1.08)}
 .grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:980px){.grid.cols-2{grid-template-columns:1fr 1fr}.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:980px){.grid.cols-2{grid-template-columns:1fr 1fr}.grid.cols-3{grid-template-columns:repeat(3,1fr)}.grid.cols-4{grid-template-columns:repeat(4,1fr)}}
 .card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.25)}
 .card h3{margin:0 0 10px 0;font-size:16px}
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
@@ -31,7 +30,7 @@ a{color:#8ecbff;text-decoration:none}
 .badge{display:inline-block;padding:6px 10px;border-radius:12px;border:1px solid var(--edge)}
 .badge.go{background:rgba(22,163,74,.15);border-color:#1d8a49}
 .badge.hold{background:rgba(245,158,11,.12);border-color:#9a6b08}
-.badge.nogo{background:rgba(239,68,68,.12);border-color:#a63131}
+.badge.nog{background:rgba(239,68,68,.12);border-color:#a63131}
 .muted{color:var(--muted)}
 input,select{background:#0e1728;border:1px solid var(--edge);color:var(--fg);border-radius:10px;padding:8px 10px}
 input[type="range"]{width:260px}
@@ -58,6 +57,7 @@ body.compact .aux{display:none}
     <div class="splash-brand">AstroTarget</div>
   </div>
 </div>
+
 <header class="hdr">
   <div class="hdr-inner">
     <img class="logoHeader" src="assets/logo-256.png" alt="AstroTarget">
@@ -72,45 +72,86 @@ body.compact .aux{display:none}
     </nav>
   </div>
 </header>
+
 <div class="wrap">
   <h1>Nightly Go/No-Go <small class="muted" id="subver">v25.3</small></h1>
+
   <div class="card" id="statusCard">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div><span id="statusBadge" class="badge hold">Hold</span> <span class="muted" id="statusWhy">clouds ≥ slider</span></div>
       <div class="muted" id="updatedAt">Updated —</div>
     </div>
   </div>
+
   <div class="grid cols-4">
     <div class="card"><h3>Astronomical dark</h3><div class="kpi" id="kpiDark">—</div><div class="muted" id="kpiDarkWhen">—</div></div>
     <div class="card"><h3>Moon</h3><div class="kpi" id="kpiMoon">—</div><div class="muted" id="kpiMoonMeta">—</div></div>
-    <div class="card"><h3>Clouds (avg)</h3><input id="cloudSlider" type="range" min="0" max="100" value="60"/><div class="muted"><span id="cloudPct">60</span>%</div></div>
+    <div class="card">
+      <h3>Clouds (avg)</h3>
+      <input id="cloudSlider" type="range" min="0" max="100" value="60"/>
+      <div class="muted"><span id="cloudPct">60</span>%</div>
+    </div>
     <div class="card"><h3>Local time</h3><div class="kpi" id="kpiTime">—</div></div>
   </div>
+
   <div class="card">
-    <div class="row" style="justify-content:space-between"><h3>Quick setup</h3><label class="muted"><input type="checkbox" id="autoCalc" checked> Auto-calc</label></div>
+    <div class="row" style="justify-content:space-between">
+      <h3>Quick setup</h3>
+      <label class="muted"><input type="checkbox" id="autoCalc" checked> Auto-calc</label>
+    </div>
     <div class="grid cols-2">
       <div><label>Latitude (°)</label><br/><input id="lat" placeholder="e.g., 37.1656"/></div>
       <div><label>Longitude (°)</label><br/><input id="lon" placeholder="-76.5865"/></div>
-      <div><button class="btn" id="gpsBtn">Use GPS</button><button class="btn" id="demoBtn">Demo</button><button class="btn" id="calcBtn">Calculate Now</button></div>
+      <div>
+        <button class="btn" id="gpsBtn">Use GPS</button>
+        <button class="btn" id="demoBtn">Demo</button>
+        <button class="btn" id="calcBtn">Calculate Now</button>
+      </div>
     </div>
   </div>
+
   <div class="grid cols-2 aux" id="gear">
-    <div class="card"><h3>Gear</h3><div class="grid cols-2">
-      <div><label>Scope</label><br/><select id="scopeSel"></select></div>
-      <div><label>Reducer / Barlow</label><br/><select id="factorSel"></select></div>
-      <div><label>Camera</label><br/><select id="camSel"></select></div>
-      <div class="muted" id="opticsMeta">FOV — • Scale —</div>
-    </div></div>
-    <div class="card"><h3>Top 5 Recommendations</h3><ol id="top5"></ol></div>
+    <div class="card">
+      <h3>Gear</h3>
+      <div class="grid cols-2">
+        <div><label>Scope</label><br/><select id="scopeSel"></select></div>
+        <div><label>Reducer / Barlow</label><br/><select id="factorSel"></select></div>
+        <div><label>Camera</label><br/><select id="camSel"></select></div>
+        <div class="muted" id="opticsMeta">FOV — • Scale —</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Top 5 Recommendations</h3>
+      <ol id="top5"></ol>
+    </div>
   </div>
-  <div class="card aux" id="catalog"><h3>Catalog (subset)</h3><input id="search" placeholder="Search by ID / name / type" style="width:260px"/><div id="table" style="margin-top:10px"></div></div>
-  <div class="card aux"><h3>Gallery</h3><div class="row"><input id="baseUrl" placeholder="https://raw.githubusercontent.com/USER/REPO/BRANCH/images/full/" style="width:520px"/><button class="btn" id="saveBase">Save</button><button class="btn" id="testBase">Test</button></div><div class="gallery-tiles" id="tiles" style="margin-top:12px"></div></div>
+
+  <div class="card aux" id="catalog">
+    <h3>Catalog (subset)</h3>
+    <input id="search" placeholder="Search by ID / name / type" style="width:260px"/>
+    <div id="table" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card aux">
+    <h3>Gallery</h3>
+    <div class="row">
+      <input id="baseUrl" placeholder="https://raw.githubusercontent.com/USER/REPO/BRANCH/images/full/" style="width:520px"/>
+      <button class="btn" id="saveBase">Save</button>
+      <button class="btn" id="testBase">Test</button>
+    </div>
+    <div class="gallery-tiles" id="tiles" style="margin-top:12px"></div>
+  </div>
+
   <div class="footer">© AstroTarget — single-file build</div>
 </div>
+
 <script>
+/* ---------- tiny helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 function setUpdatedAt(){const el=$('#updatedAt');if(el){const now=new Date();el.textContent='Updated '+now.toLocaleTimeString();}}
 const K={base:'astro.baseUrl',setup:'gng.setup',compact:'gng.single.compact'};
+
+/* ---------- astro math ---------- */
 const d2r=x=>x*Math.PI/180,r2d=x=>x*180/Math.PI;function jd(d){return d.getTime()/86400000+2440587.5}
 function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
 function lst(d,lon){return(gmst(d)+lon/15+24)%24}
@@ -118,30 +159,182 @@ function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36
 function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon}}
 function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
 function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
+
+/* ---------- data ---------- */
 const SCOPES=[{id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1.0,2.0]},{id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1.0,2.0]},{id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.63,1.0,2.0]},{id:'custom',name:'Custom',fl:null,ap:null,presets:[1.0]}];
 const CAMS=[{name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},{name:'Canon R6',w:35.9,h:23.9,px:6.56},{name:'Custom',w:null,h:null,px:null}];
 const MESSIER=[{id:'M13',name:'Hercules Globular',type:'GC',ra:16.695,dec:36.467},{id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.991,dec:22.721},{id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.712,dec:41.269},{id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.555,dec:30.660},{id:'M42',name:'Orion Nebula',type:'EN',ra:5.587,dec:-5.391},{id:'M45',name:'Pleiades',type:'OC',ra:3.792,dec:24.117},{id:'M57',name:'Ring Nebula',type:'PN',ra:18.891,dec:33.030}];
-function setStatus(kind,why){const badge=$('#statusBadge');badge.className='badge '+kind;badge.textContent=(kind==='go'?'Go':kind==='nog'?'No Go':'Hold');const sw=$('#statusWhy');if(sw)sw.textContent=why||'';const hdrT=$('#statusTextHdr'),hdrW=$('#statusWhyHdr');if(hdrT)hdrT.textContent=badge.textContent;if(hdrW)hdrW.textContent=why||'';}
+
+/* ---------- UI wiring ---------- */
+function setStatus(kind,why){
+  const badge=$('#statusBadge');
+  badge.className='badge '+kind;
+  badge.textContent=(kind==='go'?'Go':kind==='nog'?'No Go':'Hold');
+  const sw=$('#statusWhy');if(sw)sw.textContent=why||'';
+  const hdrT=$('#statusTextHdr'),hdrW=$('#statusWhyHdr');
+  if(hdrT)hdrT.textContent=badge.textContent;
+  if(hdrW)hdrW.textContent=why||'';
+}
 function updateTime(){$('#kpiTime').textContent=new Date().toLocaleString();}
-function applyScope(){const s=SCOPES[$('#scopeSel').value||0];const f=parseFloat($('#factorSel').value)||1;const c=CAMS[$('#camSel').value||0];if(!s||!c)return;const eff=(s.fl||0)*f;const fov=(eff>0&&c.w&&c.h)?(57.2958*c.w/eff).toFixed(1)+'° × '+(57.2958*c.h/eff).toFixed(1)+'°':'—';const scale=(eff>0&&c.px)?(206.265*c.px/eff).toFixed(2)+'"/px':'—';$('#opticsMeta').textContent='FOV '+fov+' • Scale '+scale;}
-function renderOptions(){const S=$('#scopeSel'),F=$('#factorSel'),C=$('#camSel');S.innerHTML=SCOPES.map((s,i)=>`<option value="${i}">${s.name}</option>`).join('');C.innerHTML=CAMS.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('');const first=SCOPES[0].presets;F.innerHTML=first.map(v=>`<option value="${v}">${v}x</option>`).join('');S.addEventListener('change',()=>{const p=SCOPES[S.value].presets;F.innerHTML=p.map(v=>`<option value="${v}">${v}x</option>`).join('');applyScope();});F.addEventListener('change',applyScope);C.addEventListener('change',applyScope);applyScope();}
-  <script>
+function applyScope(){
+  const s=SCOPES[$('#scopeSel').value||0];
+  const f=parseFloat($('#factorSel').value)||1;
+  const c=CAMS[$('#camSel').value||0];
+  if(!s||!c)return;
+  const eff=(s.fl||0)*f;
+  const fov=(eff>0&&c.w&&c.h)?(57.2958*c.w/eff).toFixed(1)+'° × '+(57.2958*c.h/eff).toFixed(1)+'°':'—';
+  const scale=(eff>0&&c.px)?(206.265*c.px/eff).toFixed(2)+'"/px':'—';
+  $('#opticsMeta').textContent='FOV '+fov+' • Scale '+scale;
+}
+function renderOptions(){
+  const S=$('#scopeSel'),F=$('#factorSel'),C=$('#camSel');
+  S.innerHTML=SCOPES.map((s,i)=>`<option value="${i}">${s.name}</option>`).join('');
+  C.innerHTML=CAMS.map((c,i)=>`<option value="${i}">${c.name}</option>`).join('');
+  const first=SCOPES[0].presets;F.innerHTML=first.map(v=>`<option value="${v}">${v}x</option>`).join('');
+  S.addEventListener('change',()=>{const p=SCOPES[S.value].presets;F.innerHTML=p.map(v=>`<option value="${v}">${v}x</option>`).join('');applyScope();});
+  F.addEventListener('change',applyScope);
+  C.addEventListener('change',applyScope);
+  applyScope();
+}
+
+/* ---------- computations ---------- */
 function phaseFromSunMoon(s,m){const phase=(m.lonD - s.lamD + 360)%360;return (1-Math.cos(d2r(phase)))/2;}
-function astroDarkNow(lat,lon){const now=new Date();const s=sunEq(now);const altSun=altFor(s.raH,s.decD,lat,lon,now);return{alt:altSun,astro:altSun<=-18,nautical:altSun<=-12};}
-async function fetchWeather(lat,lon){const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,wind_speed_10m,relative_humidity_2m&timezone=auto&forecast_days=1`;const r=await fetch(url);const j=await r.json();const n=6;const clouds=(j.hourly?.cloud_cover||[]).slice(0,n);const vis=(j.hourly?.visibility?.[0]||0)/1000;const avg=clouds.length?clouds.reduce((a,b)=>a+b,0)/clouds.length:60;return{avgCloud:avg,vis:vis};}
-function mathClamp(x,a,b){return Math.max(a,Math.min(b,x));}
-function scoreTargets(lat,lon,cloudAvg){const now=new Date();const s=sunEq(now);const m=moonEq(now);const mInfo={raH:m.raH,decD:m.decD,illum:phaseFromSunMoon(s,m)};function score(o){const alt=altFor(o.ra,o.dec,lat,lon,now);if(alt<20)return null;const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);const moonPenalty=(1-mathClamp(sep/60,0,1))*mInfo.illum;const cloudPenalty=cloudAvg/100;const val=0.5*(alt/90)+0.3*(1-cloudPenalty)+0.2*(1-moonPenalty);return {...o,alt,sep,score:val};}const list=MESSIER.map(score).filter(Boolean).sort((a,b)=>b.score-a.score).slice(0,5);$('#top5').innerHTML=list.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('');const rows=MESSIER.map(score).filter(Boolean).sort((a,b)=>b.score-a.score).map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td><td>${o.alt.toFixed(0)}°</td><td>${o.sep.toFixed(0)}°</td></tr>`).join('');$('#table').innerHTML=`<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Alt</th><th>Moon Sep</th></tr></thead><tbody>${rows}</tbody></table>`;}
+function astroDarkNow(lat,lon){
+  const now=new Date();const s=sunEq(now);
+  const altSun=altFor(s.raH,s.decD,lat,lon,now);
+  return{alt:altSun,astro:altSun<=-18,nautical:altSun<=-12};
+}
+async function fetchWeather(lat,lon){
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,wind_speed_10m,relative_humidity_2m&timezone=auto&forecast_days=1`;
+  const r=await fetch(url);const j=await r.json();
+  const n=6;const clouds=(j.hourly?.cloud_cover||[]).slice(0,n);
+  const vis=(j.hourly?.visibility?.[0]||0)/1000;
+  const avg=clouds.length?clouds.reduce((a,b)=>a+b,0)/clouds.length:60;
+  return{avgCloud:avg,vis:vis};
+}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function scoreTargets(lat,lon,cloudAvg){
+  const now=new Date();const s=sunEq(now);const m=moonEq(now);
+  const mInfo={raH:m.raH,decD:m.decD,illum:phaseFromSunMoon(s,m)};
+  function score(o){
+    const alt=altFor(o.ra,o.dec,lat,lon,now);
+    if(alt<20)return null;
+    const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
+    const moonPenalty=(1-clamp(sep/60,0,1))*mInfo.illum;
+    const cloudPenalty=cloudAvg/100;
+    const val=0.5*(alt/90)+0.3*(1-cloudPenalty)+0.2*(1-moonPenalty);
+    return {...o,alt,sep,score:val};
+  }
+  const list=MESSIER.map(score).filter(Boolean).sort((a,b)=>b.score-a.score).slice(0,5);
+  $('#top5').innerHTML=list.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('');
+  const query=($('#search').value||'').toLowerCase();
+  const rows=MESSIER.map(score).filter(Boolean).filter(o=>!query||o.id.toLowerCase().includes(query)||o.name.toLowerCase().includes(query)||o.type.toLowerCase().includes(query)).sort((a,b)=>b.score-a.score).map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td><td>${o.alt.toFixed(0)}°</td><td>${o.sep.toFixed(0)}°</td></tr>`).join('');
+  $('#table').innerHTML=`<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Alt</th><th>Moon Sep</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
 function galleryBase(){return localStorage.getItem(K.base)||''}
 function saveBase(v){localStorage.setItem(K.base,v)}
 function thumbUrl(id){const base=galleryBase();if(!base)return'';const low=(id||'').toLowerCase();return base+low+'.jpg'}
-function loadTiles(){const ids=MESSIER.map(o=>o.id.toLowerCase());const tiles=ids.map(id=>{const url=thumbUrl(id);return url?`<a href="${url}" target="_blank"><img alt="${id}" loading="lazy" src="${url}"/></a>`:'';}).join('');$('#tiles').innerHTML=tiles||'<div class="muted">Set a GitHub Raw base URL above to show thumbnails.</div>'}
-function decideStatus(astro,cloudAvg,vis){if(!astro.nautical)return['nog','Too bright'];if(!astro.astro)return['hold','Not fully dark'];if(cloudAvg<=25)return['go',`Clouds ~${Math.round(cloudAvg)}% · Vis ${Math.round(vis)} km`];if(cloudAvg>=60)return['nog',`Clouds ~${Math.round(cloudAvg)}% · Vis ${Math.round(vis)} km`];return['hold',`Clouds ~${Math.round(cloudAvg)}% · Vis ${Math.round(vis)} km`]}
-async function recompute(){const lat=parseFloat($('#lat').value),lon=parseFloat($('#lon').value);if(!Number.isFinite(lat)||!Number.isFinite(lon)){return}localStorage.setItem(K.setup,JSON.stringify({lat,lon}));setUpdatedAt();updateTime();const astro=astroDarkNow(lat,lon);$('#kpiDark').textContent=astro.astro?'Yes':'No';$('#kpiDarkWhen').textContent='Sun alt '+astro.alt.toFixed(1)+'°';const m=moonEq(new Date()),s=sunEq(new Date());const illum=(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2;const altM=altFor(m.raH,m.decD,lat,lon,new Date());$('#kpiMoon').textContent=Math.round(illum*100)+'%';$('#kpiMoonMeta').textContent='Alt '+altM.toFixed(0)+'°';let wx={avgCloud:parseFloat($('#cloudSlider').value)||60,vis:10};try{wx=await fetchWeather(lat,lon)}catch(_){ }$('#cloudSlider').value=Math.round(wx.avgCloud);$('#cloudPct').textContent=Math.round(wx.avgCloud);const [kind,why]=decideStatus(astro,wx.avgCloud,wx.vis);setStatus(kind,why);scoreTargets(lat,lon,wx.avgCloud)}
-function tryGPS(){const b=$('#gpsBtn');if(b)b.disabled=true;navigator.geolocation.getCurrentPosition(pos=>{$('#lat').value=pos.coords.latitude.toFixed(5);$('#lon').value=pos.coords.longitude.toFixed(5);if($('#autoCalc').checked)recompute();if(b)b.disabled=false;},_=>{if(b)b.disabled=false;},{enableHighAccuracy:true,timeout:8000})}
-(function(){const night=$('#nightBtnHdr'),compact=$('#compactBtnHdr');if(night)night.addEventListener('click',()=>document.body.classList.toggle('night'));const saved=localStorage.getItem(K.compact)==='1';document.body.classList.toggle('compact',saved);if(compact)compact.setAttribute('aria-pressed',saved?'true':'false');if(compact)compact.addEventListener('click',()=>{const on=!document.body.classList.contains('compact');document.body.classList.toggle('compact',on);localStorage.setItem(K.compact,on?'1':'0');compact.setAttribute('aria-pressed',on?'true':'false');});})();
-(function(){const MIN_BRAND_MS=3200;const s=document.getElementById('splash');if(!s)return;const t=performance.now();function hide(){const el=performance.now()-t;const wait=Math.max(0,MIN_BRAND_MS-el);setTimeout(()=>{s.classList.add('hidden');setTimeout(()=>{s.remove&&s.remove();},500);},wait)}if(document.readyState==='complete'||document.readyState==='interactive')setTimeout(hide,0);else document.addEventListener('DOMContentLoaded',hide,{once:true});})();
-document.addEventListener('DOMContentLoaded',()=>{try{const j=JSON.parse(localStorage.getItem(K.setup)||'null');if(j){$('#lat').value=j.lat;$('#lon').value=j.lon;}}catch(_){ }renderOptions();$('#gpsBtn').addEventListener('click',tryGPS);$('#demoBtn').addEventListener('click',()=>{$('#lat').value='37.16562';$('#lon').value='-76.58650';if($('#autoCalc').checked)recompute();});$('#calcBtn').addEventListener('click',recompute);$('#cloudSlider').addEventListener('input',()=>{$('#cloudPct').textContent=$('#cloudSlider').value;if($('#autoCalc').checked)recompute();});$('#baseUrl').value=galleryBase();$('#saveBase').addEventListener('click',()=>{saveBase($('#baseUrl').value.trim());loadTiles();});$('#testBase').addEventListener('click',loadTiles);loadTiles();if(!$('#lat').value||!$('#lon').value)tryGPS();else recompute();});
-window.addEventListener('unhandledrejection',(e)=>{const r=e.reason||{};const msg=(r&&(r.message||r.toString()))||'';if(msg.includes('A listener indicated an asynchronous response')||msg.includes('message channel closed'))e.preventDefault();});
+function loadTiles(){
+  const ids=MESSIER.map(o=>o.id.toLowerCase());
+  const tiles=ids.map(id=>{const url=thumbUrl(id);return url?`<a href="${url}" target="_blank"><img alt="${id}" loading="lazy" src="${url}"/></a>`:'';}).join('');
+  $('#tiles').innerHTML=tiles||'<div class="muted">Set a GitHub Raw base URL above to show thumbnails.</div>';
+}
+function decideStatus(astro,cloudAvg,vis){
+  if(!astro.nautical) return ['nog','Too bright'];
+  if(!astro.astro)    return ['hold','Not fully dark'];
+  const why=`Clouds ~${Math.round(cloudAvg)}% · Vis ${Math.round(vis)} km`;
+  if(cloudAvg<=25) return ['go',why];
+  if(cloudAvg>=60) return ['nog',why];
+  return ['hold',why];
+}
+
+/* ---------- main flow ---------- */
+async function recompute(){
+  const lat=parseFloat($('#lat').value),lon=parseFloat($('#lon').value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){return}
+  localStorage.setItem(K.setup,JSON.stringify({lat,lon}));
+  setUpdatedAt();updateTime();
+
+  const astro=astroDarkNow(lat,lon);
+  $('#kpiDark').textContent=astro.astro?'Yes':'No';
+  $('#kpiDarkWhen').textContent='Sun alt '+astro.alt.toFixed(1)+'°';
+
+  const m=moonEq(new Date()),s=sunEq(new Date());
+  const illum=(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2;
+  const altM=altFor(m.raH,m.decD,lat,lon,new Date());
+  $('#kpiMoon').textContent=Math.round(illum*100)+'%';
+  $('#kpiMoonMeta').textContent='Alt '+altM.toFixed(0)+'°';
+
+  let wx={avgCloud:parseFloat($('#cloudSlider').value)||60,vis:10};
+  try{wx=await fetchWeather(lat,lon)}catch(_){ }
+  $('#cloudSlider').value=Math.round(wx.avgCloud);
+  $('#cloudPct').textContent=Math.round(wx.avgCloud);
+
+  const [kind,why]=decideStatus(astro,wx.avgCloud,wx.vis);
+  setStatus(kind,why);
+  scoreTargets(lat,lon,wx.avgCloud);
+}
+
+/* ---------- GPS, header toggles, splash ---------- */
+function tryGPS(){
+  const b=$('#gpsBtn');if(b)b.disabled=true;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    $('#lat').value=pos.coords.latitude.toFixed(5);
+    $('#lon').value=pos.coords.longitude.toFixed(5);
+    if($('#autoCalc').checked)recompute();
+    if(b)b.disabled=false;
+  },_=>{
+    if(b)b.disabled=false;
+  },{enableHighAccuracy:true,timeout:8000});
+}
+(function(){
+  const night=$('#nightBtnHdr'),compact=$('#compactBtnHdr');
+  if(night)night.addEventListener('click',()=>document.body.classList.toggle('night'));
+  const saved=localStorage.getItem(K.compact)==='1';
+  document.body.classList.toggle('compact',saved);
+  if(compact)compact.setAttribute('aria-pressed',saved?'true':'false');
+  if(compact)compact.addEventListener('click',()=>{
+    const on=!document.body.classList.contains('compact');
+    document.body.classList.toggle('compact',on);
+    localStorage.setItem(K.compact,on?'1':'0');
+    compact.setAttribute('aria-pressed',on?'true':'false');
+  });
+})();
+(function(){
+  const MIN_BRAND_MS=3200;
+  const s=document.getElementById('splash');if(!s)return;
+  const t=performance.now();
+  function hide(){
+    const el=performance.now()-t;const wait=Math.max(0,MIN_BRAND_MS-el);
+    setTimeout(()=>{s.classList.add('hidden');setTimeout(()=>{s.remove&&s.remove();},500);},wait);
+  }
+  if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(hide,0);
+  else document.addEventListener('DOMContentLoaded',hide,{once:true});
+})();
+
+/* ---------- boot ---------- */
+document.addEventListener('DOMContentLoaded',()=>{
+  try{const j=JSON.parse(localStorage.getItem(K.setup)||'null');if(j){$('#lat').value=j.lat;$('#lon').value=j.lon;}}catch(_){}
+  renderOptions();
+  $('#gpsBtn').addEventListener('click',tryGPS);
+  $('#demoBtn').addEventListener('click',()=>{$('#lat').value='37.16562';$('#lon').value='-76.58650';if($('#autoCalc').checked)recompute();});
+  $('#calcBtn').addEventListener('click',recompute);
+  $('#cloudSlider').addEventListener('input',()=>{$('#cloudPct').textContent=$('#cloudSlider').value;if($('#autoCalc').checked)recompute();});
+  $('#search').addEventListener('input',recompute);
+  $('#baseUrl').value=galleryBase();
+  $('#saveBase').addEventListener('click',()=>{saveBase($('#baseUrl').value.trim());loadTiles();});
+  $('#testBase').addEventListener('click',loadTiles);
+  loadTiles();
+  if(!$('#lat').value||!$('#lon').value)tryGPS();else recompute();
+  updateTime();setInterval(updateTime,1000);
+});
+
+/* ---------- silence extension noise in console ---------- */
+window.addEventListener('unhandledrejection',(e)=>{
+  const r=e.reason||{};const msg=(r&&(r.message||r.toString()))||'';
+  if(msg.includes('A listener indicated an asynchronous response')||msg.includes('message channel closed')) e.preventDefault();
+});
 </script>
 </body>
 </html>
+```0
