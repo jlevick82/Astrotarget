@@ -1,507 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Nightly Go/No-Go — AstroTarget</title>
-<meta name="theme-color" content="#0b1020"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nightly Go/No-Go — AstroTarget (single file)</title>
+<meta name="theme-color" content="#0b1622">
 <style>
 :root{
-  --bg:#0b1020; --card:#111a28; --edge:#233245;
-  --text:#dfe9ff; --muted:#9ab0cc; --accent:#63a3ff;
-  --pill:#0f1724; --pill-edge:#223149;
+  --bg:#0b1622;--card:#152234;--edge:#22344a;--muted:#8aa2c0;--text:#d9e6f2;--good:#1f8b4c;--warn:#b58a00;--bad:#b54949;--pill:#223246;
+  --blue:#2f6fed;--purple:#7b61ff;--amber:#e6a700;--red:#ff5c5c;--shadow:0 6px 20px rgba(0,0,0,.35);
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);
-  font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:18px 14px 80px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, sans-serif}
+a{color:#9cc3ff}
+.wrap{max-width:980px;margin:0 auto;padding:20px 14px 80px}
+.hdr{display:flex;align-items:center;gap:14px;margin:6px 0 8px}
+.hdr .logo{width:40px;height:40px;border-radius:9px;background:#000 url('https://cdn.jsdelivr.net/gh/jlevick82/Astrotarget@main/assets/logo-256.png') center/cover no-repeat;box-shadow:var(--shadow)}
+.hdr h1{font-size:34px;line-height:1;margin:0 8px 0 0;font-weight:800;letter-spacing:.5px}
+.hdr .v{opacity:.6;font-size:14px;margin-top:8px}
+.actions{margin-left:auto;display:flex;gap:10px}
+.btn{background:var(--pill);border:1px solid var(--edge);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer}
+.btn:hover{filter:brightness(1.1)}
+.badge{display:inline-flex;align-items:center;gap:10px;border-radius:14px;padding:14px 16px;border:1px solid var(--edge);background:var(--card)}
+.badge .dot{width:42px;height:42px;border-radius:10px;display:inline-grid;place-items:center;font-weight:800}
+.dot.go{background:rgba(31,139,76,.15);color:#76e4a1;border:1px solid #205f3e}
+.dot.nogo{background:rgba(181,73,73,.15);color:#ff9f9f;border:1px solid #7d3333}
+.dot.marginal{background:rgba(229,176,43,.13);color:#ffd772;border:1px solid #6f5415}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:16px 14px;margin:14px 0;box-shadow:var(--shadow)}
+.card h3{margin:2px 2px 12px;font-size:18px;letter-spacing:.2px}
+.grid{display:grid;gap:14px}
+.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kv{background:rgba(0,0,0,.15);border:1px solid var(--edge);border-radius:12px;padding:12px 12px}
+.kv .k{opacity:.7;font-size:14px}
+.kv .v{font-size:28px;font-weight:800;margin-top:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .grow{flex:1}
+input,select{width:100%;background:#0f1a2a;border:1px solid var(--edge);color:var(--text);border-radius:12px;padding:12px 12px}
+small.muted{opacity:.7}
+.pills{display:flex;gap:10px;flex-wrap:wrap}
+.pill{border:1px solid var(--edge);background:#0f1a2a;padding:10px 14px;border-radius:12px;cursor:pointer}
+.pill.active{outline:2px solid #3c7cff}
+.tbl{overflow:auto;border-radius:14px;border:1px solid var(--edge)}
+table{width:100%;border-collapse:collapse;background:#0f1a2a}
+th,td{padding:12px;border-bottom:1px solid #1b2a3f;text-align:left;white-space:nowrap}
+th{position:sticky;top:0;background:#132034;z-index:1}
+td.center{text-align:center}
+img.thumb{width:86px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--edge)}
+tfoot td{padding:10px}
+.footer{opacity:.6;margin-top:28px;text-align:center}
 
-/* header */
-.hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.logoBox{width:36px;height:36px;border-radius:9px;overflow:hidden;border:1px solid var(--edge);flex:0 0 36px;background:#0002}
-.appicon{width:100%;height:100%;object-fit:cover}
-.title{display:flex;flex-direction:column}
-.brand{font-weight:800;font-size:26px;letter-spacing:.2px;line-height:1}
-.sub{opacity:.7;font-weight:600}
-.actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
-.btn{appearance:none;border:1px solid var(--pill-edge);background:var(--pill);
-  color:var(--text); padding:9px 12px;border-radius:12px;font-weight:600}
-.btn:active{transform:translateY(1px)}
-.badge{display:inline-block;padding:7px 10px;border-radius:11px;border:1px solid}
-.badge.go{background:#0c1a13;border-color:#1b5f3a;color:#a3ffce}
-.badge.marginal{background:#1c1609;border-color:#8b6a1a;color:#ffe29e}
-.badge.nogo{background:#1b0f10;border-color:#8f2f2f;color:#ffc5c5}
+/* Toasts */
+.toast{position:fixed;inset:auto 50% 18px auto;transform:translateX(-50%);min-width:220px;max-width:90vw;background:#0f1a2a;border:1px solid var(--edge);padding:12px 14px;border-radius:12px;display:none;box-shadow:var(--shadow);font-weight:600}
+.toast.show{display:block;animation:pop .16s ease-out}
+.toast.success{background:#112347;border-color:#274fda;color:#dfe7ff}
+.toast.info{background:#1a1235;border-color:#6b57ff;color:#ede9ff}
+.toast.warn{background:#2a230a;border-color:#e6a700;color:#ffe9a6}
+.toast.error{background:#2a1111;border-color:#ff5c5c;color:#ffd7d7}
+@keyframes pop{from{transform:translate(-50%,20px);opacity:.0}to{transform:translate(-50%,0);opacity:1}}
+.note{color:#9cc3ff}
 
-/* cards */
-.card{background:var(--card);border:1px solid var(--edge);border-radius:14px;margin:12px 0;overflow:hidden}
-.card .head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--edge)}
-.card .head h3{margin:0;font-size:18px}
-.toggle{margin-left:auto; width:34px;height:28px;border-radius:10px;border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);font-weight:900}
-.body{padding:14px}
-.collapsed .body{display:none}
-
-/* layout bits */
-.smalllabel{font-size:12px;color:var(--muted);margin-bottom:4px}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tag{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--pill);border:1px solid var(--pill-edge);color:var(--muted);font-weight:600}
-
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid var(--edge);text-align:left}
-thead th{color:var(--muted);font-weight:700}
-
-/* toast */
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
-  background:#0f1a2a;border:1px solid var(--edge);color:var(--text);
-  padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s}
-#toast.show{opacity:1}
-
-/* compact / night */
-.compact .optional{display:none}
-.compact .card .head{padding:10px}
-.compact .body{padding:10px}
-.compact .kv{gap:8px}
-
-.night{
-  --bg:#0b0706; --card:#130b09; --edge:#2b1a14;
-  --text:#ffd9c7; --muted:#ffbba3; --accent:#ff7a45;
-  --pill:#1a0f0c; --pill-edge:#2b1a14;
-}
-.night .badge.go{background:#111f18;border-color:#2e7e52;color:#a6ffd6}
-.night .badge.marginal{background:#2c1e0a;border-color:#9a6a16;color:#ffe6a6}
-.night .badge.nogo{background:#2a1212;border-color:#a33;color:#ffbaba}
-
-/* banner */
-.banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.banner .txt{flex:1;min-width:240px}
-.banner time{color:var(--muted);font-weight:600}
+/* collapsible */
+.card[data-collapsible]{position:relative}
+.card .toggle{position:absolute;right:10px;top:10px;border:1px solid var(--edge);background:#0f1a2a;border-radius:10px;padding:6px 9px;cursor:pointer}
+.card.collapsed .body{display:none}
+.card.collapsed{padding-bottom:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hdr">
-    <div class="logoBox"><img id="logo" class="appicon" alt="AstroTarget"/></div>
-    <div class="title">
-      <div class="brand">Nightly Go/No-Go <span id="ver" class="sub">v25.8</span></div>
+    <div class="logo" id="logoBox" aria-label="AstroTarget"></div>
+    <div>
+      <h1>Nightly<br>Go/No-Go <span class="v" id="ver">v26.0</span></h1>
     </div>
     <div class="actions">
-      <button id="btnInstall" class="btn">Install</button>
-      <button id="btnCompact" class="btn">Compact off</button>
-      <button id="btnNight" class="btn">Night</button>
+      <button class="btn" id="btnInstall">Install</button>
+      <button class="btn" id="btnCompact">Compact off</button>
+      <button class="btn" id="btnNight">Night</button>
     </div>
   </header>
 
-  <!-- STATUS (merged sky details here) -->
-  <section class="card" id="statusCard">
-    <div class="head"><h3>Status</h3><button class="toggle" data-t="statusCard">▾</button></div>
+  <section class="card" id="statusCard" data-collapsible>
+    <button class="toggle" aria-expanded="true">▾</button>
     <div class="body">
-      <div class="banner">
-        <span id="badge" class="badge">—</span>
-        <div id="bannerText" class="txt">—</div>
-        <time id="updated">Updated —</time>
+      <div class="badge" id="statusBadge">
+        <span class="dot go" id="statusDot">GO</span>
+        <div class="grow" id="statusText">GO — Clouds ~2% · Vis 12 km · Astro dark</div>
+        <a id="updatedAt" class="note" href="#now">Updated —</a>
       </div>
     </div>
   </section>
 
-  <!-- CLOUDS -->
-  <section class="card" id="cloudsCard">
-    <div class="head"><h3>Clouds (avg)</h3><button class="toggle" data-t="cloudsCard">▾</button></div>
-    <div class="body">
-      <input id="clouds" type="range" min="0" max="100" value="40" style="width:100%"/>
-      <div id="cloudMeta" class="tag">Manual • slide to adjust.</div>
-      <div class="tag">Use <button id="btnCalc" class="btn" style="padding:4px 10px;margin:0 6px">Calculate</button> to auto-fill from Open-Meteo. Slider overrides clouds.</div>
-    </div>
-  </section>
-
-  <!-- QUICK SETUP -->
-  <section class="card" id="quick">
-    <div class="head"><h3>Quick setup</h3><button class="toggle" data-t="quick">▾</button></div>
-    <div class="body">
-      <div class="kv">
-        <div>
-          <div class="smalllabel">Latitude (°)</div>
-          <input id="lat" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
-        </div>
-        <div>
-          <div class="smalllabel">Longitude (°)</div>
-          <input id="lon" inputmode="decimal" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
+  <section class="grid cols-2">
+    <div class="card" data-collapsible>
+      <button class="toggle" aria-expanded="true">▾</button>
+      <div class="body">
+        <h3>Sky conditions</h3>
+        <div class="grid cols-2">
+          <div class="kv"><div class="k">Astronomical dark</div><div class="v" id="astroDark">—</div><div class="k" id="sunAlt">Sun alt —</div></div>
+          <div class="kv"><div class="k">Moon illum</div><div class="v" id="moonIllum">—</div><div class="k" id="moonAlt">Alt —</div></div>
         </div>
       </div>
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button id="btnGPS" class="btn">Use GPS</button>
-        <button id="btnDemo" class="btn optional">Demo</button>
-        <button id="btnRecompute" class="btn">Calculate</button>
+    </div>
+
+    <div class="card" id="cloudCard" data-collapsible>
+      <button class="toggle" aria-expanded="true">▾</button>
+      <div class="body">
+        <h3>Clouds (avg)</h3>
+        <input id="cloudRange" type="range" min="0" max="100" step="1" value="5">
+        <div class="row" style="margin-top:10px;align-items:center">
+          <button class="btn" id="btnUseWx">Use</button>
+          <button class="btn" id="btnCalc">Calculate</button>
+          <div class="grow"></div>
+          <small class="muted" id="cloudSource">to auto-fill from weather. Slider overrides clouds.</small>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- GEAR -->
-  <section class="card" id="gear">
-    <div class="head"><h3>Gear</h3><button class="toggle" data-t="gear">▾</button></div>
+  <section class="card" data-collapsible>
+    <button class="toggle" aria-expanded="true">▾</button>
     <div class="body">
-      <div class="kv">
-        <div>
-          <div class="smalllabel">Scope</div>
-          <select id="scope" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
-        </div>
-        <div>
-          <div class="smalllabel">Reducer / Barlow</div>
-          <div id="chips" class="kv" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
-        </div>
-        <div>
-          <div class="smalllabel">Camera</div>
-          <select id="camera" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"></select>
-        </div>
-        <div>
-          <div class="smalllabel">FOV &amp; Scale</div>
-          <div class="tag" id="fov">FOV —</div>
-          <div class="tag" id="scale" style="margin-top:10px">Scale —</div>
-        </div>
+      <h3>Quick setup</h3>
+      <div class="grid cols-3">
+        <div><label>Latitude (°)<input id="lat" inputmode="decimal"></label></div>
+        <div><label>Longitude (°)<input id="lon" inputmode="decimal"></label></div>
+        <div><label>Hours <input id="hours" type="number" min="1" max="10" value="3"></label></div>
       </div>
-
-      <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
-        <input id="presetName" placeholder="Preset name" style="flex:1;min-width:160px;padding:9px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
-        <button id="btnSavePreset" class="btn">Save preset</button>
-        <select id="presetList" style="flex:1;min-width:180px;padding:9px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)">
-          <option value="">Load preset…</option>
-        </select>
-        <button id="btnDeletePreset" class="btn">Delete</button>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="btnGPS">Use GPS</button>
+        <button class="btn" id="btnDemo">Demo</button>
+        <button class="btn" id="btnRecalc">Calculate Now</button>
       </div>
     </div>
   </section>
 
-  <!-- TOP 5 -->
-  <section class="card" id="top5">
-    <div class="head"><h3>Top 5 Recommendations</h3><button class="toggle" data-t="top5">▾</button></div>
-    <div class="body"><ol id="topList" style="margin:6px 0 0 18px"></ol></div>
-  </section>
-
-  <!-- CATALOG -->
-  <section class="card optional" id="catalog">
-    <div class="head"><h3>Catalog (subset)</h3><button class="toggle" data-t="catalog">▾</button></div>
+  <section class="card" data-collapsible id="gearCard">
+    <button class="toggle" aria-expanded="true">▾</button>
     <div class="body">
-      <input id="q" placeholder="Search by ID / name / type" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text);margin-bottom:10px"/>
-      <div id="table"></div>
+      <h3>Gear</h3>
+      <div class="grid cols-2">
+        <div>
+          <label>Scope
+            <select id="scopeSel"></select>
+          </label>
+        </div>
+        <div>
+          <label>Reducer / Barlow</label>
+          <div class="pills" id="factorPills"></div>
+        </div>
+        <div>
+          <label>Camera
+            <select id="camSel"></select>
+          </label>
+        </div>
+        <div>
+          <label>FOV &amp; Scale</label>
+          <div class="kv"><div class="k" id="fov">FOV —</div><div class="k" id="scale">Scale —</div></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input id="presetName" placeholder="Preset name…" class="grow">
+        <button class="btn" id="btnSavePreset">Save</button>
+        <select id="presetList" style="max-width:220px"></select>
+        <button class="btn" id="btnDeletePreset">Delete</button>
+      </div>
     </div>
   </section>
 
-  <div id="toast" role="status" aria-live="polite"></div>
+  <section class="card" data-collapsible>
+    <button class="toggle" aria-expanded="true">▾</button>
+    <div class="body">
+      <h3>Top 5 Recommendations</h3>
+      <ol id="top5" style="margin:0 0 4px 20px"></ol>
+    </div>
+  </section>
+
+  <section class="card" data-collapsible>
+    <button class="toggle" aria-expanded="true">▾</button>
+    <div class="body">
+      <h3>Catalog (subset)</h3>
+      <div class="row" style="margin-bottom:10px">
+        <input id="search" class="grow" placeholder="Search by ID / name / type">
+      </div>
+      <div class="tbl" id="tblBox"></div>
+    </div>
+  </section>
+
+  <section class="card" data-collapsible>
+    <button class="toggle" aria-expanded="true">▾</button>
+    <div class="body">
+      <h3>Gallery</h3>
+      <div class="row">
+        <input id="imgBase" class="grow" placeholder="CDN base (optional) — leave blank to use repo default">
+        <button class="btn" id="btnSaveBase">Save</button>
+        <button class="btn" id="btnTestBase">Test</button>
+      </div>
+      <small class="muted">Default: <span class="note">jsDelivr → jlevick82/Astrotarget@main/images/full/</span></small>
+    </div>
+  </section>
+
+  <div class="footer">© AstroTarget — single-file build</div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
-/* ===== version & logo (robust) ===== */
-document.getElementById('ver').textContent='v25.8';
-(()=>{ // default inline SVG so a logo always shows
-  const inline='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="50%"><stop offset="0" stop-color="#ffb24d"/><stop offset="0.55" stop-color="#ff7a00"/><stop offset="1" stop-color="#1a0f0c"/></radialGradient></defs><rect width="64" height="64" rx="12" fill="#090c12"/><circle cx="32" cy="32" r="18" fill="url(#g)" stroke="#ff9a2a" stroke-width="3"/></svg>`);
-  const lg=document.getElementById('logo');
-  const user=localStorage.getItem('gng.logoUrl'); // user-supplied override
-  const paths=[
-    user,
-    'https://jlevick82.github.io/Astrotarget/images/logo-256.png',
-    'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png'
-  ].filter(Boolean);
-  let i=-1; function tryNext(){ i++; if(i>=paths.length){ lg.src=inline; return; } lg.src=paths[i]; lg.onerror=tryNext; }
-  tryNext();
-})();
-
-/* ===== compact & night ===== */
-const btnCompact=document.getElementById('btnCompact');
-const btnNight=document.getElementById('btnNight');
-function applyToggles(){
-  const compact=localStorage.getItem('gng.compact')==='1';
-  const night=localStorage.getItem('gng.night')==='1';
-  document.documentElement.classList.toggle('compact',compact);
-  document.documentElement.classList.toggle('night',night);
-  btnCompact.textContent= compact?'Compact on':'Compact off';
-  btnNight.textContent= night?'Blue':'Night';
+/* ======= small utilities ======= */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+function toast(msg,type='success',ms=1500){
+  const t=$('#toast'); t.textContent=msg; t.className='toast '+type+' show';
+  clearTimeout(toast._to); toast._to=setTimeout(()=>t.classList.remove('show'),ms);
 }
-btnCompact.addEventListener('click',()=>{localStorage.setItem('gng.compact', localStorage.getItem('gng.compact')==='1'?'0':'1');applyToggles();});
-btnNight.addEventListener('click',()=>{localStorage.setItem('gng.night', localStorage.getItem('gng.night')==='1'?'0':'1');applyToggles();});
-applyToggles();
-
-/* ===== collapsible cards ===== */
-document.querySelectorAll('.toggle').forEach(b=>{
-  const id=b.dataset.t, sec=document.getElementById(id);
-  const saved=localStorage.getItem('gng.collapse.'+id);
-  if(saved==='closed') sec.classList.add('collapsed');
-  b.textContent = sec.classList.contains('collapsed')?'▸':'▾';
-  b.addEventListener('click',()=>{
-    sec.classList.toggle('collapsed');
-    b.textContent = sec.classList.contains('collapsed')?'▸':'▾';
-    localStorage.setItem('gng.collapse.'+id, sec.classList.contains('collapsed')?'closed':'open');
-  });
-});
-
-/* ===== toast ===== */
-function toast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400)}
-
-/* ===== DOM refs ===== */
-const dom={
-  badge:document.getElementById('badge'),
-  bannerText:document.getElementById('bannerText'),
-  updated:document.getElementById('updated'),
-  clouds:document.getElementById('clouds'),
-  cloudMeta:document.getElementById('cloudMeta'),
-  lat:document.getElementById('lat'),
-  lon:document.getElementById('lon'),
-  scope:document.getElementById('scope'),
-  camera:document.getElementById('camera'),
-  chips:document.getElementById('chips'),
-  fov:document.getElementById('fov'),
-  scale:document.getElementById('scale'),
-  topList:document.getElementById('topList'),
-  q:document.getElementById('q'),
-  table:document.getElementById('table'),
-  btnCalc:document.getElementById('btnCalc'),
-  btnGPS:document.getElementById('btnGPS'),
-  btnDemo:document.getElementById('btnDemo'),
-  btnRecompute:document.getElementById('btnRecompute'),
-  presetName:document.getElementById('presetName'),
-  presetList:document.getElementById('presetList'),
-  btnSavePreset:document.getElementById('btnSavePreset'),
-  btnDeletePreset:document.getElementById('btnDeletePreset'),
-};
-
-/* ===== data ===== */
-const scopes=[
-  {id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1,2]},
-  {id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1,2]},
-  {id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1,2]},
-  {id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1,2]},
-  {id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1,2]},
-  {id:'custom',name:'Custom',fl:600,ap:80,presets:[1]}
-];
-const cameras=[
-  {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
-  {name:'ZWO ASI2600 (APS-C)',w:23.5,h:15.7,px:3.76},
-  {name:'Canon R6',w:35.9,h:23.9,px:6.56}
-];
-const MESSIER=[
-  {id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.71,dec:41.3},
-  {id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.99,dec:22.7},
-  {id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.55,dec:30.7},
-  {id:'M57',name:'Ring Nebula',type:'PN',ra:18.89,dec:33.0},
-  {id:'M13',name:'Hercules Globular',type:'GC',ra:16.70,dec:36.5},
-  {id:'M45',name:'Pleiades',type:'OC',ra:3.79,dec:24.1}
-];
-
-/* ===== astro math ===== */
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function jd(d){return d.getTime()/86400000+2440587.5}
 const d2r=x=>x*Math.PI/180, r2d=x=>x*180/Math.PI;
-const jd=d=>d.getTime()/86400000+2440587.5;
 function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
 function lst(d,lon){return(gmst(d)+lon/15+24)%24}
 function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));const lam=L0+C,eps=23.439291-0.0130042*T;const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lamD:lam}}
 function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon}}
-function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
-function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
+function altAt(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
+function sepDeg(ra1,dec1,ra2,dec2){const a1=d2r(dec1),a2=d2r(dec2),dRA=d2r((ra1-ra2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
 
-/* ===== state/helpers ===== */
-let lastWx=null; // {cloud, vis, when, src}
-function setUpdated(){dom.updated.textContent='Updated '+new Date().toLocaleTimeString()}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function load(k,def){try{const v=localStorage.getItem(k); return v?JSON.parse(v):def}catch(_){return def}}
+/* ======= simple data ======= */
+const SCOPES=[
+  {id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1.0,2.0]},
+  {id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1.0,2.0]},
+  {id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1.0,2.0]},
+  {id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1.0,2.0]},
+  {id:'custom',name:'Custom',fl:null,ap:null,presets:[1.0]}
+];
+const CAMERAS=[
+  {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
+  {name:'ZWO ASI2600 (IMX571 APS-C)',w:23.5,h:15.7,px:3.76},
+  {name:'Canon T3i / 600D',w:22.3,h:14.9,px:4.30},
+  {name:'Custom',w:null,h:null,px:null}
+];
+/* small subset (extend later) */
+const MESSIER_SUBSET=[
+  {id:'M31', name:'Andromeda Galaxy', type:'GX', ra:0.712, dec:41.3},
+  {id:'M33', name:'Triangulum Galaxy', type:'GX', ra:1.556, dec:30.7},
+  {id:'M27', name:'Dumbbell Nebula', type:'PN', ra:19.99, dec:22.7},
+  {id:'M57', name:'Ring Nebula', type:'PN', ra:18.89, dec:33.0},
+  {id:'M13', name:'Hercules Globular', type:'GC', ra:16.70, dec:36.5},
+  {id:'C14', name:'Double Cluster', type:'OC', ra:2.34, dec:57.1}
+];
 
-/* optics */
-function updateOptics(factor){
-  const s=scopes[parseInt(dom.scope.value,10)]||scopes[0];
-  const cam=cameras[parseInt(dom.camera.value,10)]||cameras[0];
-  const active=dom.chips.querySelector('.chip.active'); const f= factor ?? (active?parseFloat(active.textContent):1);
-  const eff=s.fl*f;
-  const fx=(57.2958*cam.w/eff).toFixed(1), fy=(57.2958*cam.h/eff).toFixed(1);
-  const scale=(206.265*cam.px/eff).toFixed(2);
-  dom.fov.textContent=`FOV ${fx}° × ${fy}°`;
-  dom.scale.textContent=`Scale ${scale}"/px`;
+/* ======= state ======= */
+let THRESH={alt_min:35,alt_best:60,cloud_good:25,cloud_bad:60,moon_tight:20,moon_loose:45,
+  weights:{alt:.35,cloud:.25,moon:.25,met:.15}};
+let lastWeather=null;
+
+/* ======= gallery mapping ======= */
+function repoBase(){
+  const user=localStorage.getItem('gallery.base');
+  if(user && /https?:\/\//.test(user)) return user.replace(/\/+$/,'/') ;
+  return 'https://cdn.jsdelivr.net/gh/jlevick82/Astrotarget@main/images/full/';
+}
+function fileForId(id){
+  id=String(id||'').trim();
+  const m=id.match(/^M(\d{1,3})$/i); if(m) return 'm'+(+m[1])+'.jpg';
+  const c=id.match(/^C(\d{1,3})$/i); if(c) return 'c'+(+c[1])+'.jpg';
+  return null;
+}
+function imgUrlForId(id){
+  const f=fileForId(id); if(!f) return '';
+  return repoBase()+f;
 }
 
-function renderChips(){
-  dom.chips.innerHTML='';
-  const s=scopes[parseInt(dom.scope.value,10)];
-  s.presets.forEach(f=>{
+/* ======= UI helpers ======= */
+function setPills(list,val,host,onPick){
+  host.innerHTML='';
+  list.forEach(v=>{
     const b=document.createElement('button');
-    b.type='button'; b.className='btn chip'; b.textContent=f+'x';
-    b.addEventListener('click',()=>{
-      dom.chips.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active'); updateOptics(f); computeAll();
-    },{passive:true});
-    dom.chips.appendChild(b);
+    b.className='pill'+(v===val?' active':'');
+    b.textContent=(v===1?'1x':v+'x');
+    b.addEventListener('click',()=>{onPick(v)});
+    host.appendChild(b);
   });
-  dom.chips.querySelector('button')?.classList.add('active');
+}
+function setStatus(status,summary){
+  const dot=$('#statusDot'); const t=$('#statusText');
+  let cls='go',txt='GO';
+  if(status==='NO-GO'){cls='nogo';txt='NO-GO'}
+  else if(status==='MARGINAL'){cls='marginal';txt='MARGINAL'}
+  dot.className='dot '+cls; dot.textContent=txt;
+  t.textContent=summary;
 }
 
-/* named presets */
-function listPresets(){return load('gng.named',[])}
-function writePresets(l){save('gng.named',l)}
-function refreshPresetList(){
-  const l=listPresets();
-  const cur=dom.presetList.value;
-  dom.presetList.innerHTML='<option value="">Load preset…</option>'+l.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
-  if(cur) dom.presetList.value=cur;
+/* ======= save/load named presets ======= */
+function getNamed(){try{return JSON.parse(localStorage.getItem('gng.named'))||[]}catch(_){return[]}}
+function putNamed(list){localStorage.setItem('gng.named',JSON.stringify(list))}
+function refreshNamedUI(){
+  const sel=$('#presetList'); const list=getNamed();
+  sel.innerHTML='<option value="">Load preset…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
 }
-function currentSetupObj(){
-  return {
-    name:(dom.presetName.value||''),
-    scope:{sel:dom.scope.value, factor:(dom.chips.querySelector('.chip.active')?.textContent||'1x')},
-    camera:{sel:dom.camera.value},
-    loc:{lat:dom.lat.value, lon:dom.lon.value}
+
+/* ======= core compute ======= */
+function currentSetup(){
+  const scope=SCOPES[$('#scopeSel').value|0];
+  const factor = parseFloat($('#factorPills').dataset.value||'1');
+  const cam = CAMERAS[$('#camSel').value|0];
+  return {scope, factor, cam,
+    lat: parseFloat($('#lat').value)||0,
+    lon: parseFloat($('#lon').value)||0,
+    hours: parseInt($('#hours').value,10)||3,
+    cloud: $('#cloudRange').value|0
   };
 }
-function applySetupObj(o){
-  if(!o) return;
-  if(o.scope){dom.scope.value=o.scope.sel; renderChips();
-    const chip=[...dom.chips.querySelectorAll('.chip')].find(c=>c.textContent===o.scope.factor);
-    chip?.click();
-  }
-  if(o.camera){dom.camera.value=o.camera.sel}
-  if(o.loc){dom.lat.value=o.loc.lat; dom.lon.value=o.loc.lon}
-  updateOptics(); computeAll();
+function updateFOV(){
+  const {scope,factor,cam}=currentSetup();
+  const fl=(scope.fl||0)*factor;
+  const fovX = (fl>0 && cam.w)? (57.2958*cam.w/fl).toFixed(1)+'°' : '—';
+  const fovY = (fl>0 && cam.h)? (57.2958*cam.h/fl).toFixed(1)+'°' : '—';
+  const scale = (fl>0 && cam.px)? (206.265*cam.px/fl).toFixed(2)+'"/px' : '—';
+  $('#fov').textContent = `FOV ${fovX} × ${fovY}`;
+  $('#scale').textContent = `Scale ${scale}`;
 }
+function recompute(){
+  const S=currentSetup();
+  const start=new Date();
+  const mid=new Date(start.getTime()+S.hours*0.5*3600*1000);
+  const su=sunEq(mid), mo=moonEq(mid);
+  const sunAlt=altAt(su.raH,su.decD,S.lat,S.lon,mid);
+  const moonAlt=altAt(mo.raH,mo.decD,S.lat,S.lon,mid);
+  const phase=(mo.lonD-su.lamD+360)%360;
+  const illum=Math.round((1-Math.cos(d2r(phase)))/2*100);
+  $('#astroDark').textContent = sunAlt<=-12 ? 'Yes' : 'No';
+  $('#sunAlt').textContent = 'Sun alt '+sunAlt.toFixed(1)+'°';
+  $('#moonIllum').textContent = illum+'%';
+  $('#moonAlt').textContent = 'Alt '+moonAlt.toFixed(0)+'°';
 
-/* sky+status */
-function computeSky(){
-  const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
-  const now=new Date();
-  const s=sunEq(now), m=moonEq(now);
-  const sunAlt=altFor(s.raH,s.decD,lat,lon,now);
-  const dark = sunAlt <= -12;
-  const mAlt = altFor(m.raH,m.decD,lat,lon,now);
-  const phase=(m.lonD - s.lamD + 360)%360;
-  const illumPct=Math.round((1-Math.cos(d2r(phase)))/2*100);
-  return {dark, sunAlt, illumPct, mAlt, s, m};
-}
-function computeStatus(){
-  const sky=computeSky();
-  const cloud = Math.round(parseFloat(dom.clouds.value)||0);
-  const vis = lastWx?.vis ?? 10;
-  let status='MARGINAL', cls='marginal';
-  if(!sky.dark || cloud>=60) { status='NO-GO'; cls='nogo'; }
-  else if(cloud<=25) { status='GO'; cls='go'; }
-  dom.badge.textContent=status;
-  dom.badge.className='badge '+cls;
-  const cloudSrc = lastWx?.src ? ` (${lastWx.src})` : ' (manual)';
-  dom.bannerText.textContent =
-    `${status} — Clouds ~${cloud}%${cloudSrc} · Vis ${vis} km · `+
-    `${sky.dark?'Astro dark':'Too bright'} · Sun alt ${sky.sunAlt.toFixed(1)}° · `+
-    `Moon ${sky.illumPct}% (alt ${sky.mAlt.toFixed(0)}°)`;
-  setUpdated();
-}
+  // simple status
+  const clouds=S.cloud|0;
+  let status='MARGINAL';
+  if(sunAlt>-12) status='NO-GO';
+  else if(clouds<=THRESH.cloud_good) status='GO';
+  else if(clouds>=THRESH.cloud_bad) status='NO-GO';
+  setStatus(status,`${
+    status==='GO'?'GO':'NO-GO'===status?'NO-GO':'MARGINAL'
+  } — Clouds ~${clouds}% · Vis ${visFromWx()} km · ${sunAlt<=-12?'Astro dark':'Too bright'}`);
 
-/* targets */
-function computeTop5(){
-  const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
-  const now=new Date(); const s=sunEq(now);
-  const mid=new Date(now.getTime()+90*60*1000);
-  const m=moonEq(mid);
-  const mInfo={raH:m.raH,decD:m.decD,illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2};
-  function scoreTarget(o){
-    const alt=altFor(o.ra,o.dec,lat,lon,mid);
-    if(alt<35) return {score:0,alt,sep:0};
-    const clouds = Math.round(parseFloat(dom.clouds.value)||40);
-    const cloudScore = 1 - Math.max(0,(clouds-25)/(60-25));
-    const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
-    let sepFactor = 1- Math.max(0,(sep-20)/(45-20)); sepFactor = 1-sepFactor;
-    const moonScore = Math.max(0, sepFactor*(1-mInfo.illum));
-    const altScore = alt>=60?1: Math.max(0,(alt-35)/(60-35));
-    const score = Math.max(0, 0.35*altScore + 0.25*cloudScore + 0.25*moonScore + 0.15*0.7);
-    return {score,alt,sep};
-  }
-  const rows=MESSIER.map(o=>{
-    const r=scoreTarget(o); return {...o,alt:r.alt,sep:r.sep,score:r.score};
+  computeTop5(S, mid, {raH:mo.raH,decD:mo.decD,illum:illum/100});
+  renderTable();
+  $('#updatedAt').textContent='Updated '+new Date().toLocaleTimeString();
+  toast('Targets updated','success',1000);
+}
+function visFromWx(){
+  if(!lastWeather||!lastWeather.hourly||!lastWeather.hourly.visibility) return 12;
+  const km=(lastWeather.hourly.visibility[0]||12000)/1000;
+  return Math.round(km);
+}
+function scoreTarget(o,mid,lat,lon,mInfo,clouds){
+  const alt=altAt(o.ra,o.dec,lat,lon,mid);
+  if(alt<THRESH.alt_min) return {score:0,alt,sep:null};
+  const cloudAvg=clouds;
+  const cloudScore=1-((cloudAvg-THRESH.cloud_good)/(THRESH.cloud_bad-THRESH.cloud_good));
+  const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
+  const moonPenalty = Math.max(0,(THRESH.moon_loose - Math.max(sep,THRESH.moon_tight))/(THRESH.moon_loose-THRESH.moon_tight)) * mInfo.illum;
+  const altScore=alt>=THRESH.alt_best?1:((alt-THRESH.alt_min)/(THRESH.alt_best-THRESH.alt_min));
+  const score=clamp(THRESH.weights.alt*altScore + THRESH.weights.cloud*clamp(cloudScore,0,1) + THRESH.weights.moon*(1-moonPenalty),0,1);
+  return {score,alt,sep};
+}
+function computeTop5(S,mid,mInfo){
+  const list=MESSIER_SUBSET.map(o=>{
+    const r=scoreTarget(o,mid,S.lat,S.lon,mInfo,S.cloud|0);
+    return {...o,alt:r.alt,sep:r.sep,score:r.score};
   }).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-
-  dom.topList.innerHTML = rows.length
-    ? rows.map((o,i)=>`<li><strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100|0)}%</li>`).join('')
-    : '<li>No suitable targets.</li>';
+  $('#top5').innerHTML = list.map((o,i)=>`<li>${i===0?'★ ':''}<b>${o.id}</b> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${(o.sep||0).toFixed(0)}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('');
 }
+
+/* ======= catalog table with thumbs ======= */
 function renderTable(){
-  const q=(dom.q.value||'').toLowerCase();
-  const rows=MESSIER.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q));
-  dom.table.innerHTML = `<table>
-    <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th></tr></thead>
-    <tbody>${rows.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td></tr>`).join('')}</tbody>
-  </table>`;
+  const q=($('#search').value||'').toLowerCase();
+  const rows=MESSIER_SUBSET.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q))
+    .map(o=>{
+      const url=imgUrlForId(o.id);
+      const img=url?`<a href="${url}" target="_blank" title="Open full"><img class="thumb" loading="lazy" src="${url}" alt="${o.id}"></a>`:'—';
+      return `<tr>
+        <td>${o.id}</td><td>${o.name}</td><td>${o.type}</td>
+        <td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td>
+        <td class="center">${img}</td>
+      </tr>`;
+    }).join('');
+  $('#tblBox').innerHTML = `<table><thead><tr>
+    <th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
 }
-function computeAll(){ computeStatus(); computeTop5(); renderTable(); }
 
-/* ===== weather fetch ===== */
+/* ======= weather ======= */
 async function fetchWeather(){
-  const lat=parseFloat(dom.lat.value), lon=parseFloat(dom.lon.value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ toast('Set location'); return; }
+  const lat=parseFloat($('#lat').value), lon=parseFloat($('#lon').value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ toast('Set lat/lon','warn'); return; }
   try{
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility&timezone=auto`;
-    const r=await fetch(url,{cache:'no-store'}); const j=await r.json();
-    const cc=(j.hourly?.cloud_cover||[]).slice(0,3);
-    const vis=(j.hourly?.visibility||[]).slice(0,3).map(x=>x/1000);
-    const cloudAvg = cc.length ? Math.round(cc.reduce((a,b)=>a+b,0)/cc.length) : 40;
-    const visAvg = vis.length ? Math.round(vis.reduce((a,b)=>a+b,0)/vis.length) : 10;
-    lastWx={cloud:cloudAvg, vis:visAvg, when:new Date().toLocaleTimeString(), src:'Open-Meteo'};
-    dom.clouds.value=String(cloudAvg);
-    dom.cloudMeta.textContent=`From Open-Meteo at ${lastWx.when} — ~${cloudAvg}% • Vis ${visAvg} km`;
-    computeAll(); toast('Targets updated');
-  }catch(e){
-    dom.cloudMeta.textContent='Weather fetch failed — using manual slider.';
-    toast('Weather failed');
-  }
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility&timezone=auto`;
+    const r=await fetch(u); lastWeather=await r.json();
+    const cc=(lastWeather?.hourly?.cloud_cover?.[0])|0;
+    $('#cloudRange').value=cc;
+    $('#cloudSource').textContent='From Open-Meteo (hourly) · slider overrides';
+    toast('Weather updated','info');
+  }catch(e){ toast('Weather failed','error',1400); }
 }
 
-/* ===== events & init ===== */
-document.addEventListener('DOMContentLoaded',()=>{
-  // selects
-  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;dom.scope.appendChild(o)});
-  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;dom.camera.appendChild(o)});
-  dom.scope.value=0; dom.camera.value=0; renderChips(); updateOptics(1);
-
-  // restore
-  dom.lat.value = localStorage.getItem('gng.lat') || '';
-  dom.lon.value = localStorage.getItem('gng.lon') || '';
-  dom.clouds.value = localStorage.getItem('gng.cloud') || '40';
-  if(localStorage.getItem('gng.cloudMeta')) dom.cloudMeta.textContent = localStorage.getItem('gng.cloudMeta');
-  refreshPresetList();
-
-  // listeners
-  ['input','change'].forEach(ev=>{
-    dom.clouds.addEventListener(ev,()=>{localStorage.setItem('gng.cloud',dom.clouds.value); dom.cloudMeta.textContent='Manual • slide to adjust.'; localStorage.setItem('gng.cloudMeta',dom.cloudMeta.textContent); computeAll();},{passive:true});
-    dom.q.addEventListener(ev,renderTable,{passive:true});
-    dom.scope.addEventListener(ev,()=>{renderChips(); updateOptics(); computeAll();},{passive:true});
-    dom.camera.addEventListener(ev,()=>{updateOptics(); computeAll();},{passive:true});
-    dom.lat.addEventListener(ev,()=>{localStorage.setItem('gng.lat',dom.lat.value);},{passive:true});
-    dom.lon.addEventListener(ev,()=>{localStorage.setItem('gng.lon',dom.lon.value);},{passive:true});
+/* ======= event wiring ======= */
+function hydrate(){
+  // collapsibles
+  $$('.card[data-collapsible]').forEach(c=>{
+    const btn=$('.toggle',c);
+    btn.addEventListener('click',()=>{
+      const open=!c.classList.toggle('collapsed');
+      btn.textContent=open?'▾':'▸';
+    });
   });
 
-  dom.btnCalc.addEventListener('click',fetchWeather);
-  dom.btnRecompute.addEventListener('click',()=>{computeAll(); toast('Targets updated')});
-  dom.btnDemo.addEventListener('click',()=>{dom.lat.value='37.16557'; dom.lon.value='-76.56839'; fetchWeather();});
-  dom.btnGPS.addEventListener('click',async()=>{
+  // populate selects
+  SCOPES.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;$('#scopeSel').appendChild(o);});
+  CAMERAS.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;$('#camSel').appendChild(o);});
+  $('#scopeSel').value=0; $('#camSel').value=0;
+
+  // factor pills
+  function setFactor(v){ $('#factorPills').dataset.value=v; setPills(SCOPES[$('#scopeSel').value|0].presets, v, $('#factorPills'), nv=>{ setFactor(nv); updateFOV(); recompute(); }); }
+  setFactor(SCOPES[0].presets[0]);
+
+  // handlers
+  $('#scopeSel').addEventListener('change',()=>{ setFactor(SCOPES[$('#scopeSel').value|0].presets[0]); updateFOV(); recompute(); });
+  $('#camSel').addEventListener('change',()=>{ updateFOV(); recompute(); });
+  $('#cloudRange').addEventListener('input',()=>{ recompute(); });
+  $('#search').addEventListener('input',renderTable);
+  $('#btnRecalc').addEventListener('click',recompute);
+  $('#btnCalc').addEventListener('click',()=>{ fetchWeather().then(recompute); });
+  $('#btnUseWx').addEventListener('click',()=>{ fetchWeather().then(recompute); });
+
+  $('#btnGPS').addEventListener('click',async()=>{
     try{
-      dom.btnGPS.disabled=true;
       const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
-      dom.lat.value=pos.coords.latitude.toFixed(5);
-      dom.lon.value=pos.coords.longitude.toFixed(5);
-      localStorage.setItem('gng.lat',dom.lat.value);
-      localStorage.setItem('gng.lon',dom.lon.value);
-      fetchWeather();
-    }catch(_){ toast('GPS failed'); }
-    finally{ dom.btnGPS.disabled=false; }
+      $('#lat').value=pos.coords.latitude.toFixed(5);
+      $('#lon').value=pos.coords.longitude.toFixed(5);
+      toast('GPS set','success'); fetchWeather().then(recompute);
+    }catch(_){ toast('GPS failed','error',1400); }
+  });
+  $('#btnDemo').addEventListener('click',()=>{
+    $('#lat').value=37.16557; $('#lon').value=-76.56839; $('#cloudRange').value=6; toast('Demo location','info'); recompute();
   });
 
-  // presets
-  dom.btnSavePreset.addEventListener('click',()=>{
-    const name=(dom.presetName.value||'').trim();
-    if(!name){toast('Enter preset name'); return;}
-    const l=listPresets(); const obj=currentSetupObj(); obj.name=name;
-    const i=l.findIndex(p=>p.name.toLowerCase()===name.toLowerCase());
-    if(i>=0) l[i]=obj; else l.push(obj);
-    writePresets(l); refreshPresetList(); toast('Preset saved');
+  // named presets
+  refreshNamedUI();
+  $('#btnSavePreset').addEventListener('click',()=>{
+    const name=($('#presetName').value||'').trim(); if(!name){toast('Enter a preset name','warn'); return;}
+    const list=getNamed(); const obj={name, scopeSel:$('#scopeSel').value, camSel:$('#camSel').value, factor:parseFloat($('#factorPills').dataset.value)};
+    const i=list.findIndex(p=>p.name.toLowerCase()===name.toLowerCase()); if(i>=0) list[i]=obj; else list.push(obj);
+    putNamed(list); refreshNamedUI(); toast('Preset saved','success');
   });
-  dom.presetList.addEventListener('change',()=>{
-    const l=listPresets(); const i=parseInt(dom.presetList.value,10);
-    if(Number.isFinite(i) && l[i]) applySetupObj(l[i]);
+  $('#presetList').addEventListener('change',()=>{
+    const i=$('#presetList').value|0; const p=getNamed()[i]; if(!p) return;
+    $('#scopeSel').value=p.scopeSel; $('#camSel').value=p.camSel; $('#factorPills').dataset.value=p.factor;
+    setPills(SCOPES[$('#scopeSel').value|0].presets, p.factor, $('#factorPills'), nv=>{ $('#factorPills').dataset.value=nv; updateFOV(); recompute(); });
+    updateFOV(); recompute(); toast('Preset loaded','info');
   });
-  dom.btnDeletePreset.addEventListener('click',()=>{
-    const i=parseInt(dom.presetList.value,10); if(!Number.isFinite(i)) return;
-    const l=listPresets(); l.splice(i,1); writePresets(l); refreshPresetList(); toast('Preset deleted');
+  $('#btnDeletePreset').addEventListener('click',()=>{
+    const i=$('#presetList').value; if(!i){toast('Pick a preset','warn'); return;}
+    const list=getNamed(); list.splice(i,1); putNamed(list); refreshNamedUI(); toast('Preset deleted','warn');
   });
 
-  computeAll();
-});
+  // base URL controls
+  $('#btnSaveBase').addEventListener('click',()=>{
+    const v=$('#imgBase').value.trim(); if(v) localStorage.setItem('gallery.base',v); else localStorage.removeItem('gallery.base');
+    renderTable(); toast('Gallery base saved','success');
+  });
+  $('#btnTestBase').addEventListener('click',()=>{ window.open(imgUrlForId('M31')||repoBase(),'_blank') });
+
+  // compact / night toggles (visual only)
+  const root=document.documentElement;
+  $('#btnCompact').addEventListener('click',()=>{
+    const on = !root.classList.toggle('compact');
+    $('#btnCompact').textContent = on?'Compact off':'Compact on';
+    toast(on?'Compact mode off':'Compact mode on','info');
+  });
+  $('#btnNight').addEventListener('click',()=>{
+    const dark = !root.classList.toggle('night-off');
+    $('#btnNight').textContent = dark?'Night':'Blue';
+  });
+
+  // initial
+  $('#lat').value = localStorage.getItem('lat')||'37.16557';
+  $('#lon').value = localStorage.getItem('lon')||'-76.56839';
+  $('#hours').value = localStorage.getItem('hours')||'3';
+  $('#imgBase').value = localStorage.getItem('gallery.base')||'';
+  updateFOV(); renderTable(); recompute();
+
+  // persist basics
+  ['lat','lon','hours'].forEach(id=>$( '#'+id ).addEventListener('input',()=>localStorage.setItem(id,$('#'+id).value)));
+}
+
+/* ======= boot ======= */
+document.addEventListener('DOMContentLoaded',hydrate);
 </script>
 </body>
 </html>
+```0
