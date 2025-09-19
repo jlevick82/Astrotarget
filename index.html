@@ -40,35 +40,40 @@
   small{font-size:12px}
   .fav{cursor:pointer}
 
-  /* v25.1 sticky merged header & modes */
-  .hdr{position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,#0c1220f0,#0c1220d0);backdrop-filter:blur(6px);border-bottom:1px solid #1c2a4a}
-  .hdr-inner{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:12px}
-  .logoHeader{height:36px;width:auto;border-radius:8px;filter:drop-shadow(0 0 4px rgba(96,165,250,.2))}
-  @media(min-width:1024px){ .logoHeader{height:44px} }
-  .brand .titleline{font-weight:800;font-size:18px}
-  .brand .why{font-size:12px;margin-top:2px}
-  .hdr-tools{margin-left:auto;display:flex;gap:10px}
-  /* Night mode colors (red-safe): */
-  body.night { --fg:#f3e7e0; --muted:#eabfb9; --bg:#070606; --card:#121010; --edge:#2a1c1c; --accent:#ff5a3c; }
-  body.night a{ color:#ffb3a6 }
-  body.night .hdr{ background:linear-gradient(180deg,#100909f0,#100909d0); border-bottom:1px solid #2a1c1c }
-  /* Compact mode: hide non-essential cards */
-  body.compact .card[data-aux="1"]{ display:none }
-  body.compact .gallery, body.compact #gear, body.compact #catalog{ display:none }
-  /* Hide duplicate inline controls row if present */
-  .top-controls-dup{ display:none !important }
-  /* Status card: don’t repeat tiny badge/why line (mirrored in header) */
-  #statusRow .badge{ display:none }
-  #statusRow .muted#statusWhy{ display:none }
+/* v25.2 header + splash */
+.hdr{position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,#0c1220f0,#0c1220d0);backdrop-filter:blur(6px);border-bottom:1px solid #1c2a4a}
+.hdr-inner{max-width:980px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:12px}
+.logoHeader{height:36px;width:auto;border-radius:8px;filter:drop-shadow(0 0 4px rgba(96,165,250,.2))}
+@media(min-width:1024px){ .logoHeader{height:44px} }
+.brand .titleline{font-weight:800;font-size:18px}
+.brand .why{font-size:12px;margin-top:2px}
+.hdr-tools{margin-left:auto;display:flex;gap:10px}
+body.night { --fg:#f3e7e0; --muted:#eabfb9; --bg:#070606; --card:#121010; --edge:#2a1c1c; --accent:#ff5a3c; }
+body.night .hdr{ background:linear-gradient(180deg,#100909f0,#100909d0); border-bottom:1px solid #2a1c1c }
+body.compact .card[data-aux="1"]{ display:none }
+body.compact .gallery, body.compact #gear, body.compact #catalog{ display:none }
+#statusRow .badge{ display:none }
+#statusRow .muted#statusWhy{ display:none }
+.splash{position:fixed;inset:0;background:var(--bg,#0b0f1a);display:flex;align-items:center;justify-content:center;z-index:2000;transition:opacity .4s;opacity:1}
+body.night .splash{background:#080707}
+.splash.hidden{opacity:0;pointer-events:none}
+.splash-inner{text-align:center}
+.splash-logo{width:min(42vw,260px);height:auto;filter:drop-shadow(0 0 12px rgba(0,0,0,.45))}
+.splash-brand{margin-top:12px;font-weight:800;letter-spacing:.6px;opacity:.9}
 
 </style>
+<link rel="icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="assets/favicon.png" sizes="64x64">
+<link rel="apple-touch-icon" href="assets/logo-256.png">
 </head>
 <body>
+<div id="splash" class="splash" aria-hidden="true"><div class="splash-inner"><img src="assets/logo-256.png" class="splash-logo" alt="AstroTarget logo"><div class="splash-brand">AstroTarget</div></div></div>
+
 <header class="hdr">
   <div class="hdr-inner">
     <img class="logoHeader" src="assets/logo-256.png" alt="AstroTarget">
     <div class="brand">
-      <div class="titleline">Nightly Go/No-Go <small id="ver">v25.1</small></div>
+      <div class="titleline">Nightly Go/No-Go <small id="ver">v25.2</small></div>
       <div class="why muted"><span id="statusTextHdr">Hold</span> — <span id="statusWhyHdr">clouds ≥ slider</span></div>
     </div>
     <nav class="hdr-tools">
@@ -81,7 +86,10 @@
 
 <div class="wrap" style="padding-top:72px">
   <h1>Nightly Go/No-Go <small>v7.3-gp</small></h1>
-  <div class="row top-controls-dup"><button class="btn" id="installBtn">Install (PWA)</button><button class="btn" id="nightBtn">Night Mode</button></div>
+  <div class="row">
+    <button class="btn" id="installBtn">Install (PWA)</button>
+    <button class="btn" id="nightBtn">Night Mode</button>
+  </div>
 
   <div id="statusRow" class="card hold" style="margin-top:14px;display:flex;align-items:center;gap:12px;justify-content:space-between;">
     <div>
@@ -208,13 +216,12 @@ const $ = (s)=>document.querySelector(s);
 function fmtTime(d){ return d.toLocaleString([], {hour:'2-digit', minute:'2-digit'}) }
 function updateTimestamp(){ $('#kpiLocal').textContent = new Date().toLocaleString(); $('#updated').textContent='Updated '+new Date().toLocaleTimeString(); }
 function setStatus(kind, why){
-  const row = $('#statusRow'); row.classList.remove('ok','hold','nog'); row.classList.add(kind);
-  const text = (kind==='ok'?'Go':kind==='nog'?'No Go':'Hold');
-  $('#statusText').textContent = text;
-  $('#statusWhy').textContent = why||'';
-  const hdrT=$('#statusTextHdr'), hdrW=$('#statusWhyHdr');
-  if(hdrT) hdrT.textContent = text;
-  if(hdrW) hdrW.textContent = why||'';
+  var row=document.querySelector('#statusRow'); if(row){row.classList.remove('ok','hold','nog'); row.classList.add(kind);}
+  var text=(kind==='ok'?'Go':kind==='nog'?'No Go':'Hold');
+  var st=document.querySelector('#statusText'); if(st) st.textContent=text;
+  var sw=document.querySelector('#statusWhy'); if(sw) sw.textContent=why||'';
+  var hdrT=document.querySelector('#statusTextHdr'), hdrW=document.querySelector('#statusWhyHdr');
+  if(hdrT) hdrT.textContent=text; if(hdrW) hdrW.textContent=why||'';
 }
 
 // ---------- FOV math ----------
@@ -366,35 +373,21 @@ $('#installBtn').addEventListener('click', async()=>{ if(deferredPrompt){ deferr
 // init
 restore(); calculate();
 </script>
+
 <script>
-// v25.1 header wiring
-(() => {
-  const $ = (s, r=document) => r.querySelector(s);
-  const nightHdr = $('#nightBtnHdr');
-  const instHdr = $('#installBtnHdr');
-  const compactHdr = $('#compactBtnHdr');
-
-  if (nightHdr && $('#nightBtn')) nightHdr.addEventListener('click', () => $('#nightBtn').click());
-  if (instHdr && $('#installBtn')) instHdr.addEventListener('click', () => $('#installBtn').click());
-
-  // Compact mode: remember in localStorage
-  const key = 'gng.single.compact';
-  const applyCompact = (on) => {
-    document.body.classList.toggle('compact', !!on);
-    if (compactHdr) compactHdr.setAttribute('aria-pressed', on ? 'true' : 'false');
-    localStorage.setItem(key, on ? '1' : '0');
-  };
-  if (compactHdr) {
-    compactHdr.addEventListener('click', () => applyCompact(!(document.body.classList.contains('compact'))));
-  }
-  const saved = localStorage.getItem(key) === '1';
-  applyCompact(saved);
-
-  // Night mode mirror: respect any existing body.night your page toggles
-  const obs = new MutationObserver(() => {
-    // future room for syncing header styles if needed
-  });
-  obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+// Header mirrors
+(function(){
+  const $ = (s,r=document)=>r.querySelector(s);
+  const nightHdr=$('#nightBtnHdr'), instHdr=$('#installBtnHdr'), compactHdr=$('#compactBtnHdr');
+  if(nightHdr && $('#nightBtn')) nightHdr.addEventListener('click', ()=>$('#nightBtn').click());
+  if(instHdr && $('#installBtn')) instHdr.addEventListener('click', ()=>$('#installBtn').click());
+  const key='gng.single.compact';
+  const apply=(on)=>{ document.body.classList.toggle('compact',!!on); if(compactHdr) compactHdr.setAttribute('aria-pressed', on?'true':'false'); localStorage.setItem(key,on?'1':'0'); };
+  if(compactHdr) compactHdr.addEventListener('click', ()=>apply(!document.body.classList.contains('compact')));
+  apply(localStorage.getItem(key)==='1');
 })();
+// Splash min brand time
+(function(){const MIN_BRAND_MS=3200;const s=document.getElementById('splash');if(!s)return;const t=performance.now();function hide(){const el=performance.now()-t;const wait=Math.max(0,MIN_BRAND_MS-el);setTimeout(()=>{s.classList.add('hidden');setTimeout(()=>{s.remove&&s.remove();},500);},wait);}if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(hide,0);}else{document.addEventListener('DOMContentLoaded',hide,{once:true});}})();
 </script>
+
 </body></html>
