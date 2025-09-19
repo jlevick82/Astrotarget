@@ -3,421 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d1726">
-<title>Nightly Go/No-Go — AstroTarget</title>
-<link rel="icon" href="favicon.ico">
+<title>Nightly Go/No-Go</title>
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{
-  --bg:#0c1623;
-  --card:#0f1c2d;
-  --edge:#1e2a3d;
-  --text:#dfe8f5;
-  --muted:#a9b7c9;
-  --good:#10b981;
-  --warn:#f59e0b;
-  --bad:#ef4444;
-  --accent:#4f8cff;
-  --chip:#14253a;
-  --chip-on:#213b62;
-  --pill:#16263d;
-  --shadow:0 8px 24px rgba(0,0,0,.35);
+  --bg:#0b1220;--surface:#121a2b;--card:#172238;--edge:#2a3958;--muted:#9fb2d6;
+  --text:#dfe8ff;--text-weak:#afc3ea;--brand:#5b8cff;--ok:#0fa66d;--warn:#e7b347;--bad:#cf4d5a;
+  --chip:#223356;--chip-on:#233e78;--toast:#1e2a44;
+  --accent:#5b8cff;
   --radius:16px;
-  --radius-sm:12px;
+  --pad:16px;
+  --shadow:0 6px 24px rgba(0,0,0,.35);
+  font-synthesis-weight:none;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
-}
-a{color:#9bc1ff;text-decoration:none}
-a:hover{text-decoration:underline}
-
-/*** layout ***/
-.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 56px}
-.header{
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:6px 0 10px;
-}
-.h1{font-weight:800;font-size:46px;line-height:1.05;letter-spacing:.3px}
-.version{opacity:.65;font-size:14px;margin-left:6px}
-.toolbar{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
-.btn{
-  background:var(--pill);color:var(--text);border:1px solid var(--edge);
-  padding:10px 16px;border-radius:14px;box-shadow:var(--shadow);cursor:pointer
-}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn.tiny{padding:6px 10px;font-size:13px;border-radius:10px}
-.btn.ghost{background:transparent}
-.btn.badge{min-width:60px;justify-content:center}
-
-.grid{display:grid;gap:16px}
-@media(min-width:880px){ .grid.two{grid-template-columns:1fr 1fr} }
-.card{
-  background:var(--card);border:1px solid var(--edge);border-radius:var(--radius);
-  box-shadow:var(--shadow);padding:16px;position:relative
-}
-.card h3{margin:0 0 10px;font-size:20px}
-.card .sub{color:var(--muted);font-size:14px}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.tag{
-  display:inline-flex;align-items:center;gap:8px;background:#0c213b;border:1px solid var(--edge);
-  color:var(--text);padding:8px 12px;border-radius:999px;font-size:14px
-}
-.tag.good{background:rgba(16,185,129,.12);border-color:#17493b}
-.tag.bad{background:rgba(239,68,68,.14);border-color:#4b1517}
-.tag.warn{background:rgba(245,158,11,.14);border-color:#4b3412}
-
-.status{
-  display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.04));
-  border:1px solid var(--edge)
-}
-.lozenge{
-  width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:700;letter-spacing:.4px;
-}
-.lozenge.go{background:rgba(16,185,129,.18);color:#7dffd4;border:1px solid rgba(16,185,129,.35)}
-.lozenge.marg{background:rgba(245,158,11,.18);color:#ffe29d;border:1px solid rgba(245,158,11,.35)}
-.lozenge.nogo{background:rgba(239,68,68,.18);color:#ffb1b1;border:1px solid rgba(239,68,68,.35)}
-.status b{font-size:18px}
-.small{font-size:13px;color:var(--muted)}
-.meta{margin-left:auto;text-align:right}
-.meta .link{font-size:14px}
-
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.kv .box{
-  background:#0d1a2a;border:1px solid var(--edge);border-radius:12px;padding:10px 12px
-}
-.kv .box b{display:block;font-size:28px}
-.kv .box .hint{font-size:13px;color:var(--muted)}
-
-.slider{width:100%}
-.controls .btn{min-width:96px}
-
-/*** select & inputs ***/
-select, input[type="text"], input[type="number"]{
-  width:100%;padding:12px 14px;border-radius:12px;background:#0d1a2a;border:1px solid var(--edge);color:var(--text)
-}
-
-/*** chips ***/
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
+h1{font-size:44px;line-height:1.05;margin:24px 0 8px}
+h2{font-size:22px;margin:0 0 8px}
+small, .small{color:var(--text-weak)}
+a{color:var(--brand);text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:12px 14px 64px}
+.row{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:740px){.row-2{grid-template-columns:1fr 1fr}}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pill{background:var(--chip);border:1px solid var(--edge);border-radius:999px;padding:10px 16px;display:inline-flex;align-items:center;gap:10px}
+.pill button{all:unset;cursor:pointer}
+.btn{appearance:none;border:1px solid var(--edge);background:var(--chip);color:var(--text);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow)}
+.btn:active{transform:translateY(1px)} .btn.ghost{background:transparent}
+.badge{display:inline-block;border-radius:12px;padding:8px 12px;border:1px solid var(--edge);background:var(--chip);color:var(--text)}
+.badge.go{background:#0b3827;border-color:#145d43} .badge.marginal{background:#3d350d;border-color:#6b5719}
+.badge.nogo{background:#3a1217;border-color:#6a232b}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.card .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.kv{display:grid;gap:8px} .kv .k{font-weight:600;color:var(--text-weak);font-size:14px} .kv .v{font-size:28px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid-2{grid-template-columns:1fr}}
+.input, select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#0f1830;color:var(--text)}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{
-  background:var(--chip);border:1px solid var(--edge);padding:10px 14px;border-radius:12px;cursor:pointer
-}
-.chip.active{background:var(--chip-on);border-color:#35517c}
-
-/*** table ***/
+.chips button{padding:10px 14px;border-radius:999px;border:1px solid var(--edge);background:var(--chip);color:var(--text);cursor:pointer}
+.chips button.active{background:var(--chip-on);border-color:#5b8cff}
 .table{overflow:auto;border-radius:12px;border:1px solid var(--edge)}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px 14px;border-bottom:1px solid var(--edge);text-align:left;white-space:nowrap}
-th{font-size:13px;color:var(--muted);background:#0d1a2a;position:sticky;top:0}
-tbody tr:hover{background:#0e2138}
-.thumb{width:76px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--edge)}
-
-/*** toast ***/
-.toast{
-  position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);
-  background:#0d1a2a;border:1px solid var(--edge);color:var(--text);padding:10px 14px;border-radius:12px;
-  opacity:0;pointer-events:none;transition:.2s ease;box-shadow:var(--shadow);font-size:14px
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.info{border-color:#2e5ab7;background:#0e1a32}
-.toast.success{border-color:#1b6b52;background:#0e1f1a}
-.toast.warn{border-color:#7a5c17;background:#211a0c}
-.toast.error{border-color:#7a1f1f;background:#2a0e0e}
-
-/*** collapse marker ***/
-.chev{position:absolute;inset:auto 12px 12px auto;background:#0b1829;border:1px solid var(--edge);color:var(--muted);padding:6px;border-radius:10px;font-size:14px}
-.collapsed .body{display:none}
-.collapsed .chev::after{content:'▸'}
-.chev::after{content:'▾'}
-
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--edge);background:#0e1c2e}
-
-/*** logo placeholder (can replace src later) ***/
-.logo{width:44px;height:44px;border-radius:10px;background:#081221 url('assets/icon-512.png') center/cover no-repeat;border:1px solid var(--edge)}
-@media (max-width:420px){
-  .h1{font-size:36px}
-}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{padding:12px 10px;border-bottom:1px solid var(--edge);text-align:left}
+th{color:var(--text-weak);font-weight:500}
+.img-thumb{width:76px;height:56px;border-radius:8px;border:1px solid var(--edge);object-fit:cover}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--toast);border:1px solid var(--edge);border-radius:12px;padding:12px 14px;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow)}
+.toast.show{opacity:1;pointer-events:auto}
+.toast.ok{border-color:#1d6e52} .toast.warn{border-color:#7a651c} .toast.err{border-color:#7a2a34}
+.meta{font-size:14px;color:var(--text-weak)}
+.copybox{width:100%;height:280px;background:#0f1830;color:var(--text);border:1px solid var(--edge);border-radius:12px;padding:12px;white-space:pre-wrap}
+hr.sep{border:0;border-top:1px solid var(--edge);margin:12px 0}
+.header-logo{width:36px;height:36px;border-radius:8px;background:#000 url('assets/icon-192.png') center/cover no-repeat;border:1px solid var(--edge)}
+/* compact */
+:root.compact .card{padding:12px} :root.compact h2{font-size:18px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="header">
-    <div class="logo" id="logo"></div>
+  <header>
+    <div class="header-logo" aria-hidden="true"></div>
     <div>
-      <div class="h1">Nightly<br>Go/No-Go <span class="version" id="ver"></span></div>
+      <h1>Nightly<br>Go/No-Go</h1>
+      <div class="small">v26.1</div>
     </div>
-    <div class="toolbar">
-      <button class="btn tiny" id="btnInstall">Install</button>
-      <button class="btn tiny" id="btnCompact">Compact off</button>
-      <button class="btn tiny" id="btnNight">Blue</button>
+    <div class="pill" style="margin-left:auto">
+      <button class="btn" id="btnInstall">Install</button>
+      <button class="btn" id="btnMode">Compact off</button>
+      <button class="btn" id="btnNight">Blue</button>
     </div>
-  </div>
+  </header>
 
   <!-- STATUS -->
-  <section class="card" id="card-status" data-collapsible="status">
-    <button class="chev" aria-label="toggle"></button>
-    <div class="body">
-      <div class="status">
-        <div class="lozenge go" id="badge">GO</div>
-        <div>
-          <b id="statusText">GO — Clouds ~— · Vis — km · Astro dark</b>
-          <div class="small" id="statusExtra">—</div>
-        </div>
-        <div class="meta">
-          <a class="link" href="#" id="updatedAt">Updated —</a>
-        </div>
+  <section class="card" id="statusCard">
+    <div class="head">
+      <div>
+        <span class="badge" id="statusBadge">—</span>
+        <span id="summary" style="margin-left:10px">—</span>
       </div>
+      <a id="updatedAt" class="small" href="#" onclick="return false">Updated: —</a>
     </div>
   </section>
 
-  <!-- SKY + CLOUDS -->
-  <div class="grid two">
-    <section class="card" id="card-sky" data-collapsible="sky">
-      <button class="chev" aria-label="toggle"></button>
-      <div class="body">
-        <h3>Sky conditions</h3>
+  <div class="row row-2">
+    <!-- SKY CONDITIONS -->
+    <section class="card">
+      <div class="head"><h2>Sky conditions</h2></div>
+      <div class="grid-2">
         <div class="kv">
-          <div class="box">
-            <div class="hint">Astronomical dark</div>
-            <b id="skyDark">—</b>
-            <div class="hint"><span id="sunAlt">Sun alt —°</span></div>
-          </div>
-          <div class="box">
-            <div class="hint">Moon illum</div>
-            <b id="moonIllum">—%</b>
-            <div class="hint"><span id="moonAlt">Alt —°</span></div>
-          </div>
+          <div class="k">Astronomical dark</div>
+          <div class="v" id="astroDark">—</div>
+          <div class="small" id="sunMeta">—</div>
         </div>
-        <div class="row" style="margin-top:14px">
-          <div class="tag" id="tagHum">Humidity —%</div>
-          <div class="tag" id="tagTrans">Transparency —</div>
+        <div class="kv">
+          <div class="k">Moon illum</div>
+          <div class="v" id="moonIllum">—</div>
+          <div class="small" id="moonMeta">—</div>
+        </div>
+      </div>
+      <hr class="sep">
+      <div class="grid-2">
+        <div class="kv">
+          <div class="k">Humidity</div><div class="v" id="humid">—</div>
+        </div>
+        <div class="kv">
+          <div class="k">Transparency</div><div class="v" id="transp">—</div>
         </div>
       </div>
     </section>
 
-    <section class="card" id="card-clouds" data-collapsible="clouds">
-      <button class="chev" aria-label="toggle"></button>
-      <div class="body">
-        <h3>Clouds (avg)</h3>
-        <input id="cloudSlider" class="slider" type="range" min="0" max="100" value="0">
-        <div class="row controls" style="margin-top:10px">
-          <button class="btn" id="btnUseClouds">Use</button>
-          <button class="btn" id="btnCalcClouds">Calculate</button>
-          <span class="small" id="cloudSource">—</span>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <span class="badge">Clouds now: <span id="cloudPct">—%</span></span>
-        </div>
+    <!-- CLOUDS -->
+    <section class="card">
+      <div class="head"><h2>Clouds (avg)</h2></div>
+      <input id="cloudSlider" type="range" min="0" max="100" value="40" oninput="onCloudSlider()" />
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn" id="useWx">Use</button>
+        <button class="btn" id="calc">Calculate</button>
       </div>
+      <div class="small" id="cloudMeta">From Open-Meteo (hourly) · slider overrides</div>
     </section>
   </div>
 
   <!-- QUICK SETUP -->
-  <section class="card" id="card-quick" data-collapsible="quick">
-    <button class="chev" aria-label="toggle"></button>
-    <div class="body">
-      <h3>Quick setup</h3>
-      <div class="grid two">
-        <div>
-          <div class="small">Latitude (°)</div>
-          <input id="lat" type="number" step="0.00001" placeholder="lat">
-        </div>
-        <div>
-          <div class="small">Longitude (°)</div>
-          <input id="lon" type="number" step="0.00001" placeholder="lon">
-        </div>
+  <section class="card">
+    <div class="head"><h2>Quick setup</h2></div>
+    <div class="grid-2">
+      <div>
+        <label class="small">Latitude (°)</label>
+        <input id="lat" class="input" inputmode="decimal" placeholder="37.1656">
       </div>
-      <div style="margin-top:12px;max-width:220px">
-        <div class="small">Hours</div>
-        <input id="hours" type="number" step="1" min="1" max="12" value="3">
+      <div>
+        <label class="small">Longitude (°)</label>
+        <input id="lon" class="input" inputmode="decimal" placeholder="-76.5683">
       </div>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" id="btnGPS">Use GPS</button>
-        <button class="btn" id="btnDemo">Demo</button>
-        <button class="btn" id="btnRecalc">Calculate Now</button>
+    </div>
+    <div style="margin-top:12px" class="grid-2">
+      <div>
+        <label class="small">Hours</label>
+        <input id="duration" class="input" inputmode="numeric" value="3">
       </div>
+      <div>
+        <label class="small">Start (local)</label>
+        <input id="start" class="input" type="datetime-local">
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="gpsBtn">Use GPS</button>
+      <button class="btn" id="demo">Demo</button>
+      <button class="btn" id="recompute">Calculate Now</button>
     </div>
   </section>
 
   <!-- GEAR -->
-  <section class="card" id="card-gear" data-collapsible="gear">
-    <button class="chev" aria-label="toggle"></button>
-    <div class="body">
-      <h3>Gear</h3>
-      <div class="grid two">
-        <div>
-          <div class="small">Scope</div>
-          <select id="scopeSel"></select>
-        </div>
-        <div>
-          <div class="small">Reducer / Barlow</div>
-          <div class="chips" id="chips"></div>
-        </div>
-        <div>
-          <div class="small">Camera</div>
-          <select id="camSel"></select>
-        </div>
-        <div>
-          <div class="small">FOV &amp; Scale</div>
-          <div class="row">
-            <div class="badge" id="fov">FOV — × —</div>
-            <div class="badge" id="scale">Scale —"/px</div>
-          </div>
-        </div>
+  <section class="card">
+    <div class="head"><h2>Gear</h2></div>
+    <div>
+      <label class="small">Scope</label>
+      <select id="scopeSel" class="input"></select>
+    </div>
+    <div style="margin:10px 0">
+      <div class="small" style="margin-bottom:6px">Reducer / Barlow</div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <label class="small">Camera</label>
+        <select id="camSel" class="input"></select>
       </div>
-      <div class="row" style="margin-top:12px;align-items:center">
-        <input id="presetName" type="text" placeholder="Preset name (e.g., Edge8 + 0.7x)">
-        <button class="btn" id="btnSaveNamed">Save</button>
-        <select id="presetList" style="max-width:320px"></select>
-        <button class="btn ghost" id="btnDeleteNamed">Delete</button>
+      <div>
+        <label class="small">FOV &amp; Scale</label>
+        <div class="input" id="fov">FOV —</div>
+        <div class="input" id="scale" style="margin-top:8px">Scale —</div>
       </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <input id="presetName" class="input" placeholder="Preset name…" style="max-width:260px">
+      <button class="btn" id="btnSaveNamed">Save</button>
+      <select id="presetList" class="input" style="max-width:260px"><option>Load preset…</option></select>
+      <button class="btn" id="btnDeleteNamed">Delete</button>
     </div>
   </section>
 
   <!-- TOP 5 -->
-  <section class="card" id="card-top5" data-collapsible="top5">
-    <button class="chev" aria-label="toggle"></button>
-    <div class="body">
-      <h3>Top 5 Recommendations</h3>
-      <ol id="top5" style="padding-left:18px;margin:10px 0 0"></ol>
-    </div>
+  <section class="card">
+    <div class="head"><h2>Top 5 Recommendations</h2></div>
+    <ol id="top5" style="margin:0 0 6px 18px"></ol>
+    <div class="small"><span id="miniMoon"></span></div>
   </section>
 
   <!-- CATALOG -->
-  <section class="card" id="card-cat" data-collapsible="catalog">
-    <button class="chev" aria-label="toggle"></button>
-    <div class="body">
-      <h3>Catalog (subset)</h3>
-      <input id="filter" type="text" placeholder="Search by ID / name / type" style="margin:8px 0 12px">
-      <div class="table" id="table"></div>
-    </div>
+  <section class="card">
+    <div class="head"><h2>Catalog (subset)</h2></div>
+    <input id="search" class="input" placeholder="Search by ID / name / type" style="margin-bottom:12px">
+    <div id="table" class="table"></div>
   </section>
 
-  <div class="small" style="margin-top:20px;opacity:.6">© AstroTarget — single-file build</div>
+  <!-- HELP -->
+  <section class="card" id="helpCard">
+    <div class="head"><h2>Help &amp; How it works</h2><button class="btn ghost" id="btnCopyHelp">Copy help</button></div>
+    <textarea id="helpText" class="copybox" readonly>
+BIG PICTURE
+This is a single-file web app. HTML lays out the cards, CSS styles them, and JavaScript handles the logic (weather, astronomy math, scoring, storage). Nothing external is required.
+
+WHAT HAPPENS ON LOAD
+• UI is populated (scopes, cameras, reducer/barlow chips).
+• GPS is requested (or last saved lat/lon is used).
+• Weather is fetched from Open-Meteo (hourly), unless you use the slider.
+• Sun/Moon positions are computed; astronomical darkness is checked.
+• Targets are scored and Top 5 is shown; the catalog table is rendered.
+• Presets and collapsed state are restored from localStorage.
+
+DATA FLOW (simplified)
+GPS or Saved Lat/Lon
+  → Open-Meteo hourly JSON (clouds/vis/wind/humidity)
+  → Sun & Moon positions (altitude, illumination)
+  → Score every Messier: altitude • clouds • moon separation • met
+  → Status banner, Top 5 list, Catalog table
+
+IMPORTANT CONTROLS
+• Cloud slider: manual override. “Use” switches back to weather.
+• Calculate: re-fetches weather and recomputes everything.
+• Calculate Now (Quick setup): recompute immediately.
+• Compact: tighter spacing. Blue/Red: quick night tint.
+• Cards: triangle toggles collapse; your choice is saved.
+• Presets: name + Save → stored; Load preset… applies; Delete removes.
+
+WHERE IMAGES COME FROM
+Messier ID → lowercase like m31.jpg, loaded from your GitHub raw:
+https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/
+
+TUNING (in code, CONFIG.thresholds)
+alt_min / alt_best — altitude gates and “best” point
+cloud_good / cloud_bad — good vs. bad cloud levels
+wind/humid/vis — met ranges
+moon_tight / moon_loose — separation from Moon
+weights.alt/cloud/moon/met — how much each factor matters
+
+WHAT PERSISTS
+Location, scope/camera selection, hours, compact/night modes, collapsed cards, and named presets — all in localStorage (per device).
+    </textarea>
+    <div class="small" style="margin-top:8px">Tip: after copying, you can paste this into Notes or a README in your repo.</div>
+  </section>
+
+  <div id="toast" class="toast">Saved.</div>
 </div>
 
-<div id="toast" class="toast">Toast</div>
-
 <script>
-/* ===========================================================
-   AstroTarget — Single-file build
-   =========================================================== */
-
-window.GNG_VERSION = 'v26.2';
-
-const CONFIG = {
-  imageBase: 'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/',
-  thresholds: {
-    alt_min: 35, alt_best: 60,
-    cloud_good: 25, cloud_bad: 60,
-    wind_good: 10, wind_bad: 25,
-    humid_good: 35, humid_bad: 85,
-    vis_good: 15, vis_bad: 8,
-    moon_tight: 20, moon_loose: 45,
-    weights: {alt:.35, cloud:.25, moon:.25, met:.15}
-  }
+/* ====== CONFIG & DATA ====== */
+const CONFIG={
+  imageBase:'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/',
+  thresholds:{alt_min:35,alt_best:60,cloud_good:25,cloud_bad:60,wind_good:10,wind_bad:25,humid_good:35,humid_bad:85,vis_good:15,vis_bad:8,moon_tight:20,moon_loose:45,weights:{alt:.35,cloud:.25,moon:.25,met:.15}}
 };
-
-const $ = (s,r=document)=>r.querySelector(s);
-const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
-const d2r=x=>x*Math.PI/180, r2d=x=>x*180/Math.PI;
-
-function toast(msg, type='info', ms=1400){
-  const t = $('#toast'); if(!t) return;
-  t.textContent = msg; t.className = 'toast show ' + type;
-  clearTimeout(toast._id); toast._id = setTimeout(()=>t.classList.remove('show'), ms);
-}
-
-/* ---------- Astronomy helpers ---------- */
-function jd(d){return d.getTime()/86400000+2440587.5}
-function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
-function lst(d,lon){return (gmst(d)+lon/15+24)%24}
-function sunEq(date){
-  const J=jd(date),T=(J-2451545)/36525;
-  const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;
-  const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;
-  const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));
-  const lam=L0+C,eps=23.439291-0.0130042*T;
-  const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));
-  const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));
-  return {raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI, decD:r2d(dec), lamD:lam};
-}
-function moonEq(date){
-  const J=jd(date);
-  const L=(218.316+13.176396*(J-2451545))%360;
-  const M=(134.963+13.064993*(J-2451545))%360;
-  const F=(93.272+13.229350*(J-2451545))%360;
-  const lon=(L+6.289*Math.sin(d2r(M)))%360;
-  const lat=5.128*Math.sin(d2r(F)), eps=23.439;
-  const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));
-  const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));
-  return {raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI, decD:r2d(dec), lonD:lon};
-}
-function altFor(raH,decD,latD,lonD,date){
-  const LST = lst(date,lonD)*15;
-  const HA  = ((LST-raH*15+540)%360)-180;
-  const ha=d2r(HA), dec=d2r(decD), lat=d2r(latD);
-  const sA = Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);
-  return r2d(Math.asin(sA));
-}
-function sepDeg(raH1,decD1,raH2,decD2){
-  const a1=d2r(decD1), a2=d2r(decD2), dRA=d2r((raH1-raH2)*15);
-  const c = Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);
-  return r2d(Math.acos(Math.min(1,Math.max(-1,c))));
-}
-const clamp01=x=>Math.max(0,Math.min(1,x));
-const lerp01=(x,a0,a1)=>a0===a1?0:clamp01((x-a0)/(a1-a0));
-
-/* ---------- UI access ---------- */
-function ui(){return{
-  ver:$('#ver'),
-  badge:$('#badge'), statusText:$('#statusText'), statusExtra:$('#statusExtra'), updatedAt:$('#updatedAt'),
-  skyDark:$('#skyDark'), sunAlt:$('#sunAlt'), moonIllum:$('#moonIllum'), moonAlt:$('#moonAlt'),
-  tagHum:$('#tagHum'), tagTrans:$('#tagTrans'),
-  cloudSlider:$('#cloudSlider'), cloudSource:$('#cloudSource'), cloudPct:$('#cloudPct'),
-  lat:$('#lat'), lon:$('#lon'), hours:$('#hours'),
-  btnGPS:$('#btnGPS'), btnDemo:$('#btnDemo'), btnRecalc:$('#btnRecalc'),
-  scopeSel:$('#scopeSel'), camSel:$('#camSel'), chips:$('#chips'),
-  fov:$('#fov'), scale:$('#scale'),
-  presetName:$('#presetName'), presetList:$('#presetList'),
-  btnSaveNamed:$('#btnSaveNamed'), btnDeleteNamed:$('#btnDeleteNamed'),
-  top5:$('#top5'), filter:$('#filter'), table:$('#table'),
-  btnInstall:$('#btnInstall'), btnCompact:$('#btnCompact'), btnNight:$('#btnNight')
-}}
-
-/* ---------- Data ---------- */
 const scopes=[
- {id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1.0,2.0]},
- {id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1.0,2.0]},
- {id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1.0,2.0]},
- {id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1.0,2.0]},
- {id:'esprit100',name:'SkyWatcher Esprit 100 (550mm f/5.5)',fl:550,ap:100,presets:[0.77,0.8,1.0,2.0]},
- {id:'samy135',name:'Samyang 135mm f/2',fl:135,ap:67,presets:[1.0,2.0]},
- {id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1.0,2.0]},
- {id:'c925',name:'Celestron C9.25 (2350mm f/10)',fl:2350,ap:235,presets:[0.7,0.63,1.0,2.0]},
- {id:'c11',name:'Celestron C11 (2800mm f/10)',fl:2800,ap:279,presets:[0.7,0.63,1.0,2.0]},
- {id:'rasa8',name:'Celestron RASA 8 (400mm f/2)',fl:400,ap:203,presets:[1.0]},
- {id:'sw150p',name:'SkyWatcher 150P (750mm f/5)',fl:750,ap:150,presets:[1.0,2.0]},
- {id:'c6',name:'Celestron C6 / 6SE (1500mm f/10)',fl:1500,ap:150,presets:[0.63,1.0,2.0]},
- {id:'custom',name:'Custom',fl:null,ap:null,presets:[1.0]}
+  {id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80,presets:[0.8,1.0,2.0]},
+  {id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71,presets:[0.8,1.0,2.0]},
+  {id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51,presets:[1.0,2.0]},
+  {id:'fra400',name:'Askar FRA400 (400mm f/5.6)',fl:400,ap:72,presets:[0.7,0.8,1.0,2.0]},
+  {id:'esprit100',name:'SkyWatcher Esprit 100 (550mm f/5.5)',fl:550,ap:100,presets:[0.77,0.8,1.0,2.0]},
+  {id:'samy135',name:'Samyang 135mm f/2',fl:135,ap:67,presets:[1.0,2.0]},
+  {id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203,presets:[0.7,0.63,1.0,2.0]},
+  {id:'c925',name:'Celestron C9.25 (2350mm f/10)',fl:2350,ap:235,presets:[0.7,0.63,1.0,2.0]},
+  {id:'c11',name:'Celestron C11 (2800mm f/10)',fl:2800,ap:279,presets:[0.7,0.63,1.0,2.0]},
+  {id:'rasa8',name:'Celestron RASA 8 (400mm f/2)',fl:400,ap:203,presets:[1.0]},
+  {id:'sw150p',name:'SkyWatcher 150P (750mm f/5)',fl:750,ap:150,presets:[1.0,2.0]},
+  {id:'c6',name:'Celestron C6 / 6SE (1500mm f/10)',fl:1500,ap:150,presets:[0.63,1.0,2.0]},
+  {id:'custom',name:'Custom',fl:null,ap:null,presets:[1.0]}
 ];
 const cameras=[
- {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
- {name:'ZWO ASI2600 (IMX571 APS-C)',w:23.5,h:15.7,px:3.76},
- {name:'ZWO ASI6200 (Full Frame)',w:36.0,h:24.0,px:3.76},
- {name:'ZWO ASI294MM',w:19.1,h:13.0,px:4.63},
- {name:'ZWO ASI1600MM',w:17.7,h:13.4,px:3.80},
- {name:'ZWO ASI183MC',w:13.2,h:8.8,px:2.40},
- {name:'Canon T3i / 600D',w:22.3,h:14.9,px:4.30},
- {name:'Canon R6',w:35.9,h:23.9,px:6.56},
- {name:'Nikon D750',w:35.9,h:24.0,px:5.97},
- {name:'Nikon Z6',w:35.9,h:23.9,px:5.94},
- {name:'Sony A7 III',w:35.8,h:23.8,px:5.94},
- {name:'Custom',w:null,h:null,px:null}
+  {name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},
+  {name:'ZWO ASI2600 (IMX571 APS-C)',w:23.5,h:15.7,px:3.76},
+  {name:'ZWO ASI6200 (Full Frame)',w:36.0,h:24.0,px:3.76},
+  {name:'ZWO ASI294MM',w:19.1,h:13.0,px:4.63},
+  {name:'ZWO ASI1600MM',w:17.7,h:13.4,px:3.80},
+  {name:'ZWO ASI183MC',w:13.2,h:8.8,px:2.40},
+  {name:'Canon T3i / 600D',w:22.3,h:14.9,px:4.30},
+  {name:'Canon R6',w:35.9,h:23.9,px:6.56},
+  {name:'Nikon D750',w:35.9,h:24.0,px:5.97},
+  {name:'Nikon Z6',w:35.9,h:23.9,px:5.94},
+  {name:'Sony A7 III',w:35.8,h:23.8,px:5.94},
+  {name:'Custom',w:null,h:null,px:null}
 ];
-
-/* Messier subset with RA hours & Dec degrees */
-const MESSIER_SUBSET = [
+// tiny Messier subset (can be expanded later)
+const MESSIER_SUBSET=[
   {id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.71,dec:41.3},
   {id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.55,dec:30.7},
   {id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.99,dec:22.7},
@@ -426,350 +293,215 @@ const MESSIER_SUBSET = [
   {id:'M45',name:'Pleiades',type:'OC',ra:3.79,dec:24.1}
 ];
 
-/* ---------- State ---------- */
-let TH = loadTH();
-let lastWeather = null;
-let compact = localStorage.getItem('gng.ui.compact') === '1';
-let night = localStorage.getItem('gng.ui.night') === '1';
-let cloudOverride = null; // number or null
-let effectiveFactor = 1;
+/* ====== UTIL ====== */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+function toast(msg,type='ok'){const t=$("#toast");t.textContent=msg;t.className='toast show '+(type||'');setTimeout(()=>t.classList.remove('show'),1600)}
+function jd(d){return d.getTime()/86400000+2440587.5}
+const d2r=x=>x*Math.PI/180, r2d=x=>x*180/Math.PI
+function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
+function lst(d,lon){return(gmst(d)+lon/15+24)%24}
+function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));const lam=L0+C,eps=23.439291-0.0130042*T;const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lamD:lam}}
+function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon}}
+function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
+function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
+function clamp01(x){return Math.max(0,Math.min(1,x))}
+function lerp01(x,a0,a1){if(a0===a1)return 0;return clamp01((x-a0)/(a1-a0))}
+function imageForMessier(id){const n=id.toLowerCase();return CONFIG.imageBase+n+'.jpg'}
 
-/* ---------- Init ---------- */
-document.addEventListener('DOMContentLoaded', init);
+/* ====== STATE ====== */
+let TH=loadTH(); let lastWeather=null; let manualCloud=null;
 
-function init(){
-  const U = ui();
-  U.ver.textContent = window.GNG_VERSION;
-
-  // compact & night UI
-  document.documentElement.classList.toggle('compact', compact);
-  U.btnCompact.textContent = 'Compact ' + (compact?'on':'off');
-  U.btnNight.textContent = night?'Red':'Blue';
-  if(night) document.documentElement.style.filter='hue-rotate(180deg)'; // simple tint
-  U.btnCompact.addEventListener('click', ()=>{ compact=!compact; localStorage.setItem('gng.ui.compact',compact?'1':'0'); U.btnCompact.textContent='Compact '+(compact?'on':'off'); toast(compact?'Compact on':'Compact off','info')});
-  U.btnNight.addEventListener('click', ()=>{ night=!night; localStorage.setItem('gng.ui.night',night?'1':'0'); document.documentElement.style.filter=night?'hue-rotate(180deg)':'none'; U.btnNight.textContent = night?'Red':'Blue'; toast(night?'Red-safe mode':'Blue mode','info')});
-
-  // collapsible cards
-  $$('[data-collapsible]').forEach(card=>{
-    const id = card.getAttribute('data-collapsible');
-    const open = localStorage.getItem('gng.collapse.'+id) !== 'closed';
-    card.classList.toggle('collapsed', !open);
-    card.querySelector('.chev').addEventListener('click', ()=>{
-      const nowClosed = card.classList.toggle('collapsed');
-      localStorage.setItem('gng.collapse.'+id, nowClosed?'closed':'open');
-    });
-  });
-
-  // populate selects
-  scopes.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.name; U.scopeSel.appendChild(o); });
-  cameras.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.name; U.camSel.appendChild(o); });
-
-  U.scopeSel.value=0; U.camSel.value=0;
-  renderChips(); applyScope(); applyCam(); updateOptics();
-
-  bind();
-
-  // defaults
-  const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
-  U.hours.value=3;
-
-  loadSaved();
-
-  // weather (GPS or saved)
-  const Llat = localStorage.getItem('gng.last.lat'), Llon = localStorage.getItem('gng.last.lon');
-  if(Llat && Llon){ U.lat.value=Llat; U.lon.value=Llon; autoFetchWeather(); }
-  else tryGPS();
-
-  computeAll();
-}
-
-function bind(){
-  const U = ui();
-
-  $('#btnInstall')?.addEventListener('click', ()=>toast('Install prompt not available in this sandbox','warn'));
-
-  U.scopeSel.addEventListener('change', ()=>{ renderChips(); applyScope(); updateOptics(); computeAll(); saveSetup(); });
-  U.camSel.addEventListener('change', ()=>{ applyCam(); updateOptics(); computeAll(); saveSetup(); });
-
-  U.cloudSlider.addEventListener('input', ()=>{ cloudOverride = parseInt(U.cloudSlider.value,10); U.cloudPct.textContent = cloudOverride+'%'; U.cloudSource.textContent='Manual slider'; computeAllThrottled(); });
-  $('#btnUseClouds').addEventListener('click', ()=>{ if(lastWeather){cloudOverride=null; setCloudFromWeather(); computeAll(); toast('Using weather clouds','success'); } else toast('No weather yet','warn')});
-  $('#btnCalcClouds').addEventListener('click', ()=>{ autoFetchWeather(true) });
-
-  U.btnGPS.addEventListener('click', tryGPS);
-  U.btnDemo.addEventListener('click', ()=>{ U.lat.value='37.16557'; U.lon.value='-76.56839'; U.hours.value='3'; toast('Loaded demo location','info'); autoFetchWeather(); });
-  U.btnRecalc.addEventListener('click', ()=>{ computeAll(); setUpdatedAt(); toast('Targets updated','success'); });
-
-  U.filter.addEventListener('input', renderTable);
-
-  U.btnSaveNamed.addEventListener('click', ()=>{ saveNamedPreset(); toast('Preset saved','success'); });
-  U.presetList.addEventListener('change', ()=>{ loadNamedPreset(); toast('Preset loaded','info')});
-  U.btnDeleteNamed.addEventListener('click', ()=>{ deleteNamedPreset(); toast('Preset deleted','warn')});
-
-  ['lat','lon','hours'].forEach(id=>{ $('#'+id).addEventListener('input', ()=>{ saveSetup(); computeAllThrottled(); })});
-}
-
-let _recalcTimer=null;
-function computeAllThrottled(){ clearTimeout(_recalcTimer); _recalcTimer = setTimeout(computeAll, 120); }
-
-/* ---------- Optics ---------- */
-function renderChips(){
-  const U = ui();
-  U.chips.innerHTML='';
-  const s = scopes[parseInt(U.scopeSel.value,10)];
-  const key='gng.preset.'+s.id; const custom=localStorage.getItem(key);
-  const list = s.presets.slice(); if(custom){const v=parseFloat(custom); if(Number.isFinite(v)&&list.indexOf(v)<0) list.unshift(v); }
-  list.forEach(f=>{
-    const b=document.createElement('button');
-    b.className='chip'; b.textContent=f+'x';
-    b.addEventListener('click',()=>{ effectiveFactor=f; highlightChip(f); updateOptics(); computeAll(); localStorage.setItem('gng.preset.'+s.id,String(f)); });
-    U.chips.appendChild(b);
-  });
-  highlightChip(list[0]||1);
-  effectiveFactor = list[0]||1;
-}
-function highlightChip(v){ $$('#chips .chip').forEach(b=>b.classList.toggle('active', b.textContent===v+'x')); }
-function applyScope(){ /* selects already filled; optics compute later */ }
-function applyCam(){ /* same */ }
-function updateOptics(){
-  const U=ui();
-  const s=scopes[parseInt(U.scopeSel.value,10)], c=cameras[parseInt(U.camSel.value,10)];
-  const eff = (s.fl||0)*(effectiveFactor||1);
-  const sw=c?.w||0, sh=c?.h||0, px=c?.px||0;
-  U.fov.textContent = (eff>0&&sw>0&&sh>0)?`FOV ${(57.2958*sw/eff).toFixed(1)}° × ${(57.2958*sh/eff).toFixed(1)}°`:'FOV — × —';
-  U.scale.textContent = (eff>0&&px>0)?`Scale ${(206.265*px/eff).toFixed(2)}"/px`:'Scale —"/px';
-}
-
-/* ---------- Storage ---------- */
+/* ====== STORAGE ====== */
+function loadTH(){try{return JSON.parse(localStorage.getItem('gng.thresholds'))||CONFIG.thresholds}catch(_){return CONFIG.thresholds}}
+function saveTH(t){localStorage.setItem('gng.thresholds',JSON.stringify(t))}
 function saveSetup(){
-  const U=ui();
-  const data = {
-    scope:{sel:U.scopeSel.value, factor:effectiveFactor},
-    cam:{sel:U.camSel.value},
-    loc:{lat:U.lat.value, lon:U.lon.value},
-    session:{hours:U.hours.value}
-  };
-  localStorage.setItem('gng.setup', JSON.stringify(data));
+  const data={scope:{sel:$("#scopeSel").value,factor:currentFactor},cam:{sel:$("#camSel").value},
+    loc:{lat:$("#lat").value,lon:$("#lon").value},session:{start:$("#start").value,dur:$("#duration").value}};
+  localStorage.setItem('gng.setup',JSON.stringify(data));
 }
 function loadSaved(){
-  const U=ui(); const j=localStorage.getItem('gng.setup'); if(!j) return;
-  try{ const d=JSON.parse(j);
-    if(d.scope){ U.scopeSel.value=d.scope.sel; effectiveFactor=d.scope.factor||1; }
-    if(d.cam){ U.camSel.value=d.cam.sel; }
-    if(d.loc){ U.lat.value=d.loc.lat; U.lon.value=d.loc.lon; }
-    if(d.session){ U.hours.value=d.session.hours||3; }
-  }catch{}
-  renderChips(); updateOptics();
+  const j=localStorage.getItem('gng.setup'); if(!j)return;
+  const d=JSON.parse(j);
+  if(d.scope){$("#scopeSel").value=d.scope.sel; setFactor(d.scope.factor||1);}
+  if(d.cam){$("#camSel").value=d.cam.sel}
+  if(d.loc){$("#lat").value=d.loc.lat;$("#lon").value=d.loc.lon}
+  if(d.session){$("#start").value=d.session.start;$("#duration").value=d.session.dur}
 }
-function loadTH(){ try{ return JSON.parse(localStorage.getItem('gng.thresholds')) || CONFIG.thresholds; }catch(_){ return CONFIG.thresholds; } }
-function saveTH(t){ localStorage.setItem('gng.thresholds', JSON.stringify(t)); }
+function getNamedPresets(){try{return JSON.parse(localStorage.getItem('gng.namedPresets'))||[]}catch(_){return[]}}
+function setNamedPresets(list){localStorage.setItem('gng.namedPresets',JSON.stringify(list))}
 
-function getNamedPresets(){ try{return JSON.parse(localStorage.getItem('gng.namedPresets'))||[]}catch(_){return[]} }
-function setNamedPresets(list){ localStorage.setItem('gng.namedPresets', JSON.stringify(list)); refreshPresetList(); }
-function currentSetupObj(){ const U=ui(); return { name:(U.presetName?.value||''), scope:{sel:U.scopeSel.value, factor:effectiveFactor}, cam:{sel:U.camSel.value}, loc:{lat:U.lat.value, lon:U.lon.value}, session:{hours:U.hours.value} }; }
-function applySetupObj(d){ const U=ui(); if(!d) return;
-  if(d.scope){U.scopeSel.value=d.scope.sel; effectiveFactor=d.scope.factor||1; renderChips();}
-  if(d.cam){U.camSel.value=d.cam.sel;}
-  if(d.loc){U.lat.value=d.loc.lat;U.lon.value=d.loc.lon;}
-  if(d.session){U.hours.value=d.session.hours||3;}
-  updateOptics(); computeAll();
+/* ====== UI & LOGIC ====== */
+let currentFactor=1;
+function setFactor(f){currentFactor=f; highlightChip(f); updateOptics(); computeAll()}
+function buildChips(){
+  const s=scopes[parseInt($("#scopeSel").value,10)];
+  const key='gng.preset.'+s.id; const custom=localStorage.getItem(key); const list=s.presets.slice();
+  if(custom){const v=parseFloat(custom); if(Number.isFinite(v)&&list.indexOf(v)<0)list.unshift(v)}
+  const box=$("#chips"); box.innerHTML='';
+  list.forEach(f=>{const b=document.createElement('button'); b.textContent=f+'x';
+    b.onclick=()=>setFactor(f); box.appendChild(b)});
 }
-function refreshPresetList(){ const U=ui(); const sel=U.presetList; if(!sel) return;
-  const list=getNamedPresets(); const current=sel.value;
-  sel.innerHTML='<option value="">Load preset…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
-  if(current) sel.value=current;
+function highlightChip(v){ $$("#chips button").forEach(b=>b.classList.toggle('active',b.textContent===String(v)+'x')) }
+function updateOptics(){
+  const s=scopes[parseInt($("#scopeSel").value,10)]; const c=cameras[parseInt($("#camSel").value,10)];
+  const fl=(s?.fl||0)*currentFactor; const sw=c?.w||0, sh=c?.h||0, px=c?.px||0;
+  $("#fov").textContent=(fl&&sw&&sh)?`FOV ${(57.2958*sw/fl).toFixed(1)}° × ${(57.2958*sh/fl).toFixed(1)}°`:'FOV —';
+  $("#scale").textContent=(fl&&px)?`Scale ${(206.265*px/fl).toFixed(2)}″/px`:'Scale —';
 }
-function saveNamedPreset(){
-  const U=ui(); if(!U.presetName || !U.presetName.value.trim()){ alert('Enter a preset name'); return; }
-  const list=getNamedPresets(); const obj=currentSetupObj(); obj.name=U.presetName.value.trim();
-  const idx=list.findIndex(p=>p.name.toLowerCase()===obj.name.toLowerCase());
-  if(idx>=0) list[idx]=obj; else list.push(obj);
-  setNamedPresets(list); refreshPresetList();
-}
-function loadNamedPreset(){ const U=ui(); const sel=U.presetList; if(!sel || !sel.value) return;
-  const list=getNamedPresets(); const i=parseInt(sel.value,10); if(Number.isFinite(i) && list[i]) applySetupObj(list[i]);
-}
-function deleteNamedPreset(){ const U=ui(); const sel=U.presetList; if(!sel||!sel.value) return;
-  const list=getNamedPresets(); const i=parseInt(sel.value,10); if(Number.isFinite(i)){ list.splice(i,1); setNamedPresets(list); refreshPresetList(); }
-}
-
-/* ---------- Weather ---------- */
-async function tryGPS(){
-  const U=ui(); try{ U.btnGPS.disabled=true; }catch(_){}
-  try{
-    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
-    U.lat.value = pos.coords.latitude.toFixed(5);
-    U.lon.value = pos.coords.longitude.toFixed(5);
-    localStorage.setItem('gng.last.lat',U.lat.value);
-    localStorage.setItem('gng.last.lon',U.lon.value);
-    toast('GPS set','success');
-    autoFetchWeather();
-  }catch(e){ toast('GPS failed','warn'); }
-  finally{ try{U.btnGPS.disabled=false}catch(_){ } }
-}
-async function autoFetchWeather(showToast){
-  const U=ui();
-  const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ toast('Set lat/lon','warn'); return; }
-  try{
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m&timezone=auto`;
-    const r = await fetch(url, {cache:'no-store'}); const j=await r.json();
-    lastWeather = j; setCloudFromWeather();
-    if(showToast) toast('Weather refreshed','success');
-    computeAll();
-  }catch(e){ toast('Weather failed','error'); }
-}
-function setCloudFromWeather(){
-  const U=ui();
-  if(!lastWeather || !lastWeather.hourly){ U.cloudSource.textContent='No weather'; return; }
-  // Use next 3 hours avg
-  const cc = lastWeather.hourly.cloud_cover.slice(0,3);
-  const avg = Math.round(cc.reduce((a,b)=>a+b,0)/cc.length);
-  if(cloudOverride==null) U.cloudSlider.value = String(avg);
-  U.cloudPct.textContent = (cloudOverride??avg)+'%';
-  U.cloudSource.textContent = 'From Open-Meteo (hourly) · slider overrides';
-}
-
-/* ---------- Display helpers ---------- */
-function setUpdatedAt(){
-  const t = new Date().toLocaleTimeString();
-  ui().updatedAt.textContent = 'Updated ' + t;
-  ui().updatedAt.href = '#';
-}
-
-/* ---------- Compute / Score ---------- */
-function scoreTarget(o, mid, lat, lon, mInfo){
-  const alt = altFor(o.ra, o.dec, lat, lon, mid);
-  if(alt < TH.alt_min) return {score:0, alt, sep:null};
-
-  const clouds = getClouds();
-  const cloudScore = 1 - lerp01(clouds, TH.cloud_good, TH.cloud_bad);
-
-  const sep = sepDeg(o.ra, o.dec, mInfo.raH, mInfo.decD);
-  let sepFactor = 1 - lerp01(sep, TH.moon_tight, TH.moon_loose); // 1 near moon
-  sepFactor = 1 - sepFactor; // invert: 1 when far
-  const moonScore = clamp01(sepFactor * (1 - mInfo.illum));
-
-  // rudimentary met score from weather row 0
-  let rh=50, wind=15, vis=10;
-  try{
-    if(lastWeather?.hourly){
-      rh = lastWeather.hourly.relative_humidity_2m[0] ?? rh;
-      wind = lastWeather.hourly.wind_speed_10m[0] ?? wind;
-      vis = (lastWeather.hourly.visibility[0]||0)/1000 || vis;
-    }
-  }catch(_){}
-  const windScore = 1 - lerp01(wind, TH.wind_good, TH.wind_bad);
-  const rhScore   = 1 - lerp01(rh, TH.humid_good, TH.humid_bad);
-  const visScore  = lerp01(vis, TH.vis_bad, TH.vis_good);
-  const metScore  = clamp01((windScore + rhScore + visScore)/3);
-
-  const altScore = alt>=TH.alt_best ? 1 : lerp01(alt, TH.alt_min, TH.alt_best);
-
-  const W = TH.weights;
-  const score = clamp01(W.alt*altScore + W.cloud*cloudScore + W.moon*moonScore + W.met*metScore);
-  return {score, alt, sep};
-}
-
-function getClouds(){
-  const U=ui();
-  const v = cloudOverride==null ? parseInt(U.cloudSlider.value,10) : cloudOverride;
-  U.cloudPct.textContent = v + '%';
-  return v;
-}
-
-function computeAll(){
-  const U=ui();
-
-  // geometry & times
-  const lat=parseFloat(U.lat.value), lon=parseFloat(U.lon.value);
-  const okLoc = Number.isFinite(lat)&&Number.isFinite(lon);
-
-  // sun & moon
-  const start=new Date(); const hours=parseInt(U.hours.value,10)||3; const mid=new Date(start.getTime()+hours*0.5*3600*1000);
-  const s=sunEq(mid), m=moonEq(mid);
-  const altSun = altFor(s.raH, s.decD, (lat||0), (lon||0), mid);
-  const phase = (m.lonD - s.lamD + 360)%360;
-  const illum = (1 - Math.cos(d2r(phase)))/2;
-  const altM = altFor(m.raH, m.decD, (lat||0), (lon||0), mid);
-
-  U.skyDark.textContent = altSun<=-12 ? 'Yes' : 'No';
-  U.sunAlt.textContent = 'Sun alt ' + altSun.toFixed(1)+'°';
-  U.moonIllum.textContent = Math.round(illum*100)+'%';
-  U.moonAlt.textContent = 'Alt ' + altM.toFixed(0)+'°';
-
-  // humidity / transparency quick labels
-  let rh=lastWeather?.hourly?.relative_humidity_2m?.[0] ?? null;
-  U.tagHum.textContent = 'Humidity ' + (rh==null?'—':rh+'%');
-  let vis=(lastWeather?.hourly?.visibility?.[0]||0)/1000;
-  let transp = vis>=15?'Excellent':vis>=10?'Good':vis>=6?'Fair':'Poor';
-  U.tagTrans.textContent = 'Transparency ' + (vis?transp:'n/a');
-
-  // Status banner (no clouds number here; clouds live in card)
-  const clouds = getClouds();
-  const dark = altSun<=-12;
-  let status='MARGINAL', cls='marg'; if(!dark) {status='NO-GO';cls='nogo';}
-  else if(clouds<=TH.cloud_good){status='GO';cls='go'} else if(clouds>=TH.cloud_bad){status='NO-GO';cls='nogo'}
-  U.badge.className='lozenge '+(cls==='go'?'go':cls==='nogo'?'nogo':'marg');
-  U.badge.textContent = cls==='go'?'GO':cls==='nogo'?'NO':'MARG';
-  U.statusText.innerHTML = `<span style="font-weight:700">${status}</span> — Clouds ~${clouds}% · Vis ${Math.round(vis||0)} km · ${dark?'Astro dark':'Too bright'}`;
-  U.statusExtra.textContent = `Sun alt ${altSun.toFixed(0)}° · Moon ${Math.round(illum*100)}% · alt ${altM.toFixed(0)}°`;
-
-  setUpdatedAt();
-
-  // Top 5 and table
-  if(!okLoc){ U.top5.innerHTML='<li class="small">Set location first</li>'; renderTable(); return; }
-  const mInfo = {raH:m.raH, decD:m.decD, illum};
-  const scored = MESSIER_SUBSET.map(o=>{
-    const r=scoreTarget(o,mid,lat,lon,mInfo);
-    return {id:o.id,name:o.name,type:o.type,alt:r.alt,sep:r.sep,score:r.score};
-  }).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-
-  U.top5.innerHTML = scored.length ?
-    scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★ </span>':''}<b>${o.id}</b> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${(o.sep||0).toFixed(0)}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('')
-    : '<li class="small">No suitable targets.</li>';
-
-  renderTable();
-}
-
-/* ---------- Catalog ---------- */
-function imgUrlForMessier(id){
-  // id is like "M31" -> m31.jpg
-  const n = id.replace(/[^0-9]/g,'');
-  return CONFIG.imageBase + 'm' + n + '.jpg';
-}
-
-function renderTable(){
-  const U=ui(); const q=(U.filter?.value||'').toLowerCase();
-  const rows = MESSIER_SUBSET.filter(o=>{
-    return !q || o.id.toLowerCase().includes(q) || o.name.toLowerCase().includes(q) || o.type.toLowerCase().includes(q);
-  }).map(o=>{
-    const url = imgUrlForMessier(o.id);
-    const img = `<a target="_blank" href="${url}" title="Open image"><img class="thumb" src="${url}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2276%22 height=%2256%22><rect width=%2276%22 height=%2256%22 fill=%22%230b1626%22/><text x=%2238%22 y=%2232%22 font-size=%2210%22 fill=%22%23a9b7c9%22 text-anchor=%22middle%22>no image</text></svg>'"></a>`;
-    return `<tr>
-      <td>${o.id}</td><td>${o.name}</td><td>${o.type}</td>
-      <td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td>
-      <td>${img}</td>
-    </tr>`;
-  }).join('');
-
-  U.table.innerHTML = `<table>
-    <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
-}
-
-/* ---------- Utilities ---------- */
-function composeBannerSummary(status, avg, vis, dark){
-  const parts = [];
-  parts.push(status + ' – Clouds ~' + Math.round(avg) + '%');
-  parts.push('Vis ' + Math.round(vis) + 'km');
-  parts.push(dark ? 'Astro dark' : 'Too bright');
+function bannerSummary(status,cloud,vis,dark,illum,altM,sAlt){
+  const parts=[]; parts.push(status); parts.push(`Clouds ~${Math.round(cloud)}%`); if(vis>0) parts.push(`Vis ${Math.round(vis)} km`);
+  parts.push(dark?'Astro dark':'Too bright'); parts.push(`Sun alt ${sAlt.toFixed(0)}° · Moon ${Math.round(illum*100)}% · alt ${altM.toFixed(0)}°`);
   return parts.join(' · ');
 }
 
-/* ---------- Kick minor UI ---------- */
-refreshPresetList();
+document.addEventListener('DOMContentLoaded',init);
+function init(){
+  // header buttons
+  let def=null;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();def=e;$("#btnInstall").disabled=false});
+  $("#btnInstall").onclick=async()=>{try{def?.prompt();await def?.userChoice;toast('Install prompt shown')}catch(e){toast('Install failed','err')}finally{def=null;$("#btnInstall").disabled=true}};
+  const root=document.documentElement;
+  $("#btnMode").onclick=()=>{const on= !root.classList.contains('compact'); root.classList.toggle('compact',on); $("#btnMode").textContent=on?'Compact on':'Compact off'; localStorage.setItem('gng.ui.compact',on?'1':'0')};
+  $("#btnNight").onclick=()=>{const blue=$("#btnNight").textContent==='Blue'; document.body.style.filter=blue?'hue-rotate(150deg)':'none'; $("#btnNight").textContent=blue?'Red':'Blue'};
 
+  // selects
+  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;$("#scopeSel").appendChild(o)});
+  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;$("#camSel").appendChild(o)});
+  $("#scopeSel").value=0; $("#camSel").value=0; buildChips(); highlightChip(1);
+
+  // saved
+  const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+  $("#start").value=now.toISOString().slice(0,16);
+  loadSaved(); updateOptics();
+
+  // binds
+  $("#scopeSel").onchange=()=>{buildChips(); updateOptics(); computeAll(); saveSetup()};
+  $("#camSel").onchange=()=>{updateOptics(); computeAll(); saveSetup()};
+  $("#lat").oninput=$("#lon").oninput=$("#duration").oninput=$("#start").oninput=()=>{saveSetup()};
+  $("#gpsBtn").onclick=tryGPS; $("#recompute").onclick=()=>{computeAll(); setUpdatedAt(); toast('Targets updated')};
+  $("#calc").onclick=()=>{manualCloud=null; $("#cloudMeta").textContent='From Open-Meteo (hourly) · slider overrides'; autoFetchWeather(true)};
+  $("#useWx").onclick=()=>{manualCloud=null; computeAll(); toast('Using weather clouds')};
+  $("#btnSaveNamed").onclick=()=>{const nm=$("#presetName").value.trim(); if(!nm){alert('Enter a preset name');return;} const list=getNamedPresets(); const obj=currentSetupObj(); obj.name=nm; const i=list.findIndex(p=>p.name.toLowerCase()===nm.toLowerCase()); if(i>=0)list[i]=obj; else list.push(obj); setNamedPresets(list); refreshPresetList(); toast('Preset saved')};
+  $("#btnDeleteNamed").onclick=()=>{const sel=$("#presetList"); if(!sel.value)return; const list=getNamedPresets(); const i=parseInt(sel.value,10); if(Number.isFinite(i)){ list.splice(i,1); setNamedPresets(list); refreshPresetList(); toast('Preset deleted','warn')}};
+  $("#presetList").onchange=()=>{const sel=$("#presetList"); if(!sel.value)return; const list=getNamedPresets(); const i=parseInt(sel.value,10); if(Number.isFinite(i) && list[i]){ applySetupObj(list[i]); toast('Preset loaded') }};
+  $("#btnCopyHelp").onclick=()=>{navigator.clipboard.writeText($("#helpText").value).then(()=>toast('Help copied','ok')).catch(()=>toast('Copy failed','err'))};
+
+  // initial weather + compute
+  const Llat=localStorage.getItem('gng.last.lat'), Llon=localStorage.getItem('gng.last.lon');
+  if(Llat&&Llon){$("#lat").value=Llat; $("#lon").value=Llon; autoFetchWeather(true)} else {tryGPS()}
+  refreshPresetList(); computeAll();
+}
+
+function currentSetupObj(){return {scope:{sel:$("#scopeSel").value,factor:currentFactor},cam:{sel:$("#camSel").value},loc:{lat:$("#lat").value,lon:$("#lon").value},session:{start:$("#start").value,dur:$("#duration").value}}}
+function applySetupObj(d){ if(d.scope){$("#scopeSel").value=d.scope.sel; setFactor(d.scope.factor||1); buildChips()} if(d.cam){$("#camSel").value=d.cam.sel} if(d.loc){$("#lat").value=d.loc.lat;$("#lon").value=d.loc.lon} if(d.session){$("#start").value=d.session.start;$("#duration").value=d.session.dur} updateOptics(); computeAll()}
+function refreshPresetList(){const sel=$("#presetList"); if(!sel)return; const list=getNamedPresets(); const cur=sel.value; sel.innerHTML='<option value=\"\">Load preset…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join(''); if(cur) sel.value=cur}
+
+async function tryGPS(){
+  try{$("#gpsBtn").disabled=true}catch(_){}
+  try{
+    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
+    $("#lat").value=pos.coords.latitude.toFixed(5); $("#lon").value=pos.coords.longitude.toFixed(5);
+    localStorage.setItem('gng.last.lat',$("#lat").value); localStorage.setItem('gng.last.lon',$("#lon").value);
+    autoFetchWeather(true); toast('GPS set')
+  }catch(e){toast('GPS failed','warn')}
+  finally{try{$("#gpsBtn").disabled=false}catch(_){}}
+}
+
+function onCloudSlider(){ manualCloud=parseInt($("#cloudSlider").value,10); $("#cloudMeta").textContent='Manual slider'; computeAll(); }
+
+async function autoFetchWeather(andCompute){
+  const lat=parseFloat($("#lat").value), lon=parseFloat($("#lon").value);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){ $("#cloudMeta").textContent='Set lat/lon first'; return; }
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m&timezone=auto`);
+    lastWeather=await r.json();
+    if(andCompute) computeAll();
+  }catch(e){ toast('Weather failed','err') }
+}
+
+function computeAll(){
+  const U=uiSnap();
+  const mInfo=updateMoonInfo();
+  const clouds = (manualCloud!=null)? manualCloud : avgNextHours('cloud_cover',3) ?? 60;
+  $("#cloudSlider").value=clouds;
+  const vis = avgNextHours('visibility',3); const visKm = vis? (vis/1000):0;
+  $("#humid").textContent = fmt(avgNextHours('relative_humidity_2m',3),'%');
+  $("#transp").textContent = transpLabel(visKm);
+
+  // status + summary
+  const statusClass = computeStatusClass(clouds, U.dark);
+  $("#statusBadge").className = 'badge '+statusClass.cls;
+  $("#statusBadge").textContent = statusClass.text;
+  $("#summary").textContent = bannerSummary(statusClass.text, clouds, visKm, U.dark, mInfo.illum, mInfo.altM, U.sunAlt);
+  setUpdatedAt();
+
+  // top 5 + table
+  computeTop5(clouds, mInfo, visKm);
+  renderTable();
+}
+
+function uiSnap(){
+  const lat=parseFloat($("#lat").value)||0, lon=parseFloat($("#lon").value)||0;
+  const start=new Date($("#start").value||new Date()); const hours=parseInt($("#duration").value,10)||3;
+  const mid=new Date(start.getTime()+hours*0.5*3600*1000);
+  const s=sunEq(mid); const sunAlt=altFor(s.raH,s.decD,lat,lon,mid); const dark=(sunAlt<=-12);
+  $("#astroDark").textContent = dark?'Yes':'No'; $("#sunMeta").textContent = `Sun alt ${sunAlt.toFixed(1)}°`;
+  return {lat,lon,start,hours,mid,dark,sunAlt};
+}
+function updateMoonInfo(){
+  const U=uiSnap(); const s=sunEq(U.mid); const m=moonEq(U.mid); const altM=altFor(m.raH,m.decD,U.lat,U.lon,U.mid);
+  const phase=(m.lonD-s.lamD+360)%360; const illum=(1-Math.cos(d2r(phase)))/2;
+  $("#moonIllum").textContent = Math.round(illum*100)+'%'; $("#moonMeta").textContent = `Alt ${altM.toFixed(0)}°`;
+  $("#miniMoon").textContent = `Moon ${Math.round(illum*100)}% · alt ${altM.toFixed(0)}°`;
+  return {raH:m.raH,decD:m.decD,illum,altM};
+}
+function computeStatusClass(clouds,dark){
+  let status='MARGINAL',cls='marginal';
+  if(!dark){status='NO-GO';cls='nogo'}
+  else if(clouds<=TH.cloud_good){status='GO';cls='go'}
+  else if(clouds>=TH.cloud_bad){status='NO-GO';cls='nogo'}
+  return {text:status,cls};
+}
+function computeTop5(clouds,mInfo,visKm){
+  const U=uiSnap(); const s=sunEq(U.mid); if(altFor(s.raH,s.decD,U.lat,U.lon,U.mid)>-12){ $("#top5").innerHTML='<li class="small">Astronomical darkness not reached.</li>'; return; }
+  const scored=MESSIER_SUBSET.map(o=>{
+    const alt=altFor(o.ra,o.dec,U.lat,U.lon,U.mid);
+    if(alt<TH.alt_min) return {...o,score:0,alt,sep:0};
+    const cloudScore=1-lerp01(clouds,TH.cloud_good,TH.cloud_bad);
+    const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD);
+    let sepFactor=1-lerp01(sep,TH.moon_tight,TH.moon_loose); sepFactor=1-sepFactor;
+    const moonScore=clamp01(sepFactor*(1-mInfo.illum));
+    const row0=firstRowWx(); let wind=15,rh=50,vis=visKm||10; if(row0){/* placeholders retained */}
+    const windScore=1-lerp01(wind,TH.wind_good,TH.wind_bad);
+    const rhScore=1-lerp01(rh,TH.humid_good,TH.humid_bad);
+    const visScore=lerp01(vis,TH.vis_bad,TH.vis_good);
+    const metScore=clamp01((windScore+rhScore+visScore)/3);
+    const altScore=alt>=TH.alt_best?1:lerp01(alt,TH.alt_min,TH.alt_best);
+    const W=TH.weights; const score=clamp01(W.alt*altScore+W.cloud*cloudScore+W.moon*moonScore+W.met*metScore);
+    return {...o,score,alt,sep};
+  }).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
+  $("#top5").innerHTML = scored.length? scored.map((o,i)=>`<li>${i===0?'<span aria-hidden="true">★</span> ':''}<b>${o.id}</b> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100).toFixed(0)}%</li>`).join('') : '<li class="small">No suitable targets.</li>';
+}
+function renderTable(){
+  const q=$("#search").value?.toLowerCase()||'';
+  const rows=MESSIER_SUBSET.filter(o=>!q||o.id.toLowerCase().includes(q)||o.name.toLowerCase().includes(q)||o.type.toLowerCase().includes(q))
+    .map(o=>{const url=imageForMessier(o.id.toLowerCase()); return `<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td><td><a href="${url}" target="_blank" title="Open full-res"><img class="img-thumb" src="${url}" alt="${o.id}"></a></td></tr>`}).join('');
+  $("#table").innerHTML = `<table><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* ====== WEATHER HELPERS ====== */
+function avgNextHours(field,n){
+  try{
+    if(!lastWeather||!lastWeather.hourly) return null;
+    const H=lastWeather.hourly; const arr=H[field]; if(!arr||!arr.length) return null;
+    const v=arr.slice(0,n).map(x=>+x||0); return v.reduce((a,b)=>a+b,0)/v.length;
+  }catch{ return null }
+}
+function firstRowWx(){return lastWeather?.hourly?{cloud:lastWeather.hourly.cloud_cover?.[0]??null}:null}
+function transpLabel(visKm){ if(!visKm) return '—'; if(visKm>=20) return 'Excellent'; if(visKm>=15) return 'Good'; if(visKm>=10) return 'Fair'; return 'Poor' }
+function fmt(x,unit){ if(x==null) return '—'; return `${Math.round(x)}${unit||''}` }
+function setUpdatedAt(){ const el=$("#updatedAt"); if(el){ const now=new Date(); el.textContent='Updated '+ now.toLocaleTimeString() } }
 </script>
 </body>
 </html>
+```0
