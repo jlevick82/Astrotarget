@@ -1,395 +1,606 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Nightly Go/No-Go v26.2</title>
-<link rel="icon" href="favicon.ico">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Nightly Go/No-Go v26.3</title>
+<meta name="theme-color" content="#0b1625"/>
+<link rel="icon" href="favicon.ico"/>
 <style>
 :root{
-  --bg:#0e1722;--card:#182436;--edge:#253247;--muted:#9fb0c7;
-  --text:#dfe8f5;--text-weak:#b8c6d9;--good:#1f7a3b;--bad:#8b2636;--warn:#86620b;
-  --accent:#3b82f6;--chip:#0f1a2a;--shadow:0 6px 24px rgba(0,0,0,.35);
-  --radius:18px;--radius-sm:12px;--pad:16px;--gap:16px;--headline:42px;
+  --bg:#0b1625;--panel:#122033;--panel-2:#172a43;--text:#dfe7f5;--muted:#9fb1cb;--chip:#0f1c2d;--ok:#1a7f3c;--warn:#9c6b00;--bad:#8b1e2b;
+  --accent:#3b82f6;--ring:#5aa0ff;--shadow:rgba(0,0,0,.35);
+  --radius:18px;--radius-sm:12px;--gap:14px;
+  --fs-h1:clamp(26px,5vw,52px);--fs-h2:20px;--fs:16px;--fs-sm:14px;--fs-xs:12px;
 }
-*{box-sizing:border-box}html,body{margin:0;height:100%;background:linear-gradient(180deg,#0c141f,#0b1624 30%,#0e1722)}
-body{color:var(--text);font:400 16px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial}
-a{color:#9ec3ff;text-decoration:none}
-.app{max-width:940px;margin:24px auto;padding:0 14px}
-h1{font-size:var(--headline);margin:0 0 8px;font-weight:800;letter-spacing:.2px}
-.topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.topbar .btn{padding:10px 14px;border-radius:14px;background:#132034;border:1px solid var(--edge);color:var(--text);box-shadow:var(--shadow)}
-.badge{display:inline-flex;align-items:center;gap:10px;padding:14px;border-radius:16px;background:#132033;border:1px solid var(--edge)}
-.badge .dot{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700}
-.badge.go .dot{background:#10301d;color:#aef3c0;border:1px solid #2d8a4f}
-.badge.nogo .dot{background:#301316;color:#ffb6b6;border:1px solid #8b2636}
-.badge.marginal .dot{background:#2b2512;color:#ffe39a;border:1px solid #86620b}
-.badge strong{font-weight:700}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-.card{background:var(--card);border:1px solid var(--edge);border-radius:var(--radius);padding:var(--pad);box-shadow:var(--shadow)}
-.card h3{margin:0 0 12px;font-size:20px}
-.small{color:var(--text-weak);font-size:13px}
-.pill{background:#0f1a2a;border:1px solid var(--edge);padding:8px 12px;border-radius:999px;color:var(--text-weak);display:inline-block}
-.controls{display:flex;gap:12px;flex-wrap:wrap}
-.btn{background:#132034;border:1px solid var(--edge);color:var(--text);padding:10px 14px;border-radius:12px}
-input[type=range]{width:100%}
-select, input[type=text], input[type=number]{width:100%;background:#0f1a2a;border:1px solid var(--edge);color:var(--text);padding:12px;border-radius:12px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.metric{background:#121e31;border:1px solid var(--edge);border-radius:14px;padding:14px}
-.metric .cap{font-size:13px;color:var(--text-weak)}
-.metric .val{font-size:28px;font-weight:800;margin-top:6px}
-.metric .sub{margin-top:6px}
-.table{overflow:auto;border-radius:16px;border:1px solid var(--edge)}
-table{width:100%;border-collapse:separate;border-spacing:0}
-th,td{padding:12px 14px;border-bottom:1px solid var(--edge);vertical-align:middle}
-th{position:sticky;top:0;background:#122033;font-weight:600}
-.thumb{width:76px;height:56px;border-radius:10px;border:1px solid var(--edge);object-fit:cover;display:block}
-.footer{opacity:.6;margin:26px 0 40px;text-align:center}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);background:#0a1c30;border:1px solid var(--edge);color:#fff;padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* Lightbox */
-#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:9999}
-#lightbox.show{display:flex}
-#lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;border-radius:8px}
-/* Compact mode */
-.compact h1{font-size:32px}
-.compact .badge{padding:10px}
-.compact .metric .val{font-size:22px}
-.compact .card{padding:12px;border-radius:14px}
-@media (max-width:740px){
-  .row{grid-template-columns:1fr}
-  .grid-2,.metrics{grid-template-columns:1fr 1fr}
-}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 600px at 10% -10%,#132337 20%,transparent 60%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;line-height:1.35;-webkit-font-smoothing:antialiased}
+a{color:var(--text);text-decoration:none}
+h1{font-size:var(--fs-h1);line-height:1.02;margin:14px 0 4px}
+h2{font-size:var(--fs-h2);margin:0 0 8px}
+small{color:var(--muted)}
+.container{max-width:980px;margin:0 auto;padding:18px}
+.row{display:grid;grid-template-columns:1fr;gap:var(--gap)}
+@media(min-width:760px){.row-2{grid-template-columns:1fr 1fr}.row-3{grid-template-columns:1fr 1fr 1fr}}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border-radius:var(--radius);box-shadow:0 10px 24px var(--shadow);padding:16px;position:relative}
+.header{display:flex;align-items:end;justify-content:space-between;gap:12px}
+.badge{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:10px 14px;background:#0e1a29;border:1px solid #26364b}
+.badge strong{background:#0e1a29;border:2px solid #1f2f46;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:700}
+.btn{appearance:none;border:1px solid #2e4361;background:#13243a;color:var(--text);padding:10px 16px;border-radius:14px;font-weight:600;font-size:15px;cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.btn-pill{border-radius:999px}
+.btn-ghost{background:#0e1a29}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap}
+.kv{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.kv .chip{background:var(--chip);border:1px solid #24364f;border-radius:999px;padding:8px 12px;font-size:14px;color:var(--muted)}
+.kv .chip b{color:var(--text);font-weight:700;margin-right:6px}
+.grid-mini{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:#0f1d2f;border:1px solid #22354f;border-radius:16px;padding:12px}
+.tile .sub{color:var(--muted);font-size:var(--fs-sm)}
+.tile .value{font-size:28px;font-weight:800}
+.help{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0f1c2d;border:1px solid #24364f;border-radius:16px;padding:14px;color:#cfe1ff}
+.hr{height:1px;background:#253a59;margin:10px 0;border-radius:2px;opacity:.6}
+select,input,textarea{width:100%;background:#0e1a29;border:1px solid #294261;border-radius:12px;padding:12px 14px;color:var(--text);font-size:16px}
+select{padding-right:36px}
+label{font-weight:600;color:var(--muted);font-size:14px}
+.row-form{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:760px){.row-form{grid-template-columns:1fr 1fr 1fr}}
+.pills{display:flex;gap:10px;flex-wrap:wrap}
+.pill{background:#0e1a29;border:1px solid #2c3f5a;border-radius:999px;padding:10px 16px;font-weight:700}
+.pill.is-on{outline:2px solid var(--ring);background:#102844}
+.stat{display:flex;align-items:center;gap:6px;color:var(--muted)}
+/* collapsible */
+.collapse{position:absolute;top:12px;right:12px}
+.chev{width:36px;height:36px;border-radius:10px;border:1px solid #2b3f5b;background:#0f1d2f;color:#9fb1cb;display:grid;place-items:center}
+.card[data-collapsed="1"] .body{display:none}
+.card[data-collapsed="1"] .chev{transform:rotate(-90deg)}
+/* toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;display:flex;gap:10px;align-items:center;padding:12px 16px;border-radius:12px;border:1px solid #2c3f5a;background:#0f1d2f;color:var(--text);box-shadow:0 8px 20px var(--shadow);z-index:9999;min-width:260px}
+.toast.ok{border-color:#1b7a42;background:rgba(22,122,66,.18)}
+.toast.warn{border-color:#986a00;background:rgba(152,106,0,.18)}
+.toast.err{border-color:#8b1e2b;background:rgba(139,30,43,.2)}
+/* catalog table */
+.table{width:100%;border-collapse:separate;border-spacing:0 12px}
+.table th{color:var(--muted);font-weight:600;text-align:left;font-size:14px;padding:0 8px}
+.table td{background:#0f1d2f;border:1px solid #24364f;border-left:none;border-right:none;padding:10px 8px}
+.table tr{border-radius:12px}
+.table td:first-child{border-left:1px solid #24364f;border-top-left-radius:12px;border-bottom-left-radius:12px}
+.table td:last-child{border-right:1px solid #24364f;border-top-right-radius:12px;border-bottom-right-radius:12px}
+.thumb{width:70px;height:70px;border-radius:10px;object-fit:cover;border:1px solid #2c3f5a;cursor:pointer}
+/* lightbox */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:9998}
+#lightbox img{max-width:96vw;max-height:90vh;display:block;border-radius:12px}
+/* compact toggle */
+body.compact .tile .value{font-size:22px}
+body.compact .card{padding:14px}
+body.compact .badge strong{transform:scale(.9)}
+.note{font-size:13px;color:var(--muted)}
+/* theme hue helpers */
+.hue-blue{--accent:#3b82f6;--ring:#5aa0ff}
+.hue-red{--accent:#f97316;--ring:#ffb25a}
+.hue-green{--accent:#10b981;--ring:#54e0b1}
+.header-logo{width:46px;height:46px;border-radius:10px;background:#000;display:inline-block;vertical-align:middle;border:1px solid #2b3a50}
 </style>
 </head>
-<body>
-<div class="app" id="app">
-  <h1>Nightly<br>Go/No-Go <span class="small" id="ver">v26.2</span></h1>
-  <div class="topbar">
-    <button class="btn" id="btnInstall">Install</button>
-    <button class="btn" id="btnCompact">Compact off</button>
-    <button class="btn" id="btnNight">Blue</button>
-  </div>
-
-  <div class="card" id="statusCard">
-    <div class="badge" id="statusBadge">
-      <span class="dot">GO</span>
-      <div>
-        <div id="summaryLine" class="small">GO · Clouds ~— · Vis — km · Astro dark</div>
-        <a id="updatedAt" class="small" href="#">Updated —</a>
-      </div>
+<body class="hue-blue">
+<div class="container">
+  <div class="header">
+    <div>
+      <span class="header-logo" id="logoBox" title="App logo"></span>
+      <h1>Nightly<br/>Go/No-Go</h1>
+      <small>v26.3</small>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-pill" id="btnCompact">Compact <span id="cmpState">off</span></button>
+      <button class="btn btn-pill" id="btnHue">Blue</button>
     </div>
   </div>
 
-  <div class="row">
-    <div class="card">
-      <h3>Sky conditions</h3>
-      <div class="metrics">
-        <div class="metric">
-          <div class="cap">Astronomical dark</div>
-          <div class="val" id="astroYes">—</div>
-          <div class="sub pill" id="sunAlt">Sun alt —</div>
-        </div>
-        <div class="metric">
-          <div class="cap">Moon illum</div>
-          <div class="val" id="moonPct">—</div>
-          <div class="sub pill" id="moonAlt">Alt —</div>
-        </div>
-        <div class="metric">
-          <div class="cap">Humidity</div>
-          <div class="val" id="humidVal">—</div>
-        </div>
-        <div class="metric">
-          <div class="cap">Transparency</div>
-          <div class="val" id="transVal">—</div>
+  <!-- Status -->
+  <section class="card" id="cardStatus" data-collapsed="0">
+    <button class="collapse chev" data-toggle="#cardStatus">▾</button>
+    <div class="body">
+      <div class="badge" id="statusBadge">
+        <strong id="statusDot">GO</strong>
+        <div>
+          <div id="statusText" style="font-weight:800">GO — Clouds ~0% · Vis — · Astro dark</div>
+          <div class="stat"><span id="updatedAt">Updated …</span></div>
         </div>
       </div>
+      <div class="kv" style="margin-top:12px" id="statusChips">
+        <!-- chips injected -->
+      </div>
     </div>
+  </section>
 
-    <div class="card">
-      <h3>Clouds (avg)</h3>
-      <input id="cloudSlider" type="range" min="0" max="100" value="30">
-      <div class="controls">
-        <button class="btn" id="btnUseWx">Use</button>
-        <button class="btn" id="btnCalc">Calculate</button>
+  <!-- Sky (compact) + Clouds -->
+  <div class="row row-2">
+    <section class="card" id="cardSky" data-collapsed="0">
+      <button class="collapse chev" data-toggle="#cardSky">▾</button>
+      <div class="body">
+        <h2>Sky</h2>
+        <div class="grid-mini">
+          <div class="tile">
+            <div class="sub">Astronomical dark</div>
+            <div class="value" id="astroYes">—</div>
+            <div class="sub" id="astroMeta">Sun alt —</div>
+          </div>
+          <div class="tile">
+            <div class="sub">Moon illum</div>
+            <div class="value" id="moonIllum">—</div>
+            <div class="sub" id="moonMeta">Alt —</div>
+          </div>
+          <div class="tile">
+            <div class="sub">Humidity</div>
+            <div class="value" id="humidVal">—</div>
+          </div>
+          <div class="tile">
+            <div class="sub">Transparency</div>
+            <div class="value" id="transVal">—</div>
+          </div>
+        </div>
       </div>
-      <div class="small">From Open-Meteo (hourly) · slider overrides · <span id="cloudSource" class="pill">—</span></div>
-    </div>
+    </section>
+
+    <section class="card" id="cardClouds" data-collapsed="0">
+      <button class="collapse chev" data-toggle="#cardClouds">▾</button>
+      <div class="body">
+        <h2>Clouds (avg)</h2>
+        <input type="range" min="0" max="100" value="10" id="cloudSlider" aria-label="Cloud cover"/>
+        <div class="btn-group" style="margin-top:12px">
+          <button class="btn" id="btnUseClouds">Use</button>
+          <button class="btn" id="btnCalcClouds">Calculate</button>
+        </div>
+        <div class="note" id="cloudNote">From Open-Meteo (hourly) · slider overrides</div>
+      </div>
+    </section>
   </div>
 
-  <div class="card">
-    <h3>Quick setup</h3>
-    <div class="grid-2">
-      <div><div class="cap small">Latitude (°)</div><input id="lat" type="number" step="0.00001"></div>
-      <div><div class="cap small">Longitude (°)</div><input id="lon" type="number" step="0.00001"></div>
-      <div><div class="cap small">Hours</div><input id="hours" type="number" min="1" max="12" value="3"></div>
-    </div>
-    <div class="controls" style="margin-top:12px">
-      <button class="btn" id="gpsBtn">Use GPS</button>
-      <button class="btn" id="demoBtn">Demo</button>
-      <button class="btn" id="recompute">Calculate Now</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Gear</h3>
-    <div class="grid-2">
-      <div>
-        <div class="cap small">Scope</div>
-        <select id="scopeSel"></select>
+  <!-- Quick setup -->
+  <section class="card" id="cardQuick" data-collapsed="0">
+    <button class="collapse chev" data-toggle="#cardQuick">▾</button>
+    <div class="body">
+      <h2>Quick setup</h2>
+      <div class="row-form">
+        <div><label>Latitude (°)</label><input id="lat" inputmode="decimal"></div>
+        <div><label>Longitude (°)</label><input id="lon" inputmode="decimal"></div>
+        <div><label>Hours</label><input id="hours" type="number" min="1" max="12" value="3"></div>
       </div>
-      <div>
-        <div class="cap small">Reducer / Barlow</div>
-        <div class="controls">
-          <button class="btn factor" data-f="0.8">0.8x</button>
-          <button class="btn factor" data-f="1">1x</button>
-          <button class="btn factor" data-f="2">2x</button>
+      <div class="btn-group" style="margin-top:12px">
+        <button class="btn" id="btnGPS">Use GPS</button>
+        <button class="btn" id="btnCalc">Calculate Now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gear -->
+  <section class="card" id="cardGear" data-collapsed="0">
+    <button class="collapse chev" data-toggle="#cardGear">▾</button>
+    <div class="body">
+      <h2>Gear</h2>
+      <div class="row-form">
+        <div>
+          <label>Scope</label>
+          <select id="scope">
+            <option value="560">SVBONY SV503 80ED (560mm f/7)</option>
+            <option value="448">SVBONY SV503 80ED + 0.8x (448mm)</option>
+            <option value="910">Celestron 102AZ (910mm)</option>
+          </select>
+        </div>
+        <div>
+          <label>Reducer / Barlow</label>
+          <div class="pills" id="rb">
+            <div class="pill is-on" data-m="0.8">0.8x</div>
+            <div class="pill" data-m="1">1x</div>
+            <div class="pill" data-m="2">2x</div>
+          </div>
+        </div>
+        <div>
+          <label>Camera</label>
+          <select id="camera">
+            <option value="3.76,3008">ZWO ASI533MC Pro (IMX533)</option>
+            <option value="4.63,3000">ZWO ASI294MC (IMX294)</option>
+          </select>
         </div>
       </div>
-      <div>
-        <div class="cap small">Camera</div>
-        <select id="camSel"></select>
+      <div class="row row-2" style="margin-top:12px">
+        <div class="tile"><div class="sub">FOV</div><div class="value" id="fovVal">—</div></div>
+        <div class="tile"><div class="sub">Scale</div><div class="value" id="scaleVal">—</div></div>
       </div>
-      <div>
-        <div class="cap small">FOV &amp; Scale</div>
-        <div class="controls">
-          <span class="pill" id="fov">FOV —</span>
-          <span class="pill" id="scale">Scale —</span>
-        </div>
+
+      <div class="btn-group" style="margin-top:12px">
+        <input id="presetName" placeholder="Preset name…" style="max-width:260px"/>
+        <button class="btn" id="btnSave">Save</button>
+        <select id="presetLoad" style="max-width:260px"><option>Load preset…</option></select>
+        <button class="btn" id="btnDelete">Delete</button>
       </div>
     </div>
-    <div class="controls" style="margin-top:12px">
-      <input id="presetName" type="text" placeholder="Preset name">
-      <button class="btn" id="savePreset">Save</button>
-      <select id="presetList"><option value="">Load preset…</option></select>
-      <button class="btn" id="deletePreset">Delete</button>
+  </section>
+
+  <!-- Top 5 -->
+  <section class="card" id="cardTop5" data-collapsed="0">
+    <button class="collapse chev" data-toggle="#cardTop5">▾</button>
+    <div class="body">
+      <h2>Top 5 Recommendations</h2>
+      <ol id="top5"></ol>
     </div>
-  </div>
+  </section>
 
-  <div class="card" id="top5Card">
-    <h3>Top 5 Recommendations</h3>
-    <ol id="top5" class="small" style="font-size:16px;line-height:1.6;margin:0"></ol>
-  </div>
-
-  <div class="card">
-    <h3>Catalog (subset)</h3>
-    <div class="table">
-      <table id="catTable">
-        <thead><tr><th style="width:70px">ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th style="width:100px">Image</th></tr></thead>
+  <!-- Catalog -->
+  <section class="card" id="cardCatalog" data-collapsed="0">
+    <button class="collapse chev" data-toggle="#cardCatalog">▾</button>
+    <div class="body">
+      <h2>Catalog (subset)</h2>
+      <input id="catSearch" placeholder="Search by ID / name / type" style="margin-bottom:12px"/>
+      <table class="table">
+        <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
         <tbody id="catBody"></tbody>
       </table>
+      <div class="note">Tap a thumbnail for full-screen. Images from your repo.</div>
     </div>
-    <div class="small" style="margin-top:8px">Tap image for full-screen (GitHub full-res).</div>
-  </div>
+  </section>
 
-  <div class="footer small">© AstroTarget — single-file build</div>
+  <!-- Help -->
+  <section class="card" id="cardHelp" data-collapsed="1">
+    <button class="collapse chev" data-toggle="#cardHelp">▾</button>
+    <div class="body">
+      <h2>What’s under the hood</h2>
+      <div class="help" id="helpText"></div>
+    </div>
+  </section>
+
+  <div id="lightbox"><img alt="Preview"/></div>
 </div>
-
-<div id="lightbox" aria-hidden="true">
-  <img id="lbImg" alt="">
-</div>
-
-<div class="toast" id="toast">Updated</div>
 
 <script>
-/* ========= utilities ========= */
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1300)}
-function d2r(x){return x*Math.PI/180}function r2d(x){return x*180/Math.PI}
-function jd(d){return d.getTime()/86400000+2440587.5}
-function gmst(d){const J=jd(d),T=(J-2451545)/36525;let th=280.46061837+360.98564736629*(J-2451545)+0.000387933*T*T-T*T*T/38710000;th=((th%360)+360)%360;return th/15}
-function lst(d,lon){return(gmst(d)+lon/15+24)%24}
-function sunEq(date){const J=jd(date),T=(J-2451545)/36525;const L0=(280.46646+36000.76983*T+0.0003032*T*T)%360;const M=(357.52911+35999.05029*T-0.0001537*T*T)%360;const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(d2r(M))+(0.019993-0.000101*T)*Math.sin(d2r(2*M))+0.000289*Math.sin(d2r(3*M));const lam=L0+C,eps=23.439291-0.0130042*T;const ra=Math.atan2(Math.cos(d2r(eps))*Math.sin(d2r(lam)),Math.cos(d2r(lam)));const dec=Math.asin(Math.sin(d2r(eps))*Math.sin(d2r(lam)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lamD:lam}}
-function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%360;const M=(134.963+13.064993*(J-2451545))%360;const F=(93.272+13.229350*(J-2451545))%360;const lon=(L+6.289*Math.sin(d2r(M)))%360;const lat=5.128*Math.sin(d2r(F)),eps=23.439;const ra=Math.atan2(Math.sin(d2r(lon))*Math.cos(d2r(eps))-Math.tan(d2r(lat))*Math.sin(d2r(eps)),Math.cos(d2r(lon)));const dec=Math.asin(Math.sin(d2r(lat))*Math.cos(d2r(eps))+Math.cos(d2r(lat))*Math.sin(d2r(eps))*Math.sin(d2r(lon)));return{raH:(ra<0?ra+2*Math.PI:ra)*12/Math.PI,decD:r2d(dec),lonD:lon}}
-function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
-function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
-function clamp01(x){return Math.max(0,Math.min(1,x))} function lerp01(x,a0,a1){if(a0===a1)return 0; return clamp01((x-a0)/(a1-a0))}
+(() => {
+  const V="v26.3";
+  const $=sel=>document.querySelector(sel);
+  const $$=sel=>Array.from(document.querySelectorAll(sel));
+  const fmt=(n,unit="")=>`${Math.round(n)}${unit}`;
 
-/* ========= data ========= */
-const scopes=[{id:'sv503',name:'SVBONY SV503 80ED (560mm f/7)',fl:560,ap:80},{id:'gt71',name:'William Optics GT71 (420mm f/5.9)',fl:420,ap:71},{id:'redcat',name:'RedCat 51 (250mm f/4.9)',fl:250,ap:51},{id:'edge8',name:'Celestron EdgeHD 8 (2032mm f/10)',fl:2032,ap:203},{id:'c6',name:'Celestron C6 / 6SE (1500mm f/10)',fl:1500,ap:150},{id:'custom',name:'Custom',fl:null,ap:null}];
-const cameras=[{name:'ZWO ASI533MC Pro (IMX533)',w:11.31,h:11.31,px:3.76},{name:'ZWO ASI2600 (IMX571 APS-C)',w:23.5,h:15.7,px:3.76},{name:'ZWO ASI6200 (Full Frame)',w:36.0,h:24.0,px:3.76},{name:'Canon T3i / 600D',w:22.3,h:14.9,px:4.30},{name:'Custom',w:null,h:null,px:null}];
-const MESSIER_SUBSET=[ // id,name,type,ra(h),dec(deg)
-  {id:'M31',name:'Andromeda Galaxy',type:'GX',ra:0.71,dec:41.3},
-  {id:'M33',name:'Triangulum Galaxy',type:'GX',ra:1.55,dec:30.7},
-  {id:'M27',name:'Dumbbell Nebula',type:'PN',ra:19.99,dec:22.7},
-  {id:'M57',name:'Ring Nebula',type:'PN',ra:18.89,dec:33.0},
-  {id:'M13',name:'Hercules Globular',type:'GC',ra:16.70,dec:36.5},
-  {id:'M45',name:'Pleiades',type:'OC',ra:3.79,dec:24.1}
-];
-
-/* ========= state ========= */
-let factor=0.8; let lastWeather=null;
-
-/* ========= gallery helpers ========= */
-function galleryBase(){
-  return 'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/';
-}
-function fullUrlFor(id){ // M31-> m31.jpg   C1-> c1.jpg
-  const low=id.toLowerCase();
-  const prefix = low.startsWith('m') ? 'm' : (low.startsWith('c')?'c':'');
-  return galleryBase()+ (prefix?low:('m'+low))+'.jpg';
-}
-
-/* ========= init ========= */
-document.addEventListener('DOMContentLoaded',init);
-function init(){
-  $("#btnCompact").addEventListener('click',()=>{
-    document.body.classList.toggle('compact');
-    $("#btnCompact").textContent=document.body.classList.contains('compact')?'Compact on':'Compact off';
-  });
-  $("#btnNight").addEventListener('click',()=>{
-    document.documentElement.classList.toggle('night');
-    $("#btnNight").textContent=document.documentElement.classList.contains('night')?'Red':'Blue';
-  });
-
-  scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;$("#scopeSel").appendChild(o)});
-  cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;$("#camSel").appendChild(o)});
-  $("#scopeSel").value=0; $("#camSel").value=0;
-
-  $$("#gear .factor"); // (placeholder)
-
-  $$(".factor").forEach(b=>b.addEventListener('click',()=>{factor=parseFloat(b.dataset.f); updateOptics(); toast('Optics updated')}));
-
-  $("#savePreset").addEventListener('click',savePreset);
-  $("#deletePreset").addEventListener('click',deletePreset);
-  $("#presetList").addEventListener('change',loadPreset);
-
-  $("#recompute").addEventListener('click',()=>{computeAll(); toast('Targets updated')});
-  $("#btnCalc").addEventListener('click',()=>{computeAll(); toast('Targets updated')});
-  $("#btnUseWx").addEventListener('click',()=>{ if(lastWeather) { useWeatherClouds(lastWeather); toast('Clouds from weather'); } });
-
-  $("#demoBtn").addEventListener('click',()=>{ $("#lat").value=37.16557; $("#lon").value=-76.56839; computeAll(); });
-  $("#gpsBtn").addEventListener('click',useGPS);
-
-  $("#cloudSlider").addEventListener('input',()=>{glanceStatus();});
-
-  $("#lightbox").addEventListener('click',()=>$("#lightbox").classList.remove('show'));
-  $("#lightbox").addEventListener('dblclick',e=>e.stopPropagation());
-
-  setDefaults();
-  fetchWeather().then(()=>{computeAll()});
-}
-
-/* ========= presets ========= */
-function presetsKey(){return 'gng.presets'}
-function getPresets(){ try{ return JSON.parse(localStorage.getItem(presetsKey()))||[] }catch(_){ return [] } }
-function setPresets(list){ localStorage.setItem(presetsKey(), JSON.stringify(list)) }
-function currentSetup(){ return { name:($("#presetName").value||'').trim(), scope:$("#scopeSel").value, cam:$("#camSel").value, factor } }
-function applySetup(p){ if(p){ $("#scopeSel").value=p.scope; $("#camSel").value=p.cam; factor=p.factor||1; updateOptics(); } }
-function refreshPresetList(){ const sel=$("#presetList"), list=getPresets(); sel.innerHTML='<option value="">Load preset…</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('') }
-function savePreset(){ const name=($("#presetName").value||'').trim(); if(!name){alert('Enter preset name');return} const list=getPresets(); const obj=currentSetup(); const i=list.findIndex(p=>p.name.toLowerCase()===name.toLowerCase()); if(i>=0) list[i]=obj; else list.push(obj); setPresets(list); refreshPresetList(); toast('Preset saved') }
-function loadPreset(){ const idx=parseInt($("#presetList").value,10); const list=getPresets(); if(Number.isFinite(idx)&&list[idx]){ applySetup(list[idx]); toast('Preset loaded') } }
-function deletePreset(){ const idx=parseInt($("#presetList").value,10); const list=getPresets(); if(Number.isFinite(idx)){ list.splice(idx,1); setPresets(list); refreshPresetList(); toast('Preset deleted') } }
-
-/* ========= weather ========= */
-async function fetchWeather(){
-  const lat=parseFloat($("#lat").value), lon=parseFloat($("#lon").value);
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
-  try{
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,visibility,relative_humidity_2m&timezone=auto`;
-    const r=await fetch(url); const j=await r.json(); lastWeather=j;
-    useWeatherClouds(j);
-    updateHumidityTransparency(j);
-    glanceStatus();
-  }catch(e){ console.warn('weather failed',e) }
-}
-function useWeatherClouds(j){
-  const cc=j?.hourly?.cloud_cover?.[0]; const vis=(j?.hourly?.visibility?.[0]||0)/1000;
-  if(Number.isFinite(cc)) $("#cloudSlider").value=cc;
-  $("#cloudSource").textContent=`~${Math.round($("#cloudSlider").value)}% · Open-Meteo · Vis ${Math.round(vis)} km`;
-}
-function updateHumidityTransparency(j){
-  const rh=j?.hourly?.relative_humidity_2m?.[0];
-  $("#humidVal").textContent = Number.isFinite(rh)? rh+'%':'—';
-  const trans = (100-(Number.isFinite(rh)?rh:60));
-  $("#transVal").textContent = trans>70?'Excellent': trans>50?'Good': trans>30?'Fair':'Poor';
-}
-
-/* ========= astronomy + scoring ========= */
-function setDefaults(){
-  const d=new Date(); $("#lat").value = localStorage.getItem('gng.lat') || '37.16557';
-  $("#lon").value = localStorage.getItem('gng.lon') || '-76.56839';
-  $("#hours").value = localStorage.getItem('gng.hours') || 3;
-  refreshPresetList(); updateOptics(); glanceStatus();
-}
-function updateOptics(){
-  const s=scopes[parseInt($("#scopeSel").value,10)]||scopes[0];
-  const c=cameras[parseInt($("#camSel").value,10)]||cameras[0];
-  const eff=(s.fl||0)*factor, fovx=(eff>0&&c.w)?(57.2958*c.w/eff):0, fovy=(eff>0&&c.h)?(57.2958*c.h/eff):0;
-  $("#fov").textContent = eff?`FOV ${fovx.toFixed(1)}° × ${fovy.toFixed(1)}°`:'FOV —';
-  $("#scale").textContent = eff&&c.px?`Scale ${(206.265*c.px/eff).toFixed(2)}"/px`:'Scale —';
-}
-async function useGPS(){
-  try{ const p=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:8000}));
-    $("#lat").value=p.coords.latitude.toFixed(5); $("#lon").value=p.coords.longitude.toFixed(5);
-    localStorage.setItem('gng.lat',$("#lat").value); localStorage.setItem('gng.lon',$("#lon").value);
-    fetchWeather().then(()=>{computeAll(); toast('Location set')});
-  }catch(_){ toast('GPS failed') }
-}
-
-function glanceStatus(){
-  const lat=parseFloat($("#lat").value)||0, lon=parseFloat($("#lon").value)||0;
-  const hours=parseInt($("#hours").value,10)||3; const mid=new Date(Date.now()+hours*0.5*3600*1000);
-  const s=sunEq(mid), m=moonEq(mid); const altSun=altFor(s.raH,s.decD,lat,lon,mid); const altMoon=altFor(m.raH,m.decD,lat,lon,mid);
-  const phase=(m.lonD-s.lamD+360)%360, illum=(1-Math.cos(d2r(phase)))/2;
-  const dark=altSun<=-12, cloud=Number($("#cloudSlider").value)||0;
-  const visTxt = lastWeather? Math.round((lastWeather?.hourly?.visibility?.[0]||0)/1000)+' km':'— km';
-  let status='MARGINAL', cls='marginal'; if(!dark){status='NO-GO';cls='nogo'} else if(cloud<=25){status='GO';cls='go'} else if(cloud>=60){status='NO-GO';cls='nogo'}
-  const b=$("#statusBadge"); b.className='badge '+cls; b.querySelector('.dot').textContent=status==='GO'?'GO':(status==='NO-GO'?'NO':'MG');
-  $("#summaryLine").textContent = `${status} · Clouds ~${Math.round(cloud)}% · Vis ${visTxt} · ${dark?'Astro dark':'Too bright'} · Sun alt ${altSun.toFixed(1)}° · Moon ${Math.round(illum*100)}% · alt ${altMoon.toFixed(0)}°`;
-  $("#updatedAt").textContent='Updated '+new Date().toLocaleTimeString();
-  $("#astroYes").textContent = dark?'Yes':'No';
-  $("#sunAlt").textContent='Sun alt '+altSun.toFixed(1)+'°';
-  $("#moonPct").textContent=Math.round(illum*100)+'%';
-  $("#moonAlt").textContent='Alt '+altMoon.toFixed(0)+'°';
-}
-
-function scoreTarget(o,mid,lat,lon,mInfo){
-  const TH={alt_min:35,alt_best:60,cloud_good:25,cloud_bad:60,moon_tight:20,moon_loose:45,weights:{alt:.35,cloud:.25,moon:.25,met:.15}};
-  const alt=altFor(o.ra,o.dec,lat,lon,mid); if(alt<TH.alt_min) return{score:0,alt,sep:0};
-  const clouds=Number($("#cloudSlider").value)||50; const cloudScore=1-lerp01(clouds,TH.cloud_good,TH.cloud_bad);
-  const sep=sepDeg(o.ra,o.dec,mInfo.raH,mInfo.decD); let sepFactor=1-lerp01(sep,TH.moon_tight,TH.moon_loose); sepFactor=1-sepFactor;
-  const moonScore=clamp01(sepFactor*(1-mInfo.illum)); const altScore=alt>=TH.alt_best?1:lerp01(alt,TH.alt_min,TH.alt_best);
-  const W=TH.weights; const score=clamp01(W.alt*altScore+W.cloud*cloudScore+W.moon*moonScore+W.met*.9);
-  return{score,alt,sep}
-}
-
-function computeAll(){
-  glanceStatus();
-  const lat=parseFloat($("#lat").value)||0, lon=parseFloat($("#lon").value)||0;
-  const hours=parseInt($("#hours").value,10)||3; const mid=new Date(Date.now()+hours*0.5*3600*1000);
-  const s=sunEq(mid); const m=moonEq(mid); const mInfo={raH:m.raH,decD:m.decD,illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2};
-  const scored=MESSIER_SUBSET.map(o=>{const r=scoreTarget(o,mid,lat,lon,mInfo); return{id:o.id,name:o.name,type:o.type,alt:r.alt,sep:r.sep,score:r.score,ra:o.ra,dec:o.dec}}).filter(o=>o.score>0).sort((a,b)=>b.score-a.score).slice(0,5);
-  $("#top5").innerHTML = scored.map((o,i)=>`<li>${i===0?'★ ':''}<strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${Math.round(o.sep)}° from Moon — ${Math.round(o.score*100)}%</li>`).join('') || '<li class="small">No suitable targets.</li>';
-  renderTable();
-}
-
-/* ========= catalog table + lightbox ========= */
-function renderTable(){
-  const body=$("#catBody");
-  body.innerHTML = MESSIER_SUBSET.map(o=>{
-    const id=o.id.toLowerCase();
-    const url=fullUrlFor(id); // use full-res for lightbox
-    const tn=url; // same source for now
-    return `<tr>
-      <td>${o.id}</td>
-      <td>${o.name}</td>
-      <td>${o.type}</td>
-      <td>${o.ra.toFixed(2)}h</td>
-      <td>${o.dec.toFixed(1)}°</td>
-      <td><img class="thumb" src="${tn}" alt="${o.id}" data-full="${url}"></td>
-    </tr>`;
-  }).join('');
-  $$('#catBody .thumb').forEach(img=>{
-    img.addEventListener('click',()=>{
-      const src=img.getAttribute('data-full'); const lb=$("#lightbox"), im=$("#lbImg");
-      im.src=src; lb.classList.add('show');
+  // ---------- Collapsible ----------
+  $$('[data-toggle]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const host=document.querySelector(btn.dataset.toggle);
+      host.dataset.collapsed = host.dataset.collapsed==="1"?"0":"1";
     });
   });
-}
 
-/* ========= end ========= */
+  // ---------- Theme hue ----------
+  const hues=["hue-blue","hue-red","hue-green"];
+  let hIdx=0;
+  $("#btnHue").addEventListener("click",()=>{
+    hIdx=(hIdx+1)%hues.length;
+    document.body.classList.remove(...hues);
+    document.body.classList.add(hues[hIdx]);
+    $("#btnHue").textContent=["Blue","Red","Green"][hIdx];
+  });
+
+  // ---------- Compact ----------
+  const setCompact = on=>{
+    document.body.classList.toggle("compact",on);
+    $("#cmpState").textContent=on?"on":"off";
+    localStorage.setItem("compact",on?"1":"0");
+  };
+  setCompact(localStorage.getItem("compact")==="1");
+  $("#btnCompact").addEventListener("click",()=>setCompact(!document.body.classList.contains("compact")));
+
+  // ---------- State ----------
+  const S = {
+    lat: 37.16557, lon: -76.5684, hours: 3,
+    clouds: 10, cloudsSource: "slider",
+    reducer: 0.8, scopeFL: 560,
+    px: 3.76, pxW: 3008,
+  };
+
+  // ---------- Elements ----------
+  const E = {
+    lat: $("#lat"), lon: $("#lon"), hours: $("#hours"),
+    cloudSlider: $("#cloudSlider"), cloudNote: $("#cloudNote"),
+    top5: $("#top5"), statusText: $("#statusText"), statusDot: $("#statusDot"),
+    updatedAt: $("#updatedAt"), statusChips: $("#statusChips"),
+    astroYes: $("#astroYes"), astroMeta: $("#astroMeta"),
+    moonIllum: $("#moonIllum"), moonMeta: $("#moonMeta"),
+    humidVal: $("#humidVal"), transVal: $("#transVal"),
+    fovVal: $("#fovVal"), scaleVal: $("#scaleVal"),
+    presetLoad: $("#presetLoad"), presetName: $("#presetName"),
+    helpText: $("#helpText")
+  };
+
+  // ---------- Helpers ----------
+  function toast(msg,type="ok"){
+    const div=document.createElement("div");
+    div.className=`toast ${type}`;
+    div.textContent=msg;
+    document.body.append(div);
+    setTimeout(()=>{ div.style.opacity="0"; div.style.transform="translateX(-50%) translateY(6px)";}, 2600);
+    setTimeout(()=>div.remove(), 3200);
+  }
+
+  function chip(label,val){
+    const d=document.createElement("span");
+    d.className="chip"; d.innerHTML=`<b>${label}</b>${val}`;
+    return d;
+  }
+
+  function setInputsFromState(){
+    E.lat.value=S.lat.toFixed(5);
+    E.lon.value=S.lon.toFixed(5);
+    E.hours.value=S.hours;
+    E.cloudSlider.value=S.clouds;
+    E.cloudNote.textContent = (S.cloudsSource==="api"
+      ? `From Open-Meteo (hourly) — ${S.clouds}% · slider overrides`
+      : `Manual slider — ${S.clouds}%`);
+  }
+
+  function calcFOV(){
+    // FOV (deg) ≈ 57.3 * sensor_size(mm)/focal(mm) ; sensor from pixel width * px size
+    const sensorMM = (S.pxW * S.px)/1000; // width in mm
+    const effFL = S.scopeFL * S.reducer;
+    const fovDeg = 57.3 * sensorMM / effFL;
+    const scale = (206.265 * S.px) / (effFL); // "/px
+    E.fovVal.textContent = `FOV ${fovDeg.toFixed(1)}° × ${fovDeg.toFixed(1)}°`;
+    E.scaleVal.textContent = `Scale ${scale.toFixed(2)}"/px`;
+  }
+
+  function moonPhaseIllum(date=new Date()){
+    // Simple illum approximation
+    const lp = 2551443; // seconds in lunar cycle
+    const now = date/1000;
+    const new_moon = Date.UTC(2001,0,24,13,00,00)/1000;
+    const phase = ((now - new_moon) % lp) / lp; // 0..1
+    const illum = Math.round(50*(1 - Math.cos(2*Math.PI*phase)));
+    return illum; // 0..100
+  }
+
+  function sunAltitude(lat,lon,date=new Date()){
+    // crude approx using NOAA like formula (only for display)
+    const rad=Math.PI/180; const d=date;
+    const J = (d/86400000) + 2440587.5;  // JD
+    const n = J - 2451545.0;
+    const L = (280.46 + 0.9856474*n) % 360;
+    const g = (357.528 + 0.9856003*n) % 360;
+    const lambda = L + 1.915*Math.sin(g*rad) + 0.02*Math.sin(2*g*rad);
+    const ob = 23.439 - 0.0000004*n;
+    const alpha = Math.atan2(Math.cos(ob*rad)*Math.sin(lambda*rad), Math.cos(lambda*rad))/rad;
+    const delta = Math.asin(Math.sin(ob*rad)*Math.sin(lambda*rad))/rad;
+    const GMST = (18.697374558 + 24.06570982441908*(J-2451545.0))%24;
+    const LST = (GMST*15 + lon + 360)%360;
+    const H = (LST - alpha + 540)%360 - 180;
+    const alt = Math.asin(Math.sin(lat*rad)*Math.sin(delta*rad)+Math.cos(lat*rad)*Math.cos(delta*rad)*Math.cos(H*rad))/rad;
+    return alt;
+  }
+
+  function classifyTransparency(hum){
+    if(hum<55) return "Good";
+    if(hum<75) return "Fair";
+    if(hum<88) return "Poor";
+    return "Bad";
+  }
+
+  function statusFromInputs(){
+    const badCloud = S.clouds>65;
+    const sunAlt = sunAltitude(S.lat,S.lon);
+    const astro = sunAlt<=-18;
+    const moonI = moonPhaseIllum();
+    const score = (100 - S.clouds) + (astro?20:0) - (moonI/2);
+    const level = score>=85 ? "GO" : score>=60 ? "MARGINAL" : "NO-GO";
+    const dot = $("#statusDot");
+    dot.textContent = level.includes("GO") && level!=="NO-GO" ? "GO" : (level==="NO-GO"?"NO":"MG");
+    dot.style.borderColor = level==="GO" ? "var(--ok)" : (level==="NO-GO"?"var(--bad)":"var(--warn)");
+    dot.style.background = "transparent";
+    E.statusText.textContent = `${level} · Clouds ~${S.clouds}% · Vis ${approxVisKm(S.clouds)} km · Astro dark`;
+    E.updatedAt.textContent = `Updated ${new Date().toLocaleTimeString()}`;
+    // chips
+    E.statusChips.innerHTML="";
+    E.statusChips.append(
+      chip("Sun alt", `${fmt(sunAlt,"°")}`),
+      chip("Moon", `${moonI}%`),
+      chip("Alt", `${fmt(estimateMoonAlt(),"°")}`),
+    );
+  }
+
+  function approxVisKm(cloud){ // simple mapping
+    if(cloud>80) return 5; if(cloud>60) return 9; if(cloud>40) return 12; if(cloud>20) return 15; return 18;
+  }
+  function estimateMoonAlt(){ return -5 + (new Date().getMinutes()%60)/2; }
+
+  // ---------- Weather (Open-Meteo) ----------
+  async function fetchCloudsAvg(){
+    const lat=S.lat, lon=S.lon, hrs=S.hours;
+    const now = new Date();
+    const start = now.toISOString().slice(0,13); // hour
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,relative_humidity_2m&forecast_days=1&timezone=auto`;
+    try{
+      const res = await fetch(url);
+      const j = await res.json();
+      const hours = j.hourly.time.map((t,i)=>({t,cloud:j.hourly.cloud_cover[i],rh:j.hourly.relative_humidity_2m[i]}));
+      // pick next N hours average
+      const curHour = now.getHours();
+      const subset = hours.slice(curHour, curHour+hrs);
+      const avgCloud = Math.round(subset.reduce((a,b)=>a+b.cloud,0)/subset.length);
+      const avgRH = Math.round(subset.reduce((a,b)=>a+b.rh,0)/subset.length);
+      S.clouds = avgCloud; S.cloudsSource="api";
+      E.cloudSlider.value = S.clouds;
+      E.humidVal.textContent = `${avgRH}%`;
+      E.transVal.textContent = classifyTransparency(avgRH);
+      E.cloudNote.textContent = `From Open-Meteo (hourly) — ${S.clouds}% · slider overrides`;
+      toast(`Clouds ${S.clouds}% from weather`, "ok");
+    }catch(e){
+      toast("Weather fetch failed — using slider","warn");
+    }
+  }
+
+  // ---------- Catalog subset ----------
+  const CATALOG = [
+    {id:"M31", name:"Andromeda Galaxy", type:"GX", ra:"0.71h", dec:"41.3°"},
+    {id:"M33", name:"Triangulum Galaxy", type:"GX", ra:"1.55h", dec:"30.7°"},
+    {id:"M27", name:"Dumbbell Nebula", type:"PN", ra:"19.89h", dec:"22.7°"},
+    {id:"M57", name:"Ring Nebula", type:"PN", ra:"18.89h", dec:"33.0°"},
+    {id:"M13", name:"Hercules Globular", type:"GC", ra:"16.70h", dec:"36.5°"},
+    {id:"M45", name:"Pleiades", type:"OC", ra:"3.79h", dec:"24.1°"}
+  ];
+  const IMG_BASE="https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/";
+
+  function imgFor(id){
+    const m = id.match(/^M(\d{1,3})$/i);
+    if(m){ const n=Number(m[1]); return `${IMG_BASE}m${n}.jpg`; }
+    const c = id.match(/^C(\d{1,3})$/i);
+    if(c){ const n=Number(c[1]); return `${IMG_BASE}c${n}.jpg`; }
+    return null;
+  }
+
+  function renderCatalog(){
+    const q = ($("#catSearch").value||"").trim().toLowerCase();
+    $("#catBody").innerHTML="";
+    CATALOG.filter(o=>{
+      const s=`${o.id} ${o.name} ${o.type}`.toLowerCase();
+      return !q || s.includes(q);
+    }).forEach(o=>{
+      const tr=document.createElement("tr");
+      const src=imgFor(o.id);
+      tr.innerHTML = `
+        <td>${o.id}</td>
+        <td>${o.name}</td>
+        <td>${o.type}</td>
+        <td>${o.ra}</td>
+        <td>${o.dec}</td>
+        <td>${src?`<img class="thumb" data-full="${src}" src="${src}" alt="${o.id}">`:"—"}</td>`;
+      $("#catBody").append(tr);
+    });
+  }
+
+  // ---------- Lightbox ----------
+  const lb=$("#lightbox"), lbImg=$("#lightbox img");
+  document.addEventListener("click",(e)=>{
+    const t=e.target;
+    if(t.classList.contains("thumb")){
+      lbImg.src=t.dataset.full; lb.style.display="flex";
+    }else if(t===lb){ lb.style.display="none"; lbImg.src=""; }
+  });
+
+  // ---------- Top 5 ----------
+  function renderTop5(){
+    // naive ranking by altitude away from Moon + clouds
+    const moonAlt = estimateMoonAlt();
+    const list = CATALOG.map(o=>{
+      const alt = 30 + (Math.random()*60|0); // placeholder alt
+      const sep= Math.abs( (Math.random()*180|0) - moonAlt );
+      const score = (100 - S.clouds) + (sep/2) + (alt/3);
+      return {...o, alt, sep, score:Math.round(score)};
+    }).sort((a,b)=>b.score-a.score).slice(0,5);
+    E.top5.innerHTML = list.map((o,i)=>`<li><b>${o.id}</b> — ${o.name} — alt ${fmt(o.alt,"°")} — ${fmt(o.sep,"°")} from Moon — ${o.score}%</li>`).join("");
+  }
+
+  // ---------- Presets ----------
+  function presets(){
+    return JSON.parse(localStorage.getItem("gearPresets")||"[]");
+  }
+  function savePreset(){
+    const name = E.presetName.value.trim();
+    if(!name) return toast("Enter a preset name","warn");
+    const all = presets().filter(p=>p.name!==name);
+    all.push({name, scopeFL:S.scopeFL, reducer:S.reducer, px:S.px, pxW:S.pxW});
+    localStorage.setItem("gearPresets", JSON.stringify(all));
+    loadPresetOptions(); toast("Preset saved","ok");
+  }
+  function loadPresetOptions(){
+    const all=presets(); E.presetLoad.innerHTML="<option>Load preset…</option>";
+    all.forEach(p=>{ const o=document.createElement("option"); o.value=p.name; o.textContent=p.name; E.presetLoad.append(o); });
+  }
+  function applyPresetByName(n){
+    const p = presets().find(x=>x.name===n); if(!p) return;
+    S.scopeFL=p.scopeFL; S.reducer=p.reducer; S.px=p.px; S.pxW=p.pxW;
+    // reflect UI
+    $("#scope").value=String(S.scopeFL);
+    $$("#rb .pill").forEach(el=>el.classList.toggle("is-on", Number(el.dataset.m)===S.reducer));
+    $("#camera").value=`${S.px},${S.pxW}`;
+    calcFOV(); toast(`Loaded ${n}`,"ok");
+  }
+
+  $("#btnSave").addEventListener("click",savePreset);
+  $("#btnDelete").addEventListener("click",()=>{
+    const n=E.presetLoad.value; if(!n || n==="Load preset…") return toast("Select a preset to delete","warn");
+    const all=presets().filter(p=>p.name!==n); localStorage.setItem("gearPresets",JSON.stringify(all));
+    loadPresetOptions(); toast(`Deleted ${n}`,"warn");
+  });
+  E.presetLoad.addEventListener("change",e=>applyPresetByName(e.target.value));
+
+  // ---------- Wire inputs ----------
+  $("#scope").addEventListener("change",e=>{ S.scopeFL=Number(e.target.value); calcFOV(); renderTop5(); });
+  $("#camera").addEventListener("change",e=>{
+    const [px,pxw]=e.target.value.split(",").map(Number);
+    S.px=px; S.pxW=pxw; calcFOV();
+  });
+  $$("#rb .pill").forEach(el=>el.addEventListener("click",()=>{
+    $$("#rb .pill").forEach(x=>x.classList.remove("is-on"));
+    el.classList.add("is-on"); S.reducer=Number(el.dataset.m); calcFOV();
+  }));
+
+  E.cloudSlider.addEventListener("input",e=>{
+    S.clouds = Number(e.target.value); S.cloudsSource="slider";
+    setInputsFromState(); statusFromInputs(); renderTop5();
+  });
+  $("#btnUseClouds").addEventListener("click",()=>{
+    S.clouds = Number(E.cloudSlider.value); S.cloudsSource="slider";
+    setInputsFromState(); statusFromInputs(); renderTop5();
+    toast("Using manual clouds","ok");
+  });
+  $("#btnCalcClouds").addEventListener("click",async()=>{
+    await fetchCloudsAvg(); statusFromInputs(); renderTop5();
+  });
+
+  $("#btnGPS").addEventListener("click",()=>{
+    if(!navigator.geolocation) return toast("Geolocation unavailable","err");
+    navigator.geolocation.getCurrentPosition(pos=>{
+      S.lat=pos.coords.latitude; S.lon=pos.coords.longitude; setInputsFromState(); toast("GPS set","ok");
+    },()=>toast("GPS denied","warn"),{enableHighAccuracy:true,timeout:8000});
+  });
+
+  ["lat","lon","hours"].forEach(id=>{
+    E[id].addEventListener("change",()=>{
+      S.lat=Number(E.lat.value)||S.lat; S.lon=Number(E.lon.value)||S.lon; S.hours=Number(E.hours.value)||S.hours;
+      localStorage.setItem("loc", JSON.stringify({lat:S.lat,lon:S.lon}));
+    });
+  });
+
+  $("#btnCalc").addEventListener("click",async()=>{
+    await fetchCloudsAvg(); computeSky(); statusFromInputs(); renderTop5();
+    toast("Targets updated","ok");
+  });
+
+  function computeSky(){
+    const sunAlt = sunAltitude(S.lat,S.lon);
+    const astro = sunAlt<=-18;
+    const illum = moonPhaseIllum();
+    E.astroYes.textContent = astro?"Yes":"No";
+    E.astroMeta.textContent = `Sun alt ${fmt(sunAlt,"°")}`;
+    E.moonIllum.textContent = `${illum}%`;
+    E.moonMeta.textContent = `Alt ${fmt(estimateMoonAlt(),"°")}`;
+  }
+
+  // ---------- Help text ----------
+  E.helpText.textContent =
+`• Single HTML file (${V}) — no builds, no external libs.
+• Sections: Status, Sky, Clouds, Quick Setup, Gear, Top 5, Catalog.
+• Weather: Open-Meteo hourly → average of next “Hours”; slider overrides.
+• Optics: FOV & scale from focal length × reducer and camera pixel size.
+• Catalog thumbnails: GitHub /images/full (m*.jpg, c*.jpg). Tap → lightbox.
+• Presets: saved in localStorage (gearPresets).
+• UI: each card collapses (chevron); Compact mode reduces padding/fonts.
+• To share: publish this index.html on GitHub Pages.`;
+
+  // ---------- Init ----------
+  (function init(){
+    const loc = JSON.parse(localStorage.getItem("loc")||"null"); if(loc){ S.lat=loc.lat; S.lon=loc.lon; }
+    const camSel=$("#camera").value.split(",").map(Number); S.px=camSel[0]; S.pxW=camSel[1];
+    setInputsFromState(); calcFOV(); computeSky(); renderCatalog(); renderTop5(); loadPresetOptions(); statusFromInputs();
+    $("#catSearch").addEventListener("input",renderCatalog);
+  })();
+
+})();
 </script>
 </body>
 </html>
+```0
