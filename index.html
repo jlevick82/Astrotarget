@@ -10,18 +10,16 @@
   --bg:#0b1020; --card:#111a28; --edge:#233245;
   --text:#dfe9ff; --muted:#9ab0cc; --accent:#63a3ff;
   --pill:#0f1724; --pill-edge:#223149;
-  --good:#1a6a3a; --warn:#a27a20; --bad:#9a2b2b;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
+*{box-sizing:border-box} html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);
   font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
 .wrap{max-width:980px;margin:0 auto;padding:18px 14px 80px}
 
 /* header */
 .hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.logoBox{width:36px;height:36px;border-radius:9px;overflow:hidden;border:1px solid var(--edge);flex:0 0 36px}
-.appicon{width:100%;height:100%;object-fit:cover;background:#0002}
+.logoBox{width:36px;height:36px;border-radius:9px;overflow:hidden;border:1px solid var(--edge);flex:0 0 36px;background:#0002}
+.appicon{width:100%;height:100%;object-fit:cover}
 .title{display:flex;flex-direction:column}
 .brand{font-weight:800;font-size:26px;letter-spacing:.2px;line-height:1}
 .sub{opacity:.7;font-weight:600}
@@ -43,18 +41,10 @@ body{margin:0;background:var(--bg);color:var(--text);
 .collapsed .body{display:none}
 
 /* layout bits */
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.big{font-size:28px;font-weight:800}
-.tag{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--pill);border:1px solid var(--pill-edge);color:var(--muted);font-weight:600}
 .smalllabel{font-size:12px;color:var(--muted);margin-bottom:4px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tag{margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--pill);border:1px solid var(--pill-edge);color:var(--muted);font-weight:600}
 
-/* chips */
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{border:1px solid var(--pill-edge);background:var(--pill);color:var(--text);
-  padding:9px 12px;border-radius:12px;font-weight:700;cursor:pointer}
-.chip.active{background:var(--accent);color:#0b1020;border-color:transparent}
-
-/* table */
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px;border-bottom:1px solid var(--edge);text-align:left}
 thead th{color:var(--muted);font-weight:700}
@@ -65,13 +55,12 @@ thead th{color:var(--muted);font-weight:700}
   padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.show{opacity:1}
 
-/* compact */
+/* compact / night */
 .compact .optional{display:none}
 .compact .card .head{padding:10px}
 .compact .body{padding:10px}
 .compact .kv{gap:8px}
 
-/* night (red safe) */
 .night{
   --bg:#0b0706; --card:#130b09; --edge:#2b1a14;
   --text:#ffd9c7; --muted:#ffbba3; --accent:#ff7a45;
@@ -92,7 +81,7 @@ thead th{color:var(--muted);font-weight:700}
   <header class="hdr">
     <div class="logoBox"><img id="logo" class="appicon" alt="AstroTarget"/></div>
     <div class="title">
-      <div class="brand">Nightly Go/No-Go <span id="ver" class="sub">v25.7</span></div>
+      <div class="brand">Nightly Go/No-Go <span id="ver" class="sub">v25.8</span></div>
     </div>
     <div class="actions">
       <button id="btnInstall" class="btn">Install</button>
@@ -101,6 +90,7 @@ thead th{color:var(--muted);font-weight:700}
     </div>
   </header>
 
+  <!-- STATUS (merged sky details here) -->
   <section class="card" id="statusCard">
     <div class="head"><h3>Status</h3><button class="toggle" data-t="statusCard">▾</button></div>
     <div class="body">
@@ -112,32 +102,17 @@ thead th{color:var(--muted);font-weight:700}
     </div>
   </section>
 
-  <section class="card" id="sky">
-    <div class="head"><h3>Sky conditions</h3><button class="toggle" data-t="sky">▾</button></div>
-    <div class="body">
-      <div class="kv">
-        <div>
-          <div class="smalllabel">Astronomical dark</div>
-          <div class="big" id="astroYes">—</div>
-          <div class="tag" id="astroVal">Sun alt —</div>
-        </div>
-        <div>
-          <div class="smalllabel">Moon illum</div>
-          <div class="big" id="moonPct">—</div>
-          <div class="tag" id="moonAlt">Alt —</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <!-- CLOUDS -->
   <section class="card" id="cloudsCard">
     <div class="head"><h3>Clouds (avg)</h3><button class="toggle" data-t="cloudsCard">▾</button></div>
     <div class="body">
       <input id="clouds" type="range" min="0" max="100" value="40" style="width:100%"/>
-      <div class="tag">Use <button id="btnCalc" class="btn" style="padding:4px 10px;margin:0 6px">Calculate</button> to auto-fill from weather. Slider overrides clouds.</div>
+      <div id="cloudMeta" class="tag">Manual • slide to adjust.</div>
+      <div class="tag">Use <button id="btnCalc" class="btn" style="padding:4px 10px;margin:0 6px">Calculate</button> to auto-fill from Open-Meteo. Slider overrides clouds.</div>
     </div>
   </section>
 
+  <!-- QUICK SETUP -->
   <section class="card" id="quick">
     <div class="head"><h3>Quick setup</h3><button class="toggle" data-t="quick">▾</button></div>
     <div class="body">
@@ -159,6 +134,7 @@ thead th{color:var(--muted);font-weight:700}
     </div>
   </section>
 
+  <!-- GEAR -->
   <section class="card" id="gear">
     <div class="head"><h3>Gear</h3><button class="toggle" data-t="gear">▾</button></div>
     <div class="body">
@@ -169,7 +145,7 @@ thead th{color:var(--muted);font-weight:700}
         </div>
         <div>
           <div class="smalllabel">Reducer / Barlow</div>
-          <div id="chips" class="chips"></div>
+          <div id="chips" class="kv" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
         </div>
         <div>
           <div class="smalllabel">Camera</div>
@@ -182,7 +158,6 @@ thead th{color:var(--muted);font-weight:700}
         </div>
       </div>
 
-      <!-- named setup presets -->
       <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
         <input id="presetName" placeholder="Preset name" style="flex:1;min-width:160px;padding:9px;border-radius:12px;border:1px solid var(--edge);background:var(--pill);color:var(--text)"/>
         <button id="btnSavePreset" class="btn">Save preset</button>
@@ -194,11 +169,13 @@ thead th{color:var(--muted);font-weight:700}
     </div>
   </section>
 
+  <!-- TOP 5 -->
   <section class="card" id="top5">
     <div class="head"><h3>Top 5 Recommendations</h3><button class="toggle" data-t="top5">▾</button></div>
     <div class="body"><ol id="topList" style="margin:6px 0 0 18px"></ol></div>
   </section>
 
+  <!-- CATALOG -->
   <section class="card optional" id="catalog">
     <div class="head"><h3>Catalog (subset)</h3><button class="toggle" data-t="catalog">▾</button></div>
     <div class="body">
@@ -211,13 +188,19 @@ thead th{color:var(--muted);font-weight:700}
 </div>
 
 <script>
-/* ===== version & logo ===== */
-document.getElementById('ver').textContent='v25.7';
-(()=>{ // load logo reliably; hide if all fail
+/* ===== version & logo (robust) ===== */
+document.getElementById('ver').textContent='v25.8';
+(()=>{ // default inline SVG so a logo always shows
+  const inline='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="50%" cy="50%"><stop offset="0" stop-color="#ffb24d"/><stop offset="0.55" stop-color="#ff7a00"/><stop offset="1" stop-color="#1a0f0c"/></radialGradient></defs><rect width="64" height="64" rx="12" fill="#090c12"/><circle cx="32" cy="32" r="18" fill="url(#g)" stroke="#ff9a2a" stroke-width="3"/></svg>`);
   const lg=document.getElementById('logo');
-  const p1='https://jlevick82.github.io/Astrotarget/images/logo-256.png';
-  const p2='https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png';
-  lg.src=p1; lg.onerror=()=>{ if(lg.src!==p2){lg.src=p2}else{lg.style.display='none'} };
+  const user=localStorage.getItem('gng.logoUrl'); // user-supplied override
+  const paths=[
+    user,
+    'https://jlevick82.github.io/Astrotarget/images/logo-256.png',
+    'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/logo-256.png'
+  ].filter(Boolean);
+  let i=-1; function tryNext(){ i++; if(i>=paths.length){ lg.src=inline; return; } lg.src=paths[i]; lg.onerror=tryNext; }
+  tryNext();
 })();
 
 /* ===== compact & night ===== */
@@ -256,11 +239,8 @@ const dom={
   badge:document.getElementById('badge'),
   bannerText:document.getElementById('bannerText'),
   updated:document.getElementById('updated'),
-  astroYes:document.getElementById('astroYes'),
-  astroVal:document.getElementById('astroVal'),
-  moonPct:document.getElementById('moonPct'),
-  moonAlt:document.getElementById('moonAlt'),
   clouds:document.getElementById('clouds'),
+  cloudMeta:document.getElementById('cloudMeta'),
   lat:document.getElementById('lat'),
   lon:document.getElementById('lon'),
   scope:document.getElementById('scope'),
@@ -314,8 +294,8 @@ function moonEq(date){const J=jd(date);const L=(218.316+13.176396*(J-2451545))%3
 function altFor(raH,decD,latD,lonD,date){const LST=lst(date,lonD)*15;const HA=((LST-raH*15+540)%360)-180;const ha=d2r(HA),dec=d2r(decD),lat=d2r(latD);const sA=Math.sin(dec)*Math.sin(lat)+Math.cos(dec)*Math.cos(lat)*Math.cos(ha);return r2d(Math.asin(sA))}
 function sepDeg(raH1,decD1,raH2,decD2){const a1=d2r(decD1),a2=d2r(decD2),dRA=d2r((raH1-raH2)*15);const c=Math.sin(a1)*Math.sin(a2)+Math.cos(a1)*Math.cos(a2)*Math.cos(dRA);return r2d(Math.acos(Math.min(1,Math.max(-1,c))))}
 
-/* ===== state & helpers ===== */
-let lastWx=null; // {cloud, vis}
+/* ===== state/helpers ===== */
+let lastWx=null; // {cloud, vis, when, src}
 function setUpdated(){dom.updated.textContent='Updated '+new Date().toLocaleTimeString()}
 function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function load(k,def){try{const v=localStorage.getItem(k); return v?JSON.parse(v):def}catch(_){return def}}
@@ -337,7 +317,7 @@ function renderChips(){
   const s=scopes[parseInt(dom.scope.value,10)];
   s.presets.forEach(f=>{
     const b=document.createElement('button');
-    b.type='button'; b.className='chip'; b.textContent=f+'x';
+    b.type='button'; b.className='btn chip'; b.textContent=f+'x';
     b.addEventListener('click',()=>{
       dom.chips.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
       b.classList.add('active'); updateOptics(f); computeAll();
@@ -375,7 +355,7 @@ function applySetupObj(o){
   updateOptics(); computeAll();
 }
 
-/* sky & status */
+/* sky+status */
 function computeSky(){
   const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
   const now=new Date();
@@ -384,33 +364,33 @@ function computeSky(){
   const dark = sunAlt <= -12;
   const mAlt = altFor(m.raH,m.decD,lat,lon,now);
   const phase=(m.lonD - s.lamD + 360)%360;
-  const illum=Math.round((1-Math.cos(d2r(phase)))/2*100);
-
-  dom.astroYes.textContent = dark ? 'Yes' : 'No';
-  dom.astroVal.textContent = 'Sun alt ' + sunAlt.toFixed(1) + '°';
-  dom.moonPct.textContent = illum + '%';
-  dom.moonAlt.textContent = 'Alt ' + mAlt.toFixed(0) + '°';
-  return {dark, illum, sunAlt, mAlt, m, s};
+  const illumPct=Math.round((1-Math.cos(d2r(phase)))/2*100);
+  return {dark, sunAlt, illumPct, mAlt, s, m};
 }
 function computeStatus(){
-  const {dark}=computeSky();
+  const sky=computeSky();
   const cloud = Math.round(parseFloat(dom.clouds.value)||0);
   const vis = lastWx?.vis ?? 10;
   let status='MARGINAL', cls='marginal';
-  if(!dark || cloud>=60) { status='NO-GO'; cls='nogo'; }
+  if(!sky.dark || cloud>=60) { status='NO-GO'; cls='nogo'; }
   else if(cloud<=25) { status='GO'; cls='go'; }
   dom.badge.textContent=status;
   dom.badge.className='badge '+cls;
-  dom.bannerText.textContent = `${status} — Clouds ~${cloud}% · Vis ${vis} km` + (dark?' · Astro dark':'');
+  const cloudSrc = lastWx?.src ? ` (${lastWx.src})` : ' (manual)';
+  dom.bannerText.textContent =
+    `${status} — Clouds ~${cloud}%${cloudSrc} · Vis ${vis} km · `+
+    `${sky.dark?'Astro dark':'Too bright'} · Sun alt ${sky.sunAlt.toFixed(1)}° · `+
+    `Moon ${sky.illumPct}% (alt ${sky.mAlt.toFixed(0)}°)`;
   setUpdated();
 }
 
 /* targets */
 function computeTop5(){
   const lat=parseFloat(dom.lat.value)||0, lon=parseFloat(dom.lon.value)||0;
-  const now=new Date(); const s=sunEq(now), mEq=moonEq(now);
+  const now=new Date(); const s=sunEq(now);
   const mid=new Date(now.getTime()+90*60*1000);
-  const m=moonEq(mid); const mInfo={raH:m.raH,decD:m.decD,illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2};
+  const m=moonEq(mid);
+  const mInfo={raH:m.raH,decD:m.decD,illum:(1-Math.cos(d2r(((m.lonD - s.lamD + 360)%360))))/2};
   function scoreTarget(o){
     const alt=altFor(o.ra,o.dec,lat,lon,mid);
     if(alt<35) return {score:0,alt,sep:0};
@@ -429,7 +409,7 @@ function computeTop5(){
 
   dom.topList.innerHTML = rows.length
     ? rows.map((o,i)=>`<li><strong>${o.id}</strong> — ${o.name} — alt ${o.alt.toFixed(0)}° — ${o.sep.toFixed(0)}° from Moon — ${(o.score*100|0)}%</li>`).join('')
-    : '<li class="bad">No suitable targets.</li>';
+    : '<li>No suitable targets.</li>';
 }
 function renderTable(){
   const q=(dom.q.value||'').toLowerCase();
@@ -439,7 +419,7 @@ function renderTable(){
     <tbody>${rows.map(o=>`<tr><td>${o.id}</td><td>${o.name}</td><td>${o.type}</td><td>${o.ra.toFixed(2)}h</td><td>${o.dec.toFixed(1)}°</td></tr>`).join('')}</tbody>
   </table>`;
 }
-function computeAll(){ computeSky(); computeStatus(); computeTop5(); renderTable(); }
+function computeAll(){ computeStatus(); computeTop5(); renderTable(); }
 
 /* ===== weather fetch ===== */
 async function fetchWeather(){
@@ -452,29 +432,33 @@ async function fetchWeather(){
     const vis=(j.hourly?.visibility||[]).slice(0,3).map(x=>x/1000);
     const cloudAvg = cc.length ? Math.round(cc.reduce((a,b)=>a+b,0)/cc.length) : 40;
     const visAvg = vis.length ? Math.round(vis.reduce((a,b)=>a+b,0)/vis.length) : 10;
-    lastWx={cloud:cloudAvg, vis:visAvg};
+    lastWx={cloud:cloudAvg, vis:visAvg, when:new Date().toLocaleTimeString(), src:'Open-Meteo'};
     dom.clouds.value=String(cloudAvg);
-    toast('Targets updated');
-    computeAll();
-  }catch(e){ toast('Weather failed'); }
+    dom.cloudMeta.textContent=`From Open-Meteo at ${lastWx.when} — ~${cloudAvg}% • Vis ${visAvg} km`;
+    computeAll(); toast('Targets updated');
+  }catch(e){
+    dom.cloudMeta.textContent='Weather fetch failed — using manual slider.';
+    toast('Weather failed');
+  }
 }
 
-/* ===== events ===== */
+/* ===== events & init ===== */
 document.addEventListener('DOMContentLoaded',()=>{
-  // populate selects
+  // selects
   scopes.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;dom.scope.appendChild(o)});
   cameras.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name;dom.camera.appendChild(o)});
   dom.scope.value=0; dom.camera.value=0; renderChips(); updateOptics(1);
 
-  // restore state
+  // restore
   dom.lat.value = localStorage.getItem('gng.lat') || '';
   dom.lon.value = localStorage.getItem('gng.lon') || '';
   dom.clouds.value = localStorage.getItem('gng.cloud') || '40';
+  if(localStorage.getItem('gng.cloudMeta')) dom.cloudMeta.textContent = localStorage.getItem('gng.cloudMeta');
   refreshPresetList();
 
   // listeners
   ['input','change'].forEach(ev=>{
-    dom.clouds.addEventListener(ev,()=>{localStorage.setItem('gng.cloud',dom.clouds.value); computeAll();},{passive:true});
+    dom.clouds.addEventListener(ev,()=>{localStorage.setItem('gng.cloud',dom.clouds.value); dom.cloudMeta.textContent='Manual • slide to adjust.'; localStorage.setItem('gng.cloudMeta',dom.cloudMeta.textContent); computeAll();},{passive:true});
     dom.q.addEventListener(ev,renderTable,{passive:true});
     dom.scope.addEventListener(ev,()=>{renderChips(); updateOptics(); computeAll();},{passive:true});
     dom.camera.addEventListener(ev,()=>{updateOptics(); computeAll();},{passive:true});
@@ -498,7 +482,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     finally{ dom.btnGPS.disabled=false; }
   });
 
-  // preset actions
+  // presets
   dom.btnSavePreset.addEventListener('click',()=>{
     const name=(dom.presetName.value||'').trim();
     if(!name){toast('Enter preset name'); return;}
@@ -521,4 +505,3 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-```0
