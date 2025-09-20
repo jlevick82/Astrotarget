@@ -3,337 +3,466 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Nightly Go/No-Go v26.6</title>
+<title>Nightly Go/No-Go</title>
 <link rel="icon" href="favicon.ico" />
 <style>
   :root{
-    --bg:#0b1a24; --card:#122736; --card2:#0f2230; --text:#e6f0f7; --muted:#acc3d3;
-    --ok:#89f08a; --warn:#ffd166; --bad:#ff7b7b; --accent:#2f80ed; --chip:#0c1f2d;
-    --outline: rgba(255,255,255,.06);
-    --radius:18px;
+    --bg: #0f2230;
+    --bg-elev: #132a3a;
+    --bg-elev-2: #163243;
+    --text: #e7f0fb;
+    --muted: #a9bfd4;
+    --chip: #0d2130;
+    --chip-bd: #24465f;
+    --ok: #36d27d;
+    --bad: #ffb84d;
+    --danger: #ff6868;
+    --accent: #2f7de0;
+    --ring: rgba(255,255,255,.10);
+    --bd: rgba(255,255,255,.08);
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius-xl: 22px; --radius-lg: 18px; --radius: 14px; --radius-sm: 12px;
+    --pad: 16px; --gap: 14px;
+    --fs-xxl: clamp(26px,4.8vw,44px);
+    --fs-xl: 26px; --fs-lg: 20px; --fs: 16px; --fs-sm: 14px; --fs-xs: 12px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:radial-gradient(1200px 600px at 50% -100px,#0e2030 0%,#0b1a24 55%) no-repeat fixed,var(--bg);color:var(--text);font:500 16px/1.35 system-ui,Segoe UI,Roboto,Helvetica,Arial}
-  h1{font-size:42px;line-height:1.05;margin:24px 16px 4px}
-  small.version{opacity:.5;margin-left:16px}
-  .wrap{padding:0 16px 80px;max-width:980px;margin:0 auto}
-  .card{background:var(--card); border:1px solid var(--outline); border-radius:var(--radius);
-        box-shadow:0 10px 30px rgba(0,0,0,.25); padding:16px; margin:14px 0; position:relative}
-  .card .title{font-weight:700;font-size:22px;margin-bottom:10px}
-  .status{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .badge{min-width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.5px}
-  .go{background:rgba(137,240,138,.12);color:var(--ok);border:2px solid rgba(137,240,138,.35)}
-  .marg{background:rgba(255,209,102,.12);color:var(--warn);border:2px solid rgba(255,209,102,.35)}
-  .nogo{background:rgba(255,123,123,.12);color:var(--bad);border:2px solid rgba(255,123,123,.35)}
-  .pill{background:var(--chip);border:1px solid var(--outline);padding:10px 14px;border-radius:999px;color:var(--muted);font-weight:600}
-  .row{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:640px){ .row.two{grid-template-columns:1fr 1fr} .row.four{grid-template-columns:repeat(4,1fr)} }
-  .kv{background:var(--card2);border:1px solid var(--outline);border-radius:16px;padding:14px}
-  .kv .k{font-size:13px;color:var(--muted);margin-bottom:8px}
-  .kv .v{font-weight:800;font-size:28px}
-  .kv .v.bad{color:var(--bad)} .kv .v.warn{color:var(--warn)}
-  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .btn{background:#18364a;border:1px solid var(--outline);color:#dfefff;border-radius:999px;padding:10px 16px;font-weight:700}
-  .btn.small{padding:8px 14px;font-size:14px}
-  .btn.ghost{background:transparent}
-  .slider{appearance:none;width:100%;height:6px;border-radius:99px;background:#e9eef5;outline:none}
-  .slider::-webkit-slider-thumb{appearance:none;width:24px;height:24px;border-radius:50%;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.35)}
-  /* Catalog table scroller */
-  .table-wrap{max-height:360px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:14px;border:1px solid var(--outline)}
-  table{border-collapse:separate;border-spacing:0;width:100%;background:var(--card2)}
-  thead th{position:sticky;top:0;background:rgba(255,255,255,.03);backdrop-filter:saturate(120%) blur(6px);z-index:2}
-  th,td{padding:12px 10px;border-bottom:1px solid var(--outline)}
-  td img{width:64px;height:64px;border-radius:10px;object-fit:cover;cursor:pointer}
+  html,body{height:100%}
+  body{
+    margin:0; font: 400 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--text); background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(55,93,133,.30), transparent 60%),
+      radial-gradient(1000px 500px at 110% -10%, rgba(35,72,110,.35), transparent 55%),
+      var(--bg);
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:28px 18px 120px}
+  header h1{margin:0 0 6px; font-size:var(--fs-xxl); letter-spacing:.3px}
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:10px 16px; border-radius:999px; border:1px solid var(--bd);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    color:var(--text); box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  .btn:active{transform:translateY(1px)}
+  .chip{padding:8px 14px; border-radius:999px; background:var(--chip); border:1px solid var(--chip-bd); color:var(--muted)}
+  .section{margin-top:18px}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)) , var(--bg-elev);
+    border:1px solid var(--bd); border-radius:var(--radius-xl); box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .card .hdr{
+    display:flex; align-items:center; gap:12px; padding:16px 16px 10px 16px;
+  }
+  .card .title{font-weight:700; font-size:var(--fs-lg)}
+  .card .sub{color:var(--muted)}
+  .card .card-body{padding: 10px 16px 16px}
+  .go-badge{
+    width:56px; height:56px; border-radius:18px; border:2px solid #2b6f41;
+    background:#0f2a1b; display:flex; align-items:center; justify-content:center; color:#a7f5c9; font-weight:800;
+    box-shadow:inset 0 0 0 2px rgba(54,210,125,.15);
+  }
+  .chevron{
+    margin-left:auto; width:38px; height:38px; border-radius:12px; border:1px solid var(--bd);
+    background:rgba(255,255,255,.04); display:inline-flex; align-items:center; justify-content:center; color:var(--muted); font-size:18px;
+  }
+  /* Sky grid */
+  .grid{display:grid; gap:14px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  @media (max-width:560px){ .grid-2{grid-template-columns:1fr} }
+  .info{
+    background:var(--bg-elev-2); border:1px solid var(--bd); border-radius:var(--radius-lg);
+    padding:14px 16px;
+  }
+  .info .label{color:var(--muted); font-size:var(--fs-sm)}
+  .info .value{font-size:clamp(20px,6vw,34px); font-weight:800; letter-spacing:.2px}
+  .value.bad{color:var(--bad)} .value.ok{color:var(--ok)} .value.danger{color:var(--danger)}
+  /* Slider & controls */
+  .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+  .row.spread{justify-content:space-between}
+  input[type=range]{width:100%}
+  .pill{border-radius:999px; padding:10px 14px; border:1px solid var(--bd); background:var(--bg-elev-2); color:var(--muted)}
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+  /* Table */
+  table{width:100%; border-collapse:separate; border-spacing:0 10px}
+  th,td{padding:12px 14px; text-align:left}
+  th{color:var(--muted); font-weight:600}
+  tbody tr{background:var(--bg-elev-2); border:1px solid var(--bd)}
+  tbody td:first-child{border-top-left-radius:14px; border-bottom-left-radius:14px}
+  tbody td:last-child{border-top-right-radius:14px; border-bottom-right-radius:14px}
+  .thumb{width:68px; height:68px; border-radius:12px; object-fit:cover; border:1px solid var(--bd); cursor:pointer}
+  /* Modal image */
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:60}
+  .modal.open{display:flex}
+  .modal img{max-width:92vw; max-height:86vh; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.5)}
   /* Toasts */
-  .toasts{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;flex-direction:column;gap:10px;z-index:2000;pointer-events:none}
-  .toast{pointer-events:auto;background:#0e2332;border:1px solid var(--outline);padding:12px 16px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);min-width:240px;text-align:center}
-  /* Image modal */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:3000}
-  .modal img{max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
-  .chiprow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-  /* Quick setup buttons smaller */
-  .qs-grid{display:grid;grid-template-columns:1fr;gap:14px}
-  @media (min-width:480px){ .qs-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px} }
+  .toast-wrap{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; flex-direction:column; gap:10px; z-index:80; width:min(92vw,580px)}
+  .toast{background:var(--bg-elev-2); border:1px solid var(--bd); color:var(--text); padding:12px 14px; border-radius:16px; box-shadow:var(--shadow)}
+  /* Compact toggle */
+  .compact .card .hdr{padding:12px 14px 8px}
+  .compact .card .card-body{padding:8px 14px 14px}
+  .compact .info{padding:12px 14px}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Nightly<br/>Go/No-Go</h1>
-    <small class="version">v26.6</small>
+<div class="wrap">
 
-    <!-- STATUS -->
-    <section class="card" id="statusCard">
-      <div class="status">
-        <div id="goBadge" class="badge go">GO</div>
-        <div>
-          <div class="title" id="statusLine">GO · Clouds ~8% · Vis 18 km · Astro dark</div>
-          <div class="pill" id="updatedPill">Updated —</div>
-          <div class="chiprow">
-            <div class="pill" id="sunChip">Sun alt —</div>
-            <div class="pill" id="moonChip">Moon —</div>
-            <div class="pill" id="altChip">Alt —</div>
-          </div>
-        </div>
+  <header class="section">
+    <h1>Nightly<br/>Go/No-Go <span style="font-size:14px; color:var(--muted)">v26.6</span></h1>
+    <div class="toolbar">
+      <button id="compactBtn" class="btn">Compact <span id="compactState">off</span></button>
+      <button id="themeBtn" class="btn">Blue</button>
+    </div>
+  </header>
+
+  <!-- ===== Status / GO card ===== -->
+  <section id="statusCard" class="section card">
+    <div class="hdr">
+      <div class="go-badge" id="goBadge">GO</div>
+      <div>
+        <div class="title" id="goLine">GO · Clouds ~— · Vis — km · Astro —</div>
+        <div class="sub" id="goSub">Observing recommendation</div>
       </div>
-    </section>
+      <button class="chevron" data-toggle="statusCard" aria-expanded="true">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="chips">
+        <span class="chip" id="chipUpdated">Updated —:—</span>
+        <span class="chip" id="chipSun" data-chip-sun>Sun alt —°</span>
+        <span class="chip" id="chipMoon" data-chip-moon>Moon —%</span>
+        <span class="chip" id="chipAlt" data-chip-alt>Alt —°</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- SKY -->
-    <section class="card">
+  <!-- ===== Sky ===== -->
+  <section id="skyCard" class="section card">
+    <div class="hdr">
       <div class="title">Sky</div>
-      <div class="row two">
-        <div class="kv">
-          <div class="k">Astronomical dark</div>
-          <div class="v" id="astroDark">Yes</div>
-          <div class="k" id="sunAlt">Sun alt —</div>
+      <button class="chevron" data-toggle="skyCard" aria-expanded="true">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="grid grid-2">
+        <div class="info">
+          <div class="label">Astronomical dark</div>
+          <div class="value ok" id="astroNow" data-sky-astro>—</div>
+          <div class="sub" id="sunAltNow" data-sky-sunalt>Sun alt —°</div>
         </div>
-        <div class="kv">
-          <div class="k">Moon illum</div>
-          <div class="v" id="moonIllum">—</div>
-          <div class="k" id="moonAlt">Alt —</div>
+        <div class="info">
+          <div class="label">Moon illum</div>
+          <div class="value" id="moonIllum">—%</div>
+          <div class="sub" id="moonAlt">Alt —°</div>
         </div>
-        <div class="kv">
-          <div class="k">Humidity</div>
-          <div class="v" id="humidity">—</div>
+        <div class="info">
+          <div class="label">Humidity</div>
+          <div class="value" id="humidityVal">—%</div>
         </div>
-        <div class="kv">
-          <div class="k">Transparency</div>
-          <div class="v warn" id="transparency">—</div>
+        <div class="info">
+          <div class="label">Transparency</div>
+          <div class="value" id="transparencyVal">—</div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- CLOUDS -->
-    <section class="card">
+  <!-- ===== Clouds ===== -->
+  <section id="cloudsCard" class="section card">
+    <div class="hdr">
       <div class="title">Clouds (avg)</div>
-      <input id="cloudSlider" class="slider" type="range" min="0" max="100" value="8" />
-      <div class="controls" style="margin-top:10px">
-        <button class="btn small" id="useCloudsBtn">Use</button>
-        <button class="btn small" id="calcCloudsBtn">Calculate</button>
-        <div class="pill" id="cloudSourcePill">From Open-Meteo (hourly) • slider overrides</div>
-        <div class="pill" id="cloudPctPill">8%</div>
+      <button class="chevron" data-toggle="cloudsCard" aria-expanded="true">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <input id="cloudsRange" type="range" min="0" max="100" value="8" />
       </div>
-    </section>
+      <div class="row">
+        <button class="btn" id="useClouds">Use</button>
+        <button class="btn" id="calcClouds">Calculate</button>
+        <span class="pill" id="cloudsSource">From Open-Meteo (hourly) · slider overrides</span>
+        <span class="chip" id="cloudsPct">8%</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- QUICK SETUP -->
-    <section class="card">
+  <!-- ===== Quick setup ===== -->
+  <section id="quickSetupCard" class="section card">
+    <div class="hdr">
       <div class="title">Quick setup</div>
-      <div class="qs-grid">
-        <div class="kv">
-          <div class="k">Latitude (°)</div>
-          <input id="lat" type="number" step="0.00001" class="btn ghost" style="width:100%;text-align:left" />
+      <button class="chevron" data-toggle="quickSetupCard" aria-expanded="true">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="grid grid-2">
+        <div class="info">
+          <div class="label">Latitude (°)</div>
+          <input id="lat" name="lat" class="pill" inputmode="decimal" />
         </div>
-        <div class="kv">
-          <div class="k">Longitude (°)</div>
-          <input id="lon" type="number" step="0.00001" class="btn ghost" style="width:100%;text-align:left" />
-        </div>
-        <div class="kv">
-          <div class="k">Hours (window)</div>
-          <input id="hours" type="number" min="1" max="12" value="3" class="btn ghost" style="width:100%;text-align:left" />
-        </div>
-        <div class="qs-actions">
-          <button class="btn small" id="gpsBtn">Use GPS</button>
-          <button class="btn small" id="calcNowBtn">Calculate Now</button>
+        <div class="info">
+          <div class="label">Longitude (°)</div>
+          <input id="lon" name="lon" class="pill" inputmode="decimal" />
         </div>
       </div>
-    </section>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="useGPS">Use GPS</button>
+        <button class="btn" id="recalc">Calculate Now</button>
+      </div>
+    </div>
+  </section>
 
-    <!-- TOP 5 -->
-    <section class="card" id="top5Card">
+  <!-- ===== Top 5 ===== -->
+  <section id="top5Card" class="section card">
+    <div class="hdr">
       <div class="title">Top 5 Recommendations</div>
-      <ol id="top5List" style="margin:0 0 4px 20px; padding:0">
-        <!-- populated in JS -->
+      <button class="chevron" data-toggle="top5Card" aria-expanded="true">▾</button>
+    </div>
+    <div class="card-body">
+      <ol id="top5List" style="margin:0 0 0 18px; padding:0; display:grid; gap:10px">
+        <!-- filled in JS -->
       </ol>
-    </section>
+    </div>
+  </section>
 
-    <!-- CATALOG -->
-    <section class="card">
+  <!-- ===== Catalog ===== -->
+  <section id="catalogCard" class="section card">
+    <div class="hdr">
       <div class="title">Catalog (subset)</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr>
-          </thead>
-          <tbody id="catalogBody">
-            <!-- populated in JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </div>
+      <button class="chevron" data-toggle="catalogCard" aria-expanded="true">▾</button>
+    </div>
+    <div class="card-body">
+      <table aria-label="Catalog">
+        <thead>
+          <tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr>
+        </thead>
+        <tbody id="catalogBody"></tbody>
+      </table>
+    </div>
+  </section>
 
-  <!-- Toasts -->
-  <div class="toasts" id="toasts"></div>
+</div>
 
-  <!-- Image Modal -->
-  <div class="modal" id="imgModal" aria-hidden="true"><img id="modalImg" alt="Target image"/></div>
+<!-- Toasts -->
+<div class="toast-wrap" id="toasts"></div>
+
+<!-- Image modal -->
+<div class="modal" id="imgModal" role="dialog" aria-modal="true" aria-label="Image preview">
+  <img id="modalImg" alt="">
+</div>
+
+<!-- SunCalc for solar/lunar positions -->
+<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
 
 <script>
-  const $ = (s)=>document.querySelector(s);
-  const $$ = (s)=>document.querySelectorAll(s);
+/* ========= Small util ========= */
+const $ = (sel, ctx=document)=>ctx.querySelector(sel);
+const $$ = (sel, ctx=document)=>Array.from(ctx.querySelectorAll(sel));
+const toasts = $('#toasts');
+function toast(msg, ms=2200){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; toasts.appendChild(t); setTimeout(()=>t.remove(), ms); }
 
-  /* ---------- Toasts ---------- */
-  function toast(msg, ms=2200){
-    const box = document.createElement('div');
-    box.className = 'toast';
-    box.textContent = msg;
-    $('#toasts').appendChild(box);
-    setTimeout(()=>{ box.style.opacity='0'; box.style.transform='translateY(8px)'; }, ms-400);
-    setTimeout(()=> box.remove(), ms);
+/* ========= Collapsible cards ========= */
+(function(){
+  const LS_KEY='astro_collapsed';
+  const state = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+  function set(card, collapsed){
+    const body = card.querySelector('.card-body');
+    const btn = card.querySelector('.chevron');
+    if (!body||!btn) return;
+    btn.setAttribute('aria-expanded', String(!collapsed));
+    btn.textContent = collapsed ? '▸' : '▾';
+    body.style.overflow='hidden';
+    body.style.transition='max-height .25s ease, opacity .25s ease';
+    if (collapsed){ body.style.maxHeight='0px'; body.style.opacity='0'; }
+    else { body.style.maxHeight=body.scrollHeight+'px'; body.style.opacity='1'; setTimeout(()=>{ body.style.maxHeight='none'; }, 250); }
   }
+  $$('.card').forEach(card=>{
+    const id = card.id || Math.random().toString(36).slice(2);
+    card.id = id;
+    const collapsed = !!state[id];
+    set(card, collapsed);
+    const btn = card.querySelector('.chevron');
+    const hdr = card.querySelector('.hdr');
+    function toggle(){ const next = btn.getAttribute('aria-expanded')==='true'; state[id]=next; localStorage.setItem(LS_KEY, JSON.stringify(state)); set(card, next); }
+    btn?.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(); });
+    hdr?.addEventListener('click', (e)=>{ if (e.target.closest('.chevron')) return; toggle(); });
+  });
+})();
 
-  /* ---------- Status logic ---------- */
-  function classifyGo(cloudPct){
-    if (cloudPct <= 20) return {label:'GO', cls:'go'};
-    if (cloudPct <= 50) return {label:'MARGINAL', cls:'marg'};
-    return {label:'NO-GO', cls:'nogo'};
-  }
-  function setGoState(pct){
-    const st = classifyGo(pct);
-    const badge = $('#goBadge');
-    badge.textContent = st.label.replace('NO-GO','NO');
-    badge.className = 'badge ' + st.cls;
-    $('#cloudPctPill').textContent = `${pct}%`;
-    $('#statusLine').textContent = `${st.label.replace('NO-GO','NO')} · Clouds ~${pct}% · Vis 18 km · Astro dark`;
-    $('#updatedPill').textContent = `Updated ${new Date().toLocaleTimeString()}`;
-  }
+/* ========= Theme + compact ========= */
+(function(){
+  const compactBtn = $('#compactBtn'), compactState = $('#compactState');
+  function sync(){ const on = document.body.classList.toggle('compact', JSON.parse(localStorage.getItem('compact')||'false')); compactState.textContent = on ? 'on' : 'off'; }
+  compactBtn.addEventListener('click', ()=>{ const next = !(JSON.parse(localStorage.getItem('compact')||'false')); localStorage.setItem('compact', JSON.stringify(next)); sync(); });
+  sync();
 
-  /* ---------- Open-Meteo fetch & cloud calc ---------- */
-  async function fetchCloudAvg(lat, lon, hours){
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloudcover&timezone=auto`;
-    const r = await fetch(url);
-    const j = await r.json();
-    const arr = (j.hourly && j.hourly.cloudcover) ? j.hourly.cloudcover : [];
-    if (!arr.length) throw new Error('No cloud data');
-    // average first N hours from "now"
-    const n = Math.max(1, Math.min(+hours||3, 12));
-    const avg = Math.round(arr.slice(0, n).reduce((a,b)=>a+b,0)/n);
-    return avg;
-  }
+  const themeBtn=$('#themeBtn');
+  themeBtn.addEventListener('click', ()=>{
+    const t = localStorage.getItem('theme') || 'blue';
+    const next = t==='blue'?'red':'blue';
+    localStorage.setItem('theme', next);
+    themeBtn.textContent = next==='blue'?'Blue':'Red';
+    // simple accent flip
+    document.documentElement.style.setProperty('--accent', next==='blue' ? '#2f7de0' : '#e04848');
+  });
+})();
 
-  /* ---------- Sky dummy calcs (placeholders) ---------- */
-  function updateSkyReadouts(){
-    // Simple placeholders; replace with real astronomy if needed
-    const sunAlt = -44; const moonAlt = -29; const moonPct = Math.max(0, Math.min(100, +$('#cloudSlider').value/10));
-    $('#astroDark').textContent = (sunAlt <= -18) ? 'Yes' : 'No';
-    $('#sunAlt').textContent = `Sun alt ${sunAlt}°`;
-    $('#moonIllum').textContent = `${(7).toString()}%`;
-    $('#moonAlt').textContent = `Alt ${moonAlt}°`;
-    $('#humidity').textContent = `91%`;
-    $('#transparency').textContent = 'Bad';
-    // status chips
-    $('#sunChip').textContent = `Sun alt ${sunAlt}°`;
-    $('#moonChip').textContent = `Moon 7%`;
-    $('#altChip').textContent = `Alt ${moonAlt}°`;
-  }
+/* ========= App state ========= */
+const app = {
+  lat: 37.1656,
+  lon: -76.5684,
+  clouds: 8, // %
+  visibilityKm: 18,
+  humidity: 91,
+  transparency: 'Bad',
+  moonIllum: 7,
+  moonAlt: -29,
+};
 
-  /* ---------- Catalog subset (with GitHub images) ---------- */
-  const GH_BASE = 'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/';
-  const CATALOG = [
-    {id:'M31', name:'Andromeda Galaxy', type:'GX', ra:'0.71h', dec:'41.3°', img:'m31.jpg'},
-    {id:'M33', name:'Triangulum Galaxy', type:'GX', ra:'1.55h', dec:'30.7°', img:'m33.jpg'},
-    {id:'M27', name:'Dumbbell Nebula', type:'PN', ra:'19.89h', dec:'22.7°', img:'m27.jpg'},
-    {id:'M57', name:'Ring Nebula', type:'PN', ra:'18.89h', dec:'33.0°', img:'m57.jpg'},
-    {id:'M13', name:'Hercules Globular', type:'GC', ra:'16.70h', dec:'36.5°', img:'m13.jpg'},
-    {id:'M45', name:'Pleiades', type:'OC', ra:'3.79h', dec:'24.1°', img:'m45.jpg'},
+/* ========= DOM refs ========= */
+const goBadge = $('#goBadge'), goLine=$('#goLine'), goSub=$('#goSub');
+const chipUpdated=$('#chipUpdated'), chipSun=$('#chipSun'), chipMoon=$('#chipMoon'), chipAlt=$('#chipAlt');
+const astroNow=$('#astroNow'), sunAltNow=$('#sunAltNow'), moonIllum=$('#moonIllum'), moonAlt=$('#moonAlt');
+const humidityVal=$('#humidityVal'), transparencyVal=$('#transparencyVal');
+const latIn=$('#lat'), lonIn=$('#lon'), recalcBtn=$('#recalc'), gpsBtn=$('#useGPS');
+const cloudsRange=$('#cloudsRange'), cloudsPct=$('#cloudsPct'), cloudsSource=$('#cloudsSource');
+const top5List=$('#top5List'), catalogBody=$('#catalogBody');
+
+/* ========= Helpers ========= */
+function fmt(num, digits=0){ return Number(num).toFixed(digits); }
+function signDeg(v){ return (v>0?'+':'') + fmt(v); }
+function nowStr(){
+  const d=new Date(); return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'});
+}
+
+/* ========= Sky & status compute ========= */
+function computeSky(){
+  const now=new Date();
+  const sun=SunCalc.getPosition(now, app.lat, app.lon);
+  const sunAltDeg = sun.altitude*180/Math.PI;
+  const astro = sunAltDeg < -18;
+  const moon = SunCalc.getMoonIllumination(now); // fraction 0..1
+  const moonPos= SunCalc.getMoonPosition(now, app.lat, app.lon);
+  const moonAltDeg = moonPos.altitude*180/Math.PI;
+
+  app.moonIllum = Math.round(moon.fraction*100);
+  app.moonAlt = Math.round(moonAltDeg);
+
+  // Update UI
+  astroNow.textContent = astro ? 'Yes' : 'No';
+  astroNow.classList.toggle('ok', astro);
+  astroNow.classList.toggle('danger', !astro);
+  sunAltNow.textContent = `Sun alt ${Math.round(sunAltDeg)}°`;
+
+  moonIllum.textContent = `${app.moonIllum}%`;
+  moonAlt.textContent = `Alt ${signDeg(app.moonAlt)}°`;
+
+  humidityVal.textContent = `${app.humidity}%`;
+  transparencyVal.textContent = app.transparency;
+
+  chipSun.textContent = `Sun alt ${Math.round(sunAltDeg)}°`;
+  chipMoon.textContent = `Moon ${app.moonIllum}%`;
+  chipAlt.textContent  = `Alt ${signDeg(app.moonAlt)}°`;
+
+  // GO/No-Go quick line
+  const cloudsStr = `Clouds ~${app.clouds}%`;
+  const visStr = `Vis ${app.visibilityKm} km`;
+  const astroStr = astro ? 'Astro dark' : 'Not astro dark';
+  goLine.textContent = `GO · ${cloudsStr} · ${visStr} · ${astroStr}`;
+  goBadge.textContent = (app.clouds>=60 || !astro) ? 'NO' : 'GO';
+  goBadge.style.borderColor = (app.clouds>=60 || !astro) ? '#6f2b2b' : '#2b6f41';
+  goBadge.style.background = (app.clouds>=60 || !astro) ? '#2a0f0f' : '#0f2a1b';
+
+  chipUpdated.textContent = `Updated ${nowStr()}`;
+}
+
+/* ========= Clouds control ========= */
+function syncCloudsUI(){
+  cloudsRange.value = String(app.clouds);
+  cloudsPct.textContent = `${app.clouds}%`;
+}
+cloudsRange.addEventListener('input', ()=>{
+  app.clouds = parseInt(cloudsRange.value,10);
+  syncCloudsUI();
+  computeSky();
+});
+$('#useClouds').addEventListener('click', ()=>{
+  toast(`Targets updated · clouds ${app.clouds}%`);
+  computeSky();
+});
+$('#calcClouds').addEventListener('click', ()=>{
+  // Placeholder: pretend we fetched Open-Meteo and got 35%
+  const fetched = 35;
+  app.clouds = fetched;
+  syncCloudsUI();
+  cloudsSource.textContent = 'From Open-Meteo (hourly) · slider overrides';
+  toast(`Clouds ${fetched}% (Open-Meteo)`);
+  computeSky();
+});
+
+/* ========= Location controls ========= */
+function syncLatLonUI(){ latIn.value = app.lat.toFixed(5); lonIn.value = app.lon.toFixed(5); }
+recalcBtn.addEventListener('click', ()=>{ 
+  app.lat=parseFloat(latIn.value); app.lon=parseFloat(lonIn.value);
+  toast('Targets updated');
+  computeSky();
+});
+gpsBtn.addEventListener('click', ()=>{
+  if (!navigator.geolocation){ toast('GPS not available'); return; }
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{ app.lat=pos.coords.latitude; app.lon=pos.coords.longitude; syncLatLonUI(); computeSky(); toast('Location set from GPS'); },
+    ()=>toast('Could not get GPS')
+  );
+});
+
+/* ========= Top 5 (demo list kept) ========= */
+function renderTop5(){
+  const items = [
+    {id:'M27', name:'Dumbbell Nebula', note:'alt 82° — 142° from Moon — 196%'},
+    {id:'M31', name:'Andromeda Galaxy', note:'alt 45° — 140° from Moon — 183%'},
+    {id:'M33', name:'Triangulum Galaxy', note:'alt 46° — 145° from Moon — 175%'},
+    {id:'M57', name:'Ring Nebula', note:'alt 44° — 115% from Moon — 155%'},
+    {id:'M13', name:'Hercules Globular', note:'alt 24° — 90° from Moon — 120%'},
   ];
-  function buildCatalog(){
-    const tbody = $('#catalogBody'); tbody.innerHTML='';
-    CATALOG.forEach(row=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row.name}</td>
-        <td>${row.type}</td>
-        <td>${row.ra}</td>
-        <td>${row.dec}</td>
-        <td><img alt="${row.id}" data-src="${GH_BASE + row.img}" src="${GH_BASE + row.img}"/></td>`;
-      tbody.appendChild(tr);
+  top5List.innerHTML = items.map((x,i)=>`<li><b>${x.id}</b> — ${x.name} — ${x.note}</li>`).join('');
+}
+
+/* ========= Catalog (subset) ========= */
+const GIT_BASE = 'https://raw.githubusercontent.com/jlevick82/Astrotarget/main/images/full/';
+const cat = [
+  {id:'M31', name:'Andromeda Galaxy', type:'GX', ra:'0.71h', dec:'41.3°', img:'m31.jpg' },
+  {id:'M33', name:'Triangulum Galaxy', type:'GX', ra:'1.55h', dec:'30.7°', img:'m33.jpg' },
+  {id:'M27', name:'Dumbbell Nebula', type:'PN', ra:'19.89h', dec:'22.7°', img:'m27.jpg' },
+  {id:'M57', name:'Ring Nebula', type:'PN', ra:'18.89h', dec:'33.0°', img:'m57.jpg' },
+  {id:'M13', name:'Hercules Globular', type:'GC', ra:'16.70h', dec:'36.5°', img:'m13.jpg' },
+];
+function renderCatalog(){
+  catalogBody.innerHTML = cat.map(row=>{
+    const url = GIT_BASE + row.img;
+    return `<tr>
+      <td>${row.name}</td>
+      <td>${row.type}</td>
+      <td>${row.ra}</td>
+      <td>${row.dec}</td>
+      <td><img class="thumb" src="${url}" alt="${row.name}" data-full="${url}"></td>
+    </tr>`;
+  }).join('');
+  // modal wiring
+  $$('#catalogBody .thumb').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      $('#modalImg').src = img.dataset.full;
+      $('#imgModal').classList.add('open');
     });
-    // image modal handlers
-    $('#catalogBody').addEventListener('click', e=>{
-      const img = e.target.closest('img'); if(!img) return;
-      $('#modalImg').src = img.getAttribute('data-src');
-      $('#imgModal').style.display = 'flex';
-    });
-  }
-  $('#imgModal').addEventListener('click', ()=>$('#imgModal').style.display='none');
-
-  /* ---------- Top 5 (simple text demo) ---------- */
-  function buildTop5(){
-    const list = $('#top5List'); list.innerHTML='';
-    const items = [
-      'M27 — Dumbbell Nebula — alt 82° — 142° from Moon — 196%',
-      'M31 — Andromeda Galaxy — alt 45° — 140° from Moon — 183%',
-      'M33 — Triangulum Galaxy — alt 46° — 145° from Moon — 175%',
-      'M57 — Ring Nebula — alt 44° — 115° from Moon — 155%',
-      'M13 — Hercules Globular — alt 24° — 90° from Moon — 120%',
-    ];
-    items.forEach(t=>{
-      const li=document.createElement('li'); li.style.margin='6px 0'; li.textContent=t; list.appendChild(li);
-    });
-  }
-
-  /* ---------- Quick setup ---------- */
-  function loadLoc(){
-    const lat = +(localStorage.getItem('lat') ?? 37.16557);
-    const lon = +(localStorage.getItem('lon') ?? -76.56849);
-    const hrs = +(localStorage.getItem('hours') ?? 3);
-    $('#lat').value = lat; $('#lon').value = lon; $('#hours').value = hrs;
-    return {lat, lon, hrs};
-  }
-  function saveLoc(){ localStorage.setItem('lat', $('#lat').value); localStorage.setItem('lon', $('#lon').value); localStorage.setItem('hours', $('#hours').value); }
-
-  $('#gpsBtn').addEventListener('click', ()=>{
-    if(!navigator.geolocation){ toast('GPS not available'); return; }
-    navigator.geolocation.getCurrentPosition(pos=>{
-      $('#lat').value = pos.coords.latitude.toFixed(5);
-      $('#lon').value = pos.coords.longitude.toFixed(5);
-      saveLoc(); toast('Location set from GPS');
-    }, ()=>toast('GPS permission denied'));
   });
+}
+$('#imgModal').addEventListener('click', ()=>$('#imgModal').classList.remove('open'));
 
-  $('#calcNowBtn').addEventListener('click', async ()=>{
-    saveLoc();
-    await doCloudCalc();
-    toast('Targets updated');
-  });
-
-  /* ---------- Cloud UI handlers ---------- */
-  async function doCloudCalc(){
-    try{
-      const {lat, lon, hrs} = {lat:+$('#lat').value, lon:+$('#lon').value, hrs:+$('#hours').value};
-      const avg = await fetchCloudAvg(lat, lon, hrs);
-      $('#cloudSlider').value = avg;
-      $('#cloudPctPill').textContent = `${avg}%`;
-      setGoState(avg);
-      toast(`Clouds ${avg}% (Open-Meteo)`);
-    }catch(e){
-      toast('Cloud calc failed; using slider');
-      setGoState(+$('#cloudSlider').value);
-    }
-  }
-  $('#calcCloudsBtn').addEventListener('click', doCloudCalc);
-  $('#useCloudsBtn').addEventListener('click', ()=>{
-    const v = +$('#cloudSlider').value;
-    setGoState(v);
-    toast(`Targets updated · clouds ${v}%`);
-  });
-  $('#cloudSlider').addEventListener('input', e=>{
-    const v = +e.target.value;
-    $('#cloudPctPill').textContent = `${v}%`;
-  });
-  $('#cloudSlider').addEventListener('change', e=>{
-    setGoState(+e.target.value);
-  });
-
-  /* ---------- Init ---------- */
-  (function init(){
-    const {lat,lon,hrs} = loadLoc();
-    updateSkyReadouts();
-    setGoState(+$('#cloudSlider').value);
-    buildTop5();
-    buildCatalog();
-    $('#updatedPill').textContent = `Updated ${new Date().toLocaleTimeString()}`;
-  })();
+/* ========= Init ========= */
+(function init(){
+  syncLatLonUI();
+  syncCloudsUI();
+  renderTop5();
+  renderCatalog();
+  computeSky();
+  setInterval(computeSky, 5*60*1000); // keep "now" fresh
+})();
 </script>
 </body>
 </html>
