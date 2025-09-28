@@ -1,341 +1,347 @@
 <!doctype html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Go/No-Go v27.4</title>
-<style>
-  :root{
-    --bg:#0d2029;
-    --bg-2:#0b1b23;
-    --ink:#e8f3f8;
-    --ink-dim:#b6c8d1;
-    --accent:#3aa0ff;
-    --good:#1fc65c;
-    --warn:#ffb200;
-    --bad:#ff5a5a;
-    --card:#112a35;
-    --card-2:#0f242d;
-    --chip:#0a1b23;
-    --chip-ink:#cfe2ea;
-    --radius-lg:18px;
-    --radius-md:12px;
-    --pad:16px;
-    --shadow:0 8px 30px rgba(0,0,0,.28);
-  }
-  body.night{
-    --bg:#040707;
-    --bg-2:#030505;
-    --ink:#ffcdc9;
-    --ink-dim:#ffb5b0;
-    --accent:#ff6c66;
-    --good:#35ff9a;
-    --warn:#ffd56a;
-    --bad:#ff7b7b;
-    --card:#0a0e0f;
-    --card-2:#090b0c;
-    --chip:#0b0b0b;
-    --chip-ink:#ffcfcf;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-    color:var(--ink); background:radial-gradient(1000px 400px at 20% -5%, #15334420, transparent), var(--bg);
-  }
-  .wrap{max-width:980px; margin:26px auto 80px; padding:0 18px;}
-  h1{font-size:42px; line-height:1.05; margin:6px 0 10px;}
-  .sub{opacity:.65; margin-left:8px; font-weight:600}
-  .bar{display:flex; gap:14px; margin:12px 0 18px; flex-wrap:wrap}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Go/No-Go v27.5</title>
+  <style>
+    :root{
+      --bg:#0d2530;            /* page */
+      --bg2:#0f2b38;           /* hero gradient end */
+      --text:#d9eef7;
+      --muted:#9bb9c6;
+      --accent:#4cb3ff;        /* chips */
+      --ok:#00d084;
+      --bad:#ff5a5f;
+      --warn:#ffc447;
+      --card:#0e2a36;          /* outer card */
+      --cardInner:#0b2230;     /* inner tiles */
+      --chipBg:rgba(255,255,255,.08);
+      --chipFg:#d9eef7;
+      --thumbBg:#112f3f;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text); background: radial-gradient(1200px 600px at 50% -200px, #1e5166 0%, var(--bg) 55%), var(--bg);
+      letter-spacing:.2px;
+    }
+    .wrap{max-width:1040px; margin:20px auto 72px; padding:0 16px}
+    header{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin:6px 0 18px}
+    .title{font-size:clamp(28px,6.2vw,56px); font-weight:800; line-height:1}
+    .ver{opacity:.5; font-weight:800}
+    .toolbar{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{background:var(--chipBg); color:var(--chipFg); padding:10px 16px; border-radius:22px; border:1px solid rgba(255,255,255,.08); cursor:pointer}
+    .btn:active{transform:translateY(1px)}/* Cards */
+.card{background:var(--card); border-radius:22px; padding:18px; margin:14px 0; box-shadow: 0 10px 32px rgba(0,0,0,.25) inset, 0 10px 30px rgba(0,0,0,.25)}
+.card-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+.card h2{margin:0; font-size:clamp(20px,4.4vw,32px)}
+.card .card-body{display:block; overflow:hidden}
+.card.is-collapsed .card-body{display:none}
+.chev{width:56px; height:56px; border-radius:16px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); display:grid; place-items:center; font-size:26px; color:var(--text); cursor:pointer; transition:transform .2s ease}
+.chev[aria-expanded="false"]{transform:rotate(180deg)}
 
-  /* Buttons / chips */
-  .btn{
-    display:inline-flex; align-items:center; gap:10px;
-    background:linear-gradient(180deg, var(--card), var(--card-2));
-    color:var(--ink); border:1px solid #ffffff14;
-    padding:10px 16px; border-radius:999px; box-shadow:var(--shadow);
-    cursor:pointer; user-select:none;
-  }
-  .btn:active{transform:translateY(1px); opacity:.9}
+/* Chips row */
+.chips{display:flex; gap:12px; flex-wrap:wrap; margin:8px 0 4px}
+.chip{background:var(--chipBg); padding:10px 16px; border-radius:22px; border:1px solid rgba(255,255,255,.08)}
 
-  /* cards */
-  .card{
-    position:relative; overflow:hidden;
-    background:linear-gradient(180deg, var(--card), var(--card-2));
-    border-radius:var(--radius-lg); box-shadow:var(--shadow);
-    padding:var(--pad);                 /* default: NO extra right padding */
-    margin:18px 0;
-  }
-  .card.has-actions{                    /* only these reserve space for the chevron area */
-    padding-right:calc(var(--pad) + 52px);
-  }
+/* Status banner */
+.status-line{font-size:clamp(22px,4.6vw,34px); font-weight:900; letter-spacing:.2px}
+.status-line .ok{color:var(--ok)}
+.status-line .no{color:var(--bad)}
+.status-badge{display:inline-grid; place-items:center; min-width:64px; height:44px; border-radius:14px; font-weight:900; letter-spacing:.6px; margin-right:10px; padding:0 10px}
+.status-badge.ok{background:rgba(0,208,132,.14); color:var(--ok); border:1px solid rgba(0,208,132,.4)}
+.status-badge.no{background:rgba(255,90,95,.14); color:var(--bad); border:1px solid rgba(255,90,95,.4)}
 
-  /* details + chevron */
-  details{transition:all .2s ease}
-  details > summary{
-    list-style:none; cursor:pointer; position:absolute; top:12px; right:12px;
-    width:44px; height:44px; border-radius:12px; background:#ffffff10;
-    display:grid; place-items:center; border:1px solid #ffffff1a; user-select:none;
-  }
-  details > summary::-webkit-details-marker{display:none}
-  .chev{width:12px; height:12px; border-right:2px solid #ffffffaa; border-bottom:2px solid #ffffffaa; transform:rotate(45deg); transition:transform .18s ease}
-  details[open] .chev{transform:rotate(-135deg)}
+/* Sky compact grid */
+.sky-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+.sky-tile{background:var(--cardInner); border-radius:14px; padding:14px 16px}
+.sky-tile h4{margin:0 0 6px; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.sky-tile .big{font-size:1.6rem; font-weight:800; margin:0 0 2px}
+.badge-bad{color:var(--bad)}
+.sky-tile .sub{opacity:.75; font-size:.9rem}
 
-  /* chips inside cards */
-  .chip{
-    display:inline-flex; align-items:center; gap:10px;
-    padding:8px 14px; background:linear-gradient(180deg, var(--chip), #00000020);
-    color:var(--chip-ink); border:1px solid #ffffff14; border-radius:999px;
-    font-weight:600;
-  }
-  .chip .dot{width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-weight:900}
-  .chip.good .dot{background:#0c321b; color:#3bff97; border:1px solid #5affb23d}
-  .chip.bad  .dot{background:#321010; color:#ff8a8a; border:1px solid #ff8a8a3d}
+/* Clouds card buttons */
+.btn-sm{padding:10px 14px; border-radius:18px}
 
-  /* Status headline */
-  .status-line{font-size:26px; font-weight:800; letter-spacing:.2px; margin:10px 0 6px}
-  .status-line .ok{color:var(--good)}
-  .status-line .ng{color:var(--bad)}
+/* Table wrap */
+.table-wrap{position:relative; overflow:auto; -webkit-overflow-scrolling:touch; width:100%; border-radius:16px; background:var(--cardInner);}
+table{width:100%; border-collapse:separate; border-spacing:0}
+th,td{padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06)}
+th{position:sticky; top:0; background:rgba(0,0,0,.18); backdrop-filter:saturate(140%) blur(4px); text-align:left; font-weight:700}
 
-  /* SKY — compact grid */
-  .sky-grid{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:12px;
-  }
-  @media (min-width:780px){
-    .sky-grid{grid-template-columns:repeat(4, minmax(0, 1fr));}
-  }
-  .stat{padding:12px 12px; border:1px solid #ffffff12; border-radius:16px; background:#ffffff05}
-  .stat .k{font-weight:650; color:var(--ink-dim); font-size:13px}
-  .stat .v{font-size:22px; font-weight:800; margin-top:4px}
-  .stat .subv{font-size:13px; opacity:.7; margin-top:2px}
+/* Thumbs */
+.obj-thumb{position:relative; width:72px; height:72px; border-radius:12px; background:var(--thumbBg); display:grid; place-items:center; overflow:hidden}
+.obj-thumb img{width:100%; height:100%; object-fit:cover; display:block}
+.obj-thumb[data-fallback="1"] img{display:none}
+.obj-thumb .badge{position:absolute; right:6px; bottom:6px; padding:.2rem .45rem; border-radius:10px; font-weight:700; font-size:.9rem; background:var(--chipBg); color:var(--chipFg)}
 
-  /* Clouds slider + controls */
-  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-  .slider{width:100%}
-  input[type=range]{width:100%}
+@media (max-width:600px){
+  .chev{width:48px; height:48px; font-size:22px}
+  .status-line{font-size:clamp(18px,5.6vw,28px)}
+  .obj-thumb{width:64px; height:64px}
+}
 
-  /* Catalog table */
-  .tableWrap{
-    max-height:420px; overflow:auto; border-radius:16px; border:1px solid #ffffff14;
-    background:#00000012;
-  }
-  table{width:100%; border-collapse:separate; border-spacing:0}
-  th, td{padding:14px 16px; border-bottom:1px solid #ffffff10}
-  th{position:sticky; top:0; background:linear-gradient(180deg, var(--card), var(--card-2)); z-index:2}
-  td:last-child, th:last-child{text-align:center; width:110px}
-
-  .thumb{
-    width:72px; height:72px; border-radius:14px; object-fit:cover;
-    border:1px solid #ffffff22; background:#00000030; display:inline-block;
-  }
-
-  /* Compact mode trims paddings/gaps a bit */
-  .compact .card{padding:12px}
-  .compact .card.has-actions{padding-right:calc(12px + 48px)}
-  .compact .sky-grid{gap:10px}
-  .compact .stat{padding:10px}
-  .compact .stat .v{font-size:20px}
-
-  a{color:var(--accent); text-decoration:none}
-</style>
+  </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Go/No-Go <span class="sub">v27.4</span></h1>
-    <div class="bar">
-      <button class="btn" id="compactBtn">Compact On</button>
-      <button class="btn" id="nightBtn">Night Mode</button>
-    </div>
-
-    <!-- STATUS -->
-    <details id="statusCard" class="card has-actions" open>
-      <summary aria-label="Toggle status"><span class="chev"></span></summary>
-      <div class="chip" id="statePill">
-        <span class="dot" id="stateDot">GO</span>
-        <span id="stateText">Ready</span>
+    <header>
+      <div class="title">Go/No-Go <span class="ver">v27.5</span></div>
+      <div class="toolbar">
+        <button class="btn" id="btnCompact">Compact On</button>
+        <button class="btn" id="btnNight">Night Mode</button>
       </div>
-      <div class="status-line" id="statusLine"><span class="ok">GO</span> · Clouds ~0% · Vis 18 km · Astro dark</div>
-      <div class="row" style="gap:12px; margin-top:8px">
-        <span class="chip" id="updatedChip">Updated --:--</span>
-        <span class="chip" id="sunChip">Sun alt -45°</span>
-        <span class="chip" id="moonChip">Moon 7%</span>
-        <span class="chip" id="altChip">Alt -29°</span>
-      </div>
-      <div style="opacity:.65; margin-top:12px">Observing recommendation</div>
-    </details>
-
-    <!-- SKY -->
-    <details id="skyCard" class="card has-actions" open>
-      <summary aria-label="Toggle sky"><span class="chev"></span></summary>
-      <h2 style="margin:4px 0 12px">Sky</h2>
-      <div class="sky-grid">
-        <div class="stat">
-          <div class="k">Astronomical dark</div>
-          <div class="v" id="astroDark">Yes</div>
-          <div class="subv" id="sunAlt">Sun alt -44°</div>
-        </div>
-        <div class="stat">
-          <div class="k">Moon illum</div>
-          <div class="v" id="moonIllum">7%</div>
-          <div class="subv" id="moonAlt">Alt -29°</div>
-        </div>
-        <div class="stat">
-          <div class="k">Humidity</div>
-          <div class="v" id="humV">91%</div>
-        </div>
-        <div class="stat">
-          <div class="k">Transparency</div>
-          <div class="v" id="transV" style="color:var(--warn)">Bad</div>
-          <div class="subv" id="transDetail">AOD 0.12 · PM2.5 2µg/m³ · RH 96% · Vis 12km · ΔT 0.7°C · 0</div>
-        </div>
-      </div>
-    </details>
-
-    <!-- CLOUDS -->
-    <details id="cloudsCard" class="card has-actions" open>
-      <summary aria-label="Toggle clouds"><span class="chev"></span></summary>
-      <h2 style="margin:4px 0 12px">Clouds (avg)</h2>
-      <input class="slider" id="cloudSlider" type="range" min="0" max="100" value="0" />
-      <div class="row" style="margin-top:10px">
-        <button class="btn" id="useBtn">Use</button>
-        <button class="btn" id="calcBtn">Calculate</button>
-        <span class="chip" id="cloudSrc">From Open-Meteo (hourly) · slider overrides</span>
-      </div>
-      <div class="row" style="margin-top:12px">
-        <span class="chip" id="cloudVal">0%</span>
-      </div>
-    </details>
-
-    <!-- QUICK SETUP -->
-    <details id="quickCard" class="card has-actions" open>
-      <summary aria-label="Toggle quick"><span class="chev"></span></summary>
-      <h2 style="margin:4px 0 12px">Quick setup</h2>
-      <div class="row" style="gap:12px; flex-direction:column">
-        <label>Latitude (°)
-          <input id="lat" type="text" value="37.16558" style="width:100%; padding:12px 16px; border-radius:999px; border:1px solid #ffffff18; background:#ffffff08; color:var(--ink)" />
-        </label>
-        <label>Longitude (°)
-          <input id="lon" type="text" value="-76.56841" style="width:100%; padding:12px 16px; border-radius:999px; border:1px solid #ffffff18; background:#ffffff08; color:var(--ink)" />
-        </label>
-        <label>Hours (window)
-          <input id="hours" type="number" min="1" max="8" value="3" style="width:100%; padding:12px 16px; border-radius:999px; border:1px solid #ffffff18; background:#ffffff08; color:var(--ink)" />
-        </label>
-        <div class="row">
-          <button class="btn" id="gpsBtn">Use GPS</button>
-          <button class="btn" id="nowBtn">Calculate Now</button>
-        </div>
-      </div>
-    </details>
-
-    <!-- TOP 5 -->
-    <details id="top5Card" class="card has-actions" open>
-      <summary aria-label="Toggle top5"><span class="chev"></span></summary>
-      <h2 style="margin:4px 0 12px">Top 5 Recommendations</h2>
-      <ol style="margin:0 0 2px 22px; padding:0">
-        <li><a href="#">M27</a> — Dumbbell Nebula — alt 82° — 142° from Moon — 196%</li>
-        <li><a href="#">M31</a> — Andromeda Galaxy — alt 45° — 140° from Moon — 183%</li>
-        <li><a href="#">M33</a> — Triangulum Galaxy — alt 46° — 145° from Moon — 175%</li>
-        <li><a href="#">M57</a> — Ring Nebula — alt 44° — 115° from Moon — 155%</li>
-        <li><a href="#">M13</a> — Hercules Globular — alt 24° — 90° from Moon — 120%</li>
-      </ol>
-    </details>
-
-    <!-- CATALOG -->
-    <details id="catCard" class="card" open>
-      <summary aria-label="Toggle catalog"><span class="chev"></span></summary>
-      <h2 style="margin:4px 0 12px">Catalog (subset)</h2>
-      <div class="tableWrap" id="catWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th>
-            </tr>
-          </thead>
-          <tbody id="catBody">
-            <tr>
-              <td>Andromeda Galaxy</td><td>GX</td><td>0.71h</td><td>41.3°</td>
-              <td><img class="thumb" referrerpolicy="no-referrer"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Andromeda_Galaxy_%28with_h-alpha%29.jpg/128px-Andromeda_Galaxy_%28with_h-alpha%29.jpg"
-                alt="M31"></td>
-            </tr>
-            <tr>
-              <td>Triangulum Galaxy</td><td>GX</td><td>1.55h</td><td>30.7°</td>
-              <td><img class="thumb" referrerpolicy="no-referrer"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/M33LRGB_1.JPG/128px-M33LRGB_1.JPG"
-                alt="M33"></td>
-            </tr>
-            <tr>
-              <td>Dumbbell Nebula</td><td>PN</td><td>19.89h</td><td>22.7°</td>
-              <td><img class="thumb" referrerpolicy="no-referrer"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/M27_-_Dumbbell_Nebula.jpg/128px-M27_-_Dumbbell_Nebula.jpg"
-                alt="M27"></td>
-            </tr>
-            <tr>
-              <td>Ring Nebula</td><td>PN</td><td>18.89h</td><td>33.0°</td>
-              <td><img class="thumb" referrerpolicy="no-referrer"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/M57_The_Ring_Nebula.JPG/128px-M57_The_Ring_Nebula.JPG"
-                alt="M57"></td>
-            </tr>
-            <tr>
-              <td>Hercules Globular</td><td>GC</td><td>16.70h</td><td>36.5°</td>
-              <td><img class="thumb" referrerpolicy="no-referrer"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/M13_-_Great_Globular_Cluster_in_Hercules.jpg/128px-M13_-_Great_Globular_Cluster_in_Hercules.jpg"
-                alt="M13"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </details>
+    </header><!-- STATUS CARD -->
+<section class="card" id="status-card">
+  <div class="card-head">
+    <h2>Status</h2>
+    <button class="chev" data-card="status-card" aria-expanded="true">▴</button>
   </div>
+  <div class="card-body">
+    <div class="status-line" id="statusLine">
+      <span class="status-badge no" id="statusBadge">NO</span>
+      <span class="no" id="statusWord">NO-GO</span>
+      <span> · Clouds <span id="cloudsPct">~100%</span> · Vis <span id="visKm">18 km</span> · <span id="astroState">Astro dark</span></span>
+    </div>
+    <div class="chips">
+      <div class="chip">Updated <span id="updated">--:--</span></div>
+      <div class="chip">Sun alt <span id="sunAlt">-45°</span></div>
+      <div class="chip">Moon <span id="moonPct">7%</span></div>
+      <div class="chip">Alt <span id="siteAlt">-29°</span></div>
+    </div>
+    <div class="muted" id="statusNote" style="opacity:.65; margin-top:10px">Observing recommendation</div>
+  </div>
+</section>
 
-<script>
-  // --- Toggles ---
-  const body = document.body;
-  const compactBtn = document.getElementById('compactBtn');
-  compactBtn.addEventListener('click', ()=>{
-    body.classList.toggle('compact');
-    compactBtn.textContent = body.classList.contains('compact') ? 'Compact Off' : 'Compact On';
-  });
-  const nightBtn = document.getElementById('nightBtn');
-  nightBtn.addEventListener('click', ()=>{
-    body.classList.toggle('night');
-    nightBtn.textContent = body.classList.contains('night') ? 'Normal Mode' : 'Night Mode';
-  });
+<!-- SKY CARD -->
+<section class="card" id="sky-card">
+  <div class="card-head">
+    <h2>Sky</h2>
+    <button class="chev" data-card="sky-card" aria-expanded="true">▴</button>
+  </div>
+  <div class="card-body">
+    <div class="sky-grid">
+      <div class="sky-tile">
+        <h4>Astronomical dark</h4>
+        <div class="big" id="astroDarkVal">Yes</div>
+        <div class="sub" id="sunAltSub">Sun alt -44°</div>
+      </div>
+      <div class="sky-tile">
+        <h4>Moon illum</h4>
+        <div class="big" id="moonIllumVal">7%</div>
+        <div class="sub" id="moonAltSub">Alt -29°</div>
+      </div>
+      <div class="sky-tile">
+        <h4>Humidity</h4>
+        <div class="big" id="humidityVal">91%</div>
+      </div>
+      <div class="sky-tile">
+        <h4>Transparency</h4>
+        <div class="big badge-bad" id="transparencyLabel">Bad</div>
+        <div class="sub" id="transparencyMeta">AOD 0.12 · PM2.5 2µg/m³ · RH 96% · Vis 12km · ΔT 0.7°C · 0</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  // --- Demo data wiring to show the status line behaving ---
-  const cloudSlider = document.getElementById('cloudSlider');
-  const cloudVal = document.getElementById('cloudVal');
-  const statusLine = document.getElementById('statusLine');
-  const statePill = document.getElementById('statePill');
-  const stateDot = document.getElementById('stateDot');
+<!-- CLOUDS CARD (UI only; your logic wires buttons) -->
+<section class="card" id="clouds-card">
+  <div class="card-head">
+    <h2>Clouds (avg)</h2>
+    <button class="chev" data-card="clouds-card" aria-expanded="true">▴</button>
+  </div>
+  <div class="card-body">
+    <input id="cloudSlider" type="range" min="0" max="100" value="100" style="width:100%" />
+    <div class="chips" style="margin-top:12px">
+      <button class="btn btn-sm" id="btnUseClouds">Use</button>
+      <button class="btn btn-sm" id="btnCalcClouds">Calculate</button>
+    </div>
+    <div class="chip" style="display:inline-block; margin-top:10px">From Open-Meteo (hourly) · slider overrides</div>
+    <div class="chip" id="cloudsValueChip" style="display:inline-block; margin-top:10px">100%</div>
+  </div>
+</section>
 
-  function updateStatus(){
-    const c = Number(cloudSlider.value);
-    cloudVal.textContent = `${c}%`;
-    const go = c <= 60; // simple demo threshold so banner changes as you slide
-    stateDot.textContent = go ? 'GO' : 'NO';
-    statePill.className = 'chip ' + (go ? 'good' : 'bad');
-    statusLine.innerHTML =
-      `<span class="${go?'ok':'ng'}">${go?'GO':'NO-GO'}</span> · Clouds ~${c}% · Vis 18 km · Astro dark`;
+<!-- QUICK SETUP (UI) -->
+<section class="card" id="setup-card">
+  <div class="card-head">
+    <h2>Quick setup</h2>
+    <button class="chev" data-card="setup-card" aria-expanded="true">▴</button>
+  </div>
+  <div class="card-body">
+    <div style="display:grid; gap:12px">
+      <label>Latitude (°)
+        <input id="lat" type="text" value="37.16558" style="width:100%; padding:14px 16px; border-radius:18px; background:var(--cardInner); color:var(--text); border:1px solid rgba(255,255,255,.08)"/>
+      </label>
+      <label>Longitude (°)
+        <input id="lon" type="text" value="-76.56841" style="width:100%; padding:14px 16px; border-radius:18px; background:var(--cardInner); color:var(--text); border:1px solid rgba(255,255,255,.08)"/>
+      </label>
+      <label>Hours (window)
+        <input id="hours" type="number" value="3" style="width:100%; padding:14px 16px; border-radius:18px; background:var(--cardInner); color:var(--text); border:1px solid rgba(255,255,255,.08)"/>
+      </label>
+      <div class="toolbar">
+        <button class="btn" id="btnGPS">Use GPS</button>
+        <button class="btn" id="btnCalcNow">Calculate Now</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOP 5 -->
+<section class="card" id="top-card">
+  <div class="card-head">
+    <h2>Top 5 Recommendations</h2>
+    <button class="chev" data-card="top-card" aria-expanded="true">▴</button>
+  </div>
+  <div class="card-body">
+    <ol id="topList" style="margin:0 0 0 22px; padding:0; line-height:1.7">
+      <li><a href="#">M27</a> — Dumbbell Nebula — alt 82° — 142° from Moon — 196%</li>
+      <li><a href="#">M31</a> — Andromeda Galaxy — alt 45° — 140° from Moon — 183%</li>
+      <li><a href="#">M33</a> — Triangulum Galaxy — alt 46° — 145° from Moon — 175%</li>
+      <li><a href="#">M57</a> — Ring Nebula — alt 44° — 115° from Moon — 155%</li>
+      <li><a href="#">M13</a> — Hercules Globular — alt 24° — 90° from Moon — 120%</li>
+    </ol>
+  </div>
+</section>
+
+<!-- CATALOG -->
+<section class="card" id="catalog-card">
+  <div class="card-head">
+    <h2>Catalog (subset)</h2>
+    <button class="chev" data-card="catalog-card" aria-expanded="true">▴</button>
+  </div>
+  <div class="card-body">
+    <div class="table-wrap">
+      <table class="catalog" id="catalogTable">
+        <thead>
+          <tr>
+            <th style="width:86px">Type</th>
+            <th style="width:100px">RA</th>
+            <th style="width:100px">Dec</th>
+            <th style="width:110px; text-align:left">Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GX</td><td>0.71h</td><td>41.3°</td>
+            <td class="thumbCell" data-code="M31"></td>
+          </tr>
+          <tr>
+            <td>GX</td><td>1.55h</td><td>30.7°</td>
+            <td class="thumbCell" data-code="M33"></td>
+          </tr>
+          <tr>
+            <td>PN</td><td>19.89h</td><td>22.7°</td>
+            <td class="thumbCell" data-code="M27"></td>
+          </tr>
+          <tr>
+            <td>PN</td><td>18.89h</td><td>33.0°</td>
+            <td class="thumbCell" data-code="M57"></td>
+          </tr>
+          <tr>
+            <td>GC</td><td>16.70h</td><td>36.5°</td>
+            <td class="thumbCell" data-code="M13"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+  </div>  <script>
+  // --- Card collapse with persistence ---
+  (function(){
+    const KEY='cardCollapse.v1';
+    const load=()=>{ try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch{return{}} };
+    const save=(s)=>localStorage.setItem(KEY,JSON.stringify(s));
+    const state=load();
+    document.querySelectorAll('.card').forEach(card=>{
+      const id=card.id||''; if(id && state[id]===false){ card.classList.add('is-collapsed'); const btn=card.querySelector('.chev'); if(btn) btn.setAttribute('aria-expanded','false'); }
+    });
+    document.querySelectorAll('.chev').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const id=btn.dataset.card; const card=document.getElementById(id); if(!card) return;
+        const collapsed=card.classList.toggle('is-collapsed');
+        btn.setAttribute('aria-expanded', collapsed? 'false':'true');
+        if(id){ state[id]=!collapsed; save(state); }
+      });
+    });
+  })();
+
+  // --- Compact & Night toggles: leave hooks for your existing theme logic ---
+  (function(){
+    const root=document.documentElement; const body=document.body;
+    const compactBtn=document.getElementById('btnCompact');
+    const nightBtn=document.getElementById('btnNight');
+
+    const setCompact=(on)=>{ body.classList.toggle('compact', !!on); compactBtn.textContent = on? 'Compact Off':'Compact On'; localStorage.setItem('compactOn', on? '1':'0'); };
+    const setNight=(on)=>{
+      body.classList.toggle('night', !!on);
+      nightBtn.textContent = on? 'Normal Mode':'Night Mode';
+      localStorage.setItem('nightOn', on? '1':'0');
+      // You can also flip CSS vars here if you use an alternate palette
+      if(on){
+        root.style.setProperty('--text','#ffcaca');
+        root.style.setProperty('--muted','#ffb0b0');
+      }else{
+        root.style.removeProperty('--text');
+        root.style.removeProperty('--muted');
+      }
+    };
+
+    // restore
+    setCompact(localStorage.getItem('compactOn')==='1');
+    setNight(localStorage.getItem('nightOn')==='1');
+
+    compactBtn.addEventListener('click',()=> setCompact(!document.body.classList.contains('compact')));
+    nightBtn.addEventListener('click',()=> setNight(!document.body.classList.contains('night')));
+  })();
+
+  // --- Cloud slider chip ---
+  (function(){
+    const slider=document.getElementById('cloudSlider');
+    const chip=document.getElementById('cloudsValueChip');
+    if(slider&&chip){ slider.addEventListener('input', ()=> chip.textContent = slider.value + '%'); }
+  })();
+
+  // --- Thumbnails with graceful fallback ---
+  function messierThumb(code){
+    const map={
+      M31:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/M31bobo.jpg/320px-M31bobo.jpg',
+      M33:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/M33_-_Triangulum_Galaxy.jpg/320px-M33_-_Triangulum_Galaxy.jpg',
+      M27:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/M27_The_Dumbbell_Nebula.jpg/320px-M27_The_Dumbbell_Nebula.jpg',
+      M57:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/M57_The_Ring_Nebula.JPG/320px-M57_The_Ring_Nebula.JPG',
+      M13:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/M13_-_The_Great_Globular_Cluster_in_Hercules.jpg/320px-M13_-_The_Great_Globular_Cluster_in_Hercules.jpg'
+    }; return map[code]||null;
   }
-  cloudSlider.addEventListener('input', updateStatus);
-  updateStatus();
+  function renderThumb(cellEl, code){
+    const url=messierThumb(code);
+    const wrap=document.createElement('div');
+    wrap.className='obj-thumb';
+    if(url){
+      const img=document.createElement('img');
+      img.src=url; img.loading='lazy'; img.referrerPolicy='no-referrer';
+      img.onerror=()=>{ wrap.setAttribute('data-fallback','1'); img.remove(); };
+      wrap.appendChild(img);
+    } else {
+      wrap.setAttribute('data-fallback','1');
+    }
+    const badge=document.createElement('div'); badge.className='badge'; badge.textContent=code; wrap.appendChild(badge);
+    cellEl.appendChild(wrap);
+  }
+  (function(){
+    document.querySelectorAll('#catalogTable .thumbCell').forEach(td=>{
+      renderThumb(td, td.dataset.code || '');
+    });
+  })();
 
-  // Buttons below slider: for now, just show we "used" the slider value
-  document.getElementById('useBtn').addEventListener('click', ()=> {
-    alert(`Using cloud override = ${cloudSlider.value}%`);
-  });
-  document.getElementById('calcBtn').addEventListener('click', ()=> {
-    // stub: pretend Open-Meteo returned 35%
-    cloudSlider.value = 35; updateStatus();
-    document.getElementById('cloudSrc').textContent = 'From Open-Meteo (hourly) • slider overrides';
-  });
-
-  // Mock: set "Updated" chip timestamp
-  function fmt(t){ return t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'}) }
-  document.getElementById('updatedChip').textContent = 'Updated ' + fmt(new Date());
-</script>
-</body>
+  // --- Hooks for your existing data logic ---
+  // Keep your current fetch + compute code. As long as it updates the text
+  // contents of the labeled spans/ids above, the UI will reflect new values.
+  // Examples to wire in your logic:
+  //   document.getElementById('statusWord').textContent = 'GO';
+  //   document.getElementById('statusBadge').className = 'status-badge ok';
+  //   document.getElementById('cloudsPct').textContent = '~8%';
+  </script></body>
 </html>
