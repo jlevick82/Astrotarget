@@ -6,59 +6,33 @@
 <title>Nightly Go/No-Go</title>
 <style>
   :root{
-    --bg: #0e1a22;         /* base background */
-    --bg-elev: #122330;    /* elevated surfaces */
-    --card: #142a39;
-    --card-2: #0f2330;
-    --ink: #d9e6ef;
-    --ink-dim: #a9c0cd;
-    --accent: #2a78ff;
-    --accent-ink: #e6f0ff;
-    --ok: #20c997;
-    --warn: #ffcc66;
-    --bad: #ff6b6b;
-    --chip: #1c3446;
-    --chip-ink:#cfe3ee;
-    --ring: rgba(255,255,255,.08);
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --radius: 16px;
-    --radius-lg: 22px;
-    --gap: 16px;
-    --pad: 18px;
-    --pad-sm: 12px;
-    --blur: 16px;
+    --bg:#0e1a22; --bg-elev:#122330; --card:#142a39; --card-2:#0f2330;
+    --ink:#d9e6ef; --ink-dim:#a9c0cd;
+    --accent:#2a78ff; --accent-ink:#e6f0ff;
+    --ok:#20c997; --warn:#ffcc66; --bad:#ff6b6b;
+    --chip:#1c3446; --chip-ink:#cfe3ee; --ring:rgba(255,255,255,.08);
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:16px; --radius-lg:22px; --gap:16px; --pad:18px; --pad-sm:12px; --blur:16px;
   }
-  /* Night (red) mode — toggled */
   .night{
-    --bg: #060808;
-    --bg-elev: #0a0a0a;
-    --card: #110707;
-    --card-2:#130808;
-    --ink: #ffbdbd;
-    --ink-dim: #ff9e9e;
-    --accent: #ff4d4d;
-    --accent-ink:#330000;
-    --ok:#67ffb5;
-    --warn:#ffd28d;
-    --bad:#ff7b7b;
-    --chip:#1a0b0b;
-    --chip-ink:#ffc8c8;
-    --ring: rgba(255, 120,120,.2);
+    --bg:#060808; --bg-elev:#0a0a0a; --card:#110707; --card-2:#130808;
+    --ink:#ffbdbd; --ink-dim:#ff9e9e;
+    --accent:#ff4d4d; --accent-ink:#330000;
+    --ok:#67ffb5; --warn:#ffd28d; --bad:#ff7b7b;
+    --chip:#1a0b0b; --chip-ink:#ffc8c8; --ring:rgba(255,120,120,.2);
   }
-
   html,body{height:100%}
   body{
-    margin:0; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
-    color:var(--ink); background:
+    margin:0; font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+    color:var(--ink);
+    background:
       radial-gradient(1200px 400px at 20% -60%, rgba(48,116,170,.25), transparent 60%),
       radial-gradient(1200px 500px at 80% -80%, rgba(24,66,110,.22), transparent 60%),
       var(--bg);
   }
-
   .container{max-width:980px; margin:24px auto 120px; padding:0 16px}
   header h1{margin:0 0 6px 0; font-size:38px; letter-spacing:.2px}
   header .ver{opacity:.6; margin-left:8px; font-size:14px}
-
   .toolbar{display:flex; gap:12px; flex-wrap:wrap; margin:16px 0 6px}
   .btn{
     border:none; background:var(--chip); color:var(--chip-ink);
@@ -69,19 +43,21 @@
   .btn-toggle[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink)}
 
   .card{
+    position:relative;
     background:linear-gradient(180deg, var(--card), var(--card-2));
     border-radius:var(--radius-lg);
     box-shadow:var(--shadow);
     padding:var(--pad);
+    /* Make space for the internal toggle button so it stays INSIDE the card */
+    padding-right: calc(var(--pad) + 52px);
     margin:18px 0;
-    position:relative;
+    overflow:hidden; /* keep everything tidy within the rounded corners */
   }
-  .card .title{font-weight:700; font-size:22px; margin:0 0 14px}
+  .title{font-weight:700; font-size:22px; margin:0 0 14px}
   .chip{
     display:inline-flex; align-items:center; gap:10px; background:var(--chip);
     color:var(--chip-ink); border-radius:28px; padding:8px 14px; margin:6px 8px 0 0;
-    box-shadow:inset 0 0 0 1px var(--ring);
-    white-space:nowrap;
+    box-shadow:inset 0 0 0 1px var(--ring); white-space:nowrap;
   }
   .row{display:flex; gap:var(--gap); flex-wrap:wrap}
   .col{flex:1 1 260px}
@@ -89,24 +65,31 @@
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--gap)}
   @media (max-width:560px){ .grid{grid-template-columns:1fr} }
 
-  .stat{
-    background:rgba(255,255,255,.03); border-radius:var(--radius); padding:14px 16px;
-    box-shadow:inset 0 0 0 1px var(--ring);
-  }
+  .stat{background:rgba(255,255,255,.03); border-radius:var(--radius); padding:14px 16px; box-shadow:inset 0 0 0 1px var(--ring)}
   .stat .k{font-size:14px; color:var(--ink-dim)}
   .stat .v{font-size:28px; font-weight:800; margin-top:6px}
-  .stat.bad .v{color:var(--bad)}
-  .stat.warn .v{color:var(--warn)}
-  .stat.ok .v{color:var(--ok)}
+  .stat.bad .v{color:var(--bad)} .stat.warn .v{color:var(--warn)} .stat.ok .v{color:var(--ok)}
 
+  /* collapsers (inside card) */
+  details.card summary{list-style:none}
   .collapse-btn{
     position:absolute; right:12px; top:12px; width:42px; height:42px; border-radius:12px;
     border:none; background:rgba(255,255,255,.06); color:var(--ink); box-shadow:inset 0 0 0 1px var(--ring);
     display:grid; place-items:center; cursor:pointer;
   }
-  details.card summary{list-style:none}
   details.card[open] .collapse-btn span{transform:rotate(180deg)}
   .collapse-btn span{transition:transform .25s ease}
+
+  /* status banner */
+  .status-banner{
+    margin:8px 0 10px;
+    padding:12px 14px;
+    border-radius:16px;
+    font-weight:800; font-size:20px; letter-spacing:.2px;
+    box-shadow:inset 0 0 0 1px var(--ring);
+  }
+  .banner-go{background:linear-gradient(180deg, rgba(32,201,151,.18), rgba(32,201,151,.10)); color:#aef3d7}
+  .banner-nogo{background:linear-gradient(180deg, rgba(255,107,107,.20), rgba(255,107,107,.10)); color:#ffd5d5}
 
   .slider{width:100%}
   .inline{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
@@ -120,7 +103,6 @@
   table{width:100%; border-collapse:separate; border-spacing:0}
   th,td{padding:14px 14px; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:middle}
   th{color:var(--ink-dim); font-weight:600; text-align:left; position:sticky; top:0; background:var(--card-2)}
-
   .thumb{width:64px; height:64px; border-radius:12px; object-fit:cover; box-shadow:inset 0 0 0 1px var(--ring); cursor:pointer}
 
   /* image modal */
@@ -128,8 +110,9 @@
   .modal.open{display:grid}
   .modal img{max-width:90vw; max-height:80vh; border-radius:18px; box-shadow:0 14px 60px rgba(0,0,0,.6)}
   .close-x{position:absolute; top:14px; right:14px; background:#000c; color:#fff; border:none; border-radius:10px; padding:8px 10px}
+
   /* compact mode */
-  .compact .card{padding:12px}
+  .compact .card{padding:12px; padding-right:64px}
   .compact .stat .v{font-size:22px}
   .compact .chip{padding:6px 10px}
 </style>
@@ -137,7 +120,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>Nightly<br/>Go/No-Go <span class="ver">v27.0</span></h1>
+      <h1>Go/No-Go <span class="ver">v27.1</span></h1>
       <div class="toolbar">
         <button id="btnCompact" class="btn btn-toggle" aria-pressed="false">Compact Off</button>
         <button id="btnNight" class="btn btn-toggle" aria-pressed="false">Night Mode</button>
@@ -148,11 +131,11 @@
     <details id="statusCard" class="card" open>
       <summary class="title">Status</summary>
       <button class="collapse-btn" aria-label="collapse"><span>▾</span></button>
-      <div class="row" style="align-items:center">
-        <div class="pill" id="goBadge">GO</div>
-        <div style="font-size:22px; font-weight:800; margin-left:8px" id="statusLine">—</div>
-      </div>
-      <div class="inline" style="margin-top:12px">
+
+      <!-- Big banner line -->
+      <div id="statusBanner" class="status-banner banner-go">GO · Clouds ~0% · Vis 18 km · Astro dark</div>
+
+      <div class="inline">
         <div class="chip" id="chipUpdated">Updated —:—</div>
         <div class="chip" id="chipSunAlt">Sun alt —°</div>
         <div class="chip" id="chipMoon">Moon —%</div>
@@ -192,7 +175,6 @@
     <details id="cloudsCard" class="card" open>
       <summary class="title">Clouds (avg)</summary>
       <button class="collapse-btn" aria-label="collapse"><span>▾</span></button>
-
       <input id="cloudSlider" class="slider" type="range" min="0" max="100" value="15" />
       <div class="inline" style="margin-top:10px">
         <button class="btn" id="useClouds">Use</button>
@@ -249,11 +231,26 @@
         <table>
           <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
           <tbody id="cat">
-            <tr><td>Andromeda Galaxy</td><td>GX</td><td>0.71h</td><td>41.3°</td><td><img class="thumb" src="https://upload.wikimedia.org/wikipedia/commons/5/55/Andromeda_Galaxy_%28with_h-alpha%29.jpg" alt="M31"/></td></tr>
-            <tr><td>Triangulum Galaxy</td><td>GX</td><td>1.55h</td><td>30.7°</td><td><img class="thumb" src="https://upload.wikimedia.org/wikipedia/commons/9/98/M33LRGB_1.JPG" alt="M33"/></td></tr>
-            <tr><td>Dumbbell Nebula</td><td>PN</td><td>19.89h</td><td>22.7°</td><td><img class="thumb" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/M27_-_Dumbbell_Nebula.jpg" alt="M27"/></td></tr>
-            <tr><td>Ring Nebula</td><td>PN</td><td>18.89h</td><td>33.0°</td><td><img class="thumb" src="https://upload.wikimedia.org/wikipedia/commons/7/72/M57_The_Ring_Nebula.JPG" alt="M57"/></td></tr>
-            <tr><td>Hercules Globular</td><td>GC</td><td>16.70h</td><td>36.5°</td><td><img class="thumb" src="https://upload.wikimedia.org/wikipedia/commons/8/8b/M13_-_Great_Globular_Cluster_in_Hercules.jpg" alt="M13"/></td></tr>
+            <tr>
+              <td>Andromeda Galaxy</td><td>GX</td><td>0.71h</td><td>41.3°</td>
+              <td><img class="thumb" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/5/55/Andromeda_Galaxy_%28with_h-alpha%29.jpg" alt="M31"/></td>
+            </tr>
+            <tr>
+              <td>Triangulum Galaxy</td><td>GX</td><td>1.55h</td><td>30.7°</td>
+              <td><img class="thumb" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/9/98/M33LRGB_1.JPG" alt="M33"/></td>
+            </tr>
+            <tr>
+              <td>Dumbbell Nebula</td><td>PN</td><td>19.89h</td><td>22.7°</td>
+              <td><img class="thumb" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/M27_-_Dumbbell_Nebula.jpg" alt="M27"/></td>
+            </tr>
+            <tr>
+              <td>Ring Nebula</td><td>PN</td><td>18.89h</td><td>33.0°</td>
+              <td><img class="thumb" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/7/72/M57_The_Ring_Nebula.JPG" alt="M57"/></td>
+            </tr>
+            <tr>
+              <td>Hercules Globular</td><td>GC</td><td>16.70h</td><td>36.5°</td>
+              <td><img class="thumb" referrerpolicy="no-referrer" src="https://upload.wikimedia.org/wikipedia/commons/8/8b/M13_-_Great_Globular_Cluster_in_Hercules.jpg" alt="M13"/></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -269,297 +266,113 @@
   </div>
 
 <script>
-/* ---------------------- small helpers ---------------------- */
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
-const toast = (msg, ms=2300) => {
-  const t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg;
-  $('#toasts').appendChild(t);
-  setTimeout(()=>{ t.remove(); }, ms);
-};
-function setPressed(btn, pressed){ btn.setAttribute('aria-pressed', pressed ? 'true' : 'false'); }
+const $ = s=>document.querySelector(s); const $$=s=>Array.from(document.querySelectorAll(s));
+const toast = (msg, ms=2300)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; $('#toasts').appendChild(t); setTimeout(()=>t.remove(), ms); };
+const setPressed=(b,p)=>b.setAttribute('aria-pressed', p?'true':'false');
 
-/* ---------------------- state ---------------------- */
-const state = {
-  lat: parseFloat(localStorage.getItem('lat')) || 37.16559,
-  lon: parseFloat(localStorage.getItem('lon')) || -76.56849,
-  hours: parseInt(localStorage.getItem('hours')) || 3,
-  clouds: parseInt(localStorage.getItem('clouds')) || 8,
-  compact: localStorage.getItem('compact') === '1',
-  night: localStorage.getItem('night') === '1',
-};
+const state={lat:parseFloat(localStorage.getItem('lat'))||37.16559,lon:parseFloat(localStorage.getItem('lon'))||-76.56849,hours:parseInt(localStorage.getItem('hours'))||3,clouds:parseInt(localStorage.getItem('clouds'))||8,compact:localStorage.getItem('compact')==='1',night:localStorage.getItem('night')==='1'};
 
-/* ---------------------- UI init ---------------------- */
 function initUI(){
-  $('#lat').value = state.lat.toFixed(5);
-  $('#lon').value = state.lon.toFixed(5);
-  $('#hours').value = state.hours;
-  $('#cloudSlider').value = state.clouds;
-  $('#cloudPct').textContent = `${state.clouds}%`;
-  document.body.classList.toggle('compact', state.compact);
-  document.body.classList.toggle('night', state.night);
-  setPressed($('#btnCompact'), state.compact);
-  $('#btnCompact').textContent = state.compact ? 'Compact On' : 'Compact Off';
-  setPressed($('#btnNight'), state.night);
-  $('#btnNight').textContent = state.night ? 'Normal Mode' : 'Night Mode';
+  $('#lat').value=state.lat.toFixed(5); $('#lon').value=state.lon.toFixed(5); $('#hours').value=state.hours;
+  $('#cloudSlider').value=state.clouds; $('#cloudPct').textContent=`${state.clouds}%`;
+  document.body.classList.toggle('compact',state.compact); document.body.classList.toggle('night',state.night);
+  setPressed($('#btnCompact'),state.compact); $('#btnCompact').textContent=state.compact?'Compact On':'Compact Off';
+  setPressed($('#btnNight'),state.night); $('#btnNight').textContent=state.night?'Normal Mode':'Night Mode';
 }
 initUI();
 
-/* ---------------------- collapsible summary buttons ---------------------- */
+/* keep toggles inside each card */
 $$('.card').forEach(card=>{
-  const b = card.querySelector('.collapse-btn');
-  if (!b) return;
-  b.addEventListener('click', () => {
-    card.open = !card.open;
-  });
+  card.querySelector('.collapse-btn')?.addEventListener('click',()=>{ card.open=!card.open; });
 });
 
-/* ---------------------- toggles ---------------------- */
-$('#btnCompact').addEventListener('click', ()=>{
-  state.compact = !state.compact;
-  localStorage.setItem('compact', state.compact?'1':'0');
-  document.body.classList.toggle('compact', state.compact);
-  setPressed($('#btnCompact'), state.compact);
-  $('#btnCompact').textContent = state.compact ? 'Compact On' : 'Compact Off';
-});
-$('#btnNight').addEventListener('click', ()=>{
-  state.night = !state.night;
-  localStorage.setItem('night', state.night?'1':'0');
-  document.body.classList.toggle('night', state.night);
-  setPressed($('#btnNight'), state.night);
-  $('#btnNight').textContent = state.night ? 'Normal Mode' : 'Night Mode';
-});
+/* Toggles */
+$('#btnCompact').onclick=()=>{ state.compact=!state.compact; localStorage.setItem('compact',state.compact?'1':'0'); document.body.classList.toggle('compact',state.compact); setPressed($('#btnCompact'),state.compact); $('#btnCompact').textContent=state.compact?'Compact On':'Compact Off'; };
+$('#btnNight').onclick=()=>{ state.night=!state.night; localStorage.setItem('night',state.night?'1':'0'); document.body.classList.toggle('night',state.night); setPressed($('#btnNight'),state.night); $('#btnNight').textContent=state.night?'Normal Mode':'Night Mode'; };
 
-/* ---------------------- image modal ---------------------- */
-$('#closeModal').onclick = ()=> $('#imgModal').classList.remove('open');
-$('#imgModal').addEventListener('click', e=>{
-  if(e.target.id==='imgModal') $('#imgModal').classList.remove('open');
-});
-$('#cat').addEventListener('click', e=>{
-  const img = e.target.closest('img.thumb');
-  if (!img) return;
-  $('#modalImg').src = img.src;
-  $('#imgModal').classList.add('open');
-});
+/* Modal */
+$('#closeModal').onclick=()=>$('#imgModal').classList.remove('open');
+$('#imgModal').addEventListener('click',e=>{ if(e.target.id==='imgModal') $('#imgModal').classList.remove('open'); });
+$('#cat').addEventListener('click',e=>{ const img=e.target.closest('img.thumb'); if(!img) return; $('#modalImg').src=img.src; $('#imgModal').classList.add('open'); });
 
-/* ---------------------- Astronomy placeholders ---------------------- */
-/* You can wire real sun alt / moon data later; for now we keep fields coherent */
+/* Static astro placeholders (same as before) */
 function updateStaticAstronomy(){
-  $('#chipUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString();
-  $('#chipSunAlt').textContent = 'Sun alt -45°';
-  $('#chipMoon').textContent = 'Moon 7%';
-  $('#chipAlt').textContent = 'Alt -29°';
-
-  $('#astroDark').textContent = 'Yes';
-  $('#sunAltDetail').textContent = 'Sun alt -45°';
-  $('#moonIllum').textContent = '7%';
-  $('#moonAltDetail').textContent = 'Alt -29°';
+  $('#chipUpdated').textContent='Updated ' + new Date().toLocaleTimeString();
+  $('#chipSunAlt').textContent='Sun alt -45°'; $('#chipMoon').textContent='Moon 7%'; $('#chipAlt').textContent='Alt -29°';
+  $('#astroDark').textContent='Yes'; $('#sunAltDetail').textContent='Sun alt -45°'; $('#moonIllum').textContent='7%'; $('#moonAltDetail').textContent='Alt -29°';
 }
 updateStaticAstronomy();
 
-/* ---------------------- Weather + Air Quality (Open-Meteo) ---------------------- */
-/* Averaging window: current local hour → +N hours */
-async function fetchOpenMeteo(lat, lon, hoursWindow=3){
-  // Weather
-  const wxParams = new URLSearchParams({
-    latitude: String(lat),
-    longitude: String(lon),
-    hourly: 'cloudcover,relative_humidity_2m,visibility,dewpoint_2m,temperature_2m,wind_speed_10m',
-    timezone: 'auto',
-    forecast_days: '1'
-  });
-  // Air quality
-  const aqParams = new URLSearchParams({
-    latitude: String(lat),
-    longitude: String(lon),
-    hourly: 'pm2_5,aerosol_optical_depth',
-    timezone: 'auto'
-  });
-
-  const [wxRes, aqRes] = await Promise.all([
-    fetch('https://api.open-meteo.com/v1/forecast?'+wxParams.toString()),
-    fetch('https://air-quality-api.open-meteo.com/v1/air-quality?'+aqParams.toString())
+/* Open-Meteo fetch (weather + air quality) */
+async function fetchOpenMeteo(lat,lon,hoursWindow=3){
+  const wx=new URLSearchParams({latitude:String(lat),longitude:String(lon),hourly:'cloudcover,relative_humidity_2m,visibility,dewpoint_2m,temperature_2m,wind_speed_10m',timezone:'auto',forecast_days:'1'});
+  const aq=new URLSearchParams({latitude:String(lat),longitude:String(lon),hourly:'pm2_5,aerosol_optical_depth',timezone:'auto'});
+  const [wxRes,aqRes]=await Promise.all([
+    fetch('https://api.open-meteo.com/v1/forecast?'+wx.toString()),
+    fetch('https://air-quality-api.open-meteo.com/v1/air-quality?'+aq.toString())
   ]);
-  if(!wxRes.ok) throw new Error('Open-Meteo weather error');
-  if(!aqRes.ok) throw new Error('Open-Meteo air-quality error');
-
-  const wx = await wxRes.json();
-  const aq = await aqRes.json();
-
-  const times = wx?.hourly?.time || [];
-  const cc   = wx?.hourly?.cloudcover || [];
-  const rh   = wx?.hourly?.relative_humidity_2m || [];
-  const vis  = wx?.hourly?.visibility || [];           // meters
-  const t2m  = wx?.hourly?.temperature_2m || [];
-  const td2m = wx?.hourly?.dewpoint_2m || [];
-  const wind = wx?.hourly?.wind_speed_10m || [];
-  const pm25 = aq?.hourly?.pm2_5 || [];
-  const aod  = aq?.hourly?.aerosol_optical_depth || [];
-
-  const now = new Date();
-  const key = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).toISOString().slice(0,13);
-  let idx = times.findIndex(t => t.slice(0,13) === key);
-  if (idx < 0) idx = 0;
-  const end = Math.min(idx + Math.max(1, Number(hoursWindow)||1), times.length);
-  const avg = arr => Math.round( (arr.slice(idx, end).reduce((a,b)=>a+Number(b||0),0) / Math.max(1,end-idx)) * 100 )/100;
-
-  return {
-    clouds: Math.round(avg(cc)),
-    rh: Math.round(avg(rh)),
-    visibilityKm: Math.round(avg(vis)/1000),
-    tempC: avg(t2m),
-    dewC: avg(td2m),
-    wind: Math.round(avg(wind)),
-    pm25: Math.round(avg(pm25)),
-    aod: Math.round(avg(aod) * 1000)/1000
-  };
+  const w=await wxRes.json(); const a=await aqRes.json();
+  const times=w?.hourly?.time||[]; const cc=w?.hourly?.cloudcover||[]; const rh=w?.hourly?.relative_humidity_2m||[]; const vis=w?.hourly?.visibility||[];
+  const t2=w?.hourly?.temperature_2m||[]; const td=w?.hourly?.dewpoint_2m||[]; const wind=w?.hourly?.wind_speed_10m||[];
+  const pm=a?.hourly?.pm2_5||[]; const aod=a?.hourly?.aerosol_optical_depth||[];
+  const now=new Date(); const key=new Date(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours()).toISOString().slice(0,13);
+  let idx=times.findIndex(t=>t.slice(0,13)===key); if(idx<0) idx=0; const end=Math.min(idx+Math.max(1,Number(hoursWindow)||1),times.length);
+  const avg=arr=>Math.round((arr.slice(idx,end).reduce((s,v)=>s+Number(v||0),0)/Math.max(1,end-idx))*100)/100;
+  return {clouds:Math.round(avg(cc)),rh:Math.round(avg(rh)),visibilityKm:Math.round(avg(vis)/1000),tempC:avg(t2),dewC:avg(td),wind:Math.round(avg(wind)),pm25:Math.round(avg(pm)),aod:Math.round(avg(aod)*1000)/1000};
 }
-
-/* Transparency model (empirical):
-   - Start with cloud cover buckets
-   - Blend penalties from AOD and PM2.5
-   - Penalize if dewpoint spread < 2°C or RH > 85%
-   Score 0..100 → label.
-*/
+/* Transparency score (same model) */
 function transparencyScore(m){
-  // cloud penalty (strong)
-  let score = 100 - m.clouds; // 0..100
-
-  // AOD (0.02 very clear; >0.2 hazy)
-  if (Number.isFinite(m.aod)){
-    const aodPenalty = Math.max(0, (m.aod - 0.04) / 0.16) * 35; // up to ~35 points
-    score -= aodPenalty;
-  }
-  // PM2.5 (µg/m3)
-  if (Number.isFinite(m.pm25)){
-    const pmPenalty =
-      m.pm25 <= 12 ? 0 :
-      m.pm25 <= 35 ? 10 :
-      m.pm25 <= 55 ? 25 : 40;
-    score -= pmPenalty;
-  }
-  // High humidity / small dew spread
-  const spread = (m.tempC - m.dewC);
-  if (m.rh >= 85) score -= 10;
-  if (spread <= 2) score -= 10;
-
-  // Clamp
-  score = Math.max(0, Math.min(100, Math.round(score)));
-
-  // Map to label
-  let label = 'Good';
-  if (score < 30) label = 'Bad';
-  else if (score < 55) label = 'Poor';
-  else if (score < 75) label = 'Fair';
-
-  return {score, label};
+  let score=100-m.clouds;
+  if(Number.isFinite(m.aod)){ const aodPenalty=Math.max(0,(m.aod-0.04)/0.16)*35; score-=aodPenalty; }
+  if(Number.isFinite(m.pm25)){ score-= (m.pm25<=12?0:m.pm25<=35?10:m.pm25<=55?25:40); }
+  const spread=(m.tempC-m.dewC); if(m.rh>=85) score-=10; if(spread<=2) score-=10;
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  let label='Good'; if(score<30) label='Bad'; else if(score<55) label='Poor'; else if(score<75) label='Fair';
+  return {score,label};
 }
 
-/* Recompute headline / Go-NoGo */
-function recalcGoNoGo(){
-  const clouds = state.clouds;
-  const ok = clouds <= 30;
-  $('#goBadge').textContent = ok ? 'GO' : 'NO';
-  $('#goBadge').style.background = ok ? '#0a1f14' : '#2a0c0c';
-  $('#goBadge').style.color = ok ? '#9ff2cd' : '#ffb3b3';
-  $('#goBadge').style.boxShadow = ok ? 'inset 0 0 0 2px #1b5f3e' : 'inset 0 0 0 2px #5f1b1b';
-  $('#statusLine').textContent = `${ok?'GO':'NO-GO'} · Clouds ~${clouds}% · Vis 18 km · Astro dark`;
+/* Banner + headline */
+function refreshBanner(){
+  const c=state.clouds;
+  const ok=c<=30;
+  const banner=$('#statusBanner');
+  banner.classList.toggle('banner-go',ok);
+  banner.classList.toggle('banner-nogo',!ok);
+  banner.textContent=`${ok?'GO':'NO-GO'} · Clouds ~${c}% · Vis 18 km · Astro dark`;
 }
 
-/* Apply transparency UI */
-function applyTransparency(label, m, score){
-  const el = $('#transparency');
-  const box = $('#statTransparency');
-  el.textContent = label;
-  box.classList.remove('ok','warn','bad');
-  if (label==='Good') box.classList.add('ok');
-  else if (label==='Fair' || label==='Poor') box.classList.add('warn');
-  else box.classList.add('bad');
-
-  $('#trDetail').textContent = `AOD ${m.aod ?? '—'} · PM2.5 ${m.pm25 ?? '—'}µg/m³ · RH ${m.rh}% · Vis ${m.visibilityKm}km · ΔT ${ (m.tempC-m.dewC).toFixed(1) }°C · ${score}`;
+/* Transparency UI */
+function applyTransparency(label,m,score){
+  const box=$('#statTransparency'); const el=$('#transparency');
+  el.textContent=label; box.classList.remove('ok','warn','bad');
+  if(label==='Good') box.classList.add('ok'); else if(label==='Fair'||label==='Poor') box.classList.add('warn'); else box.classList.add('bad');
+  $('#trDetail').textContent=`AOD ${m.aod ?? '—'} · PM2.5 ${m.pm25 ?? '—'}µg/m³ · RH ${m.rh}% · Vis ${m.visibilityKm}km · ΔT ${(m.tempC-m.dewC).toFixed(1)}°C · ${score}`;
 }
 
-/* ---------------------- Wire buttons ---------------------- */
-$('#cloudSlider').addEventListener('input', e=>{
-  state.clouds = Number(e.target.value);
-  $('#cloudPct').textContent = `${state.clouds}%`;
-});
-$('#useClouds').addEventListener('click', ()=>{
-  localStorage.setItem('clouds', String(state.clouds));
-  recalcGoNoGo();
-  // Estimate transparency from clouds + current humidity if available
-  const rh = parseInt($('#humidity').textContent) || 60;
-  const m = {clouds: state.clouds, rh, visibilityKm:15, tempC:10, dewC:8, pm25:12, aod:0.06};
-  const t = transparencyScore(m);
-  applyTransparency(t.label, m, t.score);
-  toast(`Targets updated · clouds ${state.clouds}%`);
-});
-$('#calcClouds').addEventListener('click', async ()=>{
-  try{
-    const m = await fetchOpenMeteo(state.lat, state.lon, state.hours);
-    state.clouds = m.clouds;
-    localStorage.setItem('clouds', String(state.clouds));
-    $('#cloudSlider').value = state.clouds;
-    $('#cloudPct').textContent = `${state.clouds}%`;
-    $('#humidity').textContent = `${m.rh}%`;
-    const t = transparencyScore(m);
-    applyTransparency(t.label, m, t.score);
-    recalcGoNoGo();
-    toast(`Clouds ${m.clouds}% (OM) · RH ${m.rh}% · Vis ${m.visibilityKm} km · AOD ${m.aod} · PM2.5 ${m.pm25}`);
-  }catch(e){
-    console.error(e);
-    toast('Open-Meteo fetch failed');
-  }
-});
+/* Buttons */
+$('#cloudSlider').addEventListener('input',e=>{ state.clouds=Number(e.target.value); $('#cloudPct').textContent=`${state.clouds}%`; refreshBanner(); });
+$('#useClouds').onclick=()=>{ localStorage.setItem('clouds',String(state.clouds)); refreshBanner(); toast(`Targets updated · clouds ${state.clouds}%`); };
+$('#calcClouds').onclick=async()=>{ try{ const m=await fetchOpenMeteo(state.lat,state.lon,state.hours); state.clouds=m.clouds; localStorage.setItem('clouds',String(state.clouds));
+  $('#cloudSlider').value=state.clouds; $('#cloudPct').textContent=`${state.clouds}%`; $('#humidity').textContent=`${m.rh}%`;
+  const t=transparencyScore(m); applyTransparency(t.label,m,t.score); refreshBanner();
+  toast(`Clouds ${m.clouds}% (OM) · RH ${m.rh}% · Vis ${m.visibilityKm} km · AOD ${m.aod} · PM2.5 ${m.pm25}`); }catch(e){ console.error(e); toast('Open-Meteo fetch failed'); } };
 
-$('#useGPS').addEventListener('click', ()=>{
-  if (!navigator.geolocation){ toast('GPS not available'); return; }
-  navigator.geolocation.getCurrentPosition(pos=>{
-    state.lat = pos.coords.latitude;
-    state.lon = pos.coords.longitude;
-    $('#lat').value = state.lat.toFixed(5);
-    $('#lon').value = state.lon.toFixed(5);
-    localStorage.setItem('lat', state.lat);
-    localStorage.setItem('lon', state.lon);
-    toast('Location set from GPS');
-  }, ()=>toast('GPS permission denied'));
-});
+$('#useGPS').onclick=()=>{ if(!navigator.geolocation){ toast('GPS not available'); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{ state.lat=pos.coords.latitude; state.lon=pos.coords.longitude;
+    $('#lat').value=state.lat.toFixed(5); $('#lon').value=state.lon.toFixed(5);
+    localStorage.setItem('lat',state.lat); localStorage.setItem('lon',state.lon); toast('Location set from GPS'); },()=>toast('GPS permission denied')); };
 
-$('#calcNow').addEventListener('click', async ()=>{
-  state.lat = parseFloat($('#lat').value);
-  state.lon = parseFloat($('#lon').value);
-  state.hours = parseInt($('#hours').value)||3;
-  localStorage.setItem('lat', state.lat);
-  localStorage.setItem('lon', state.lon);
-  localStorage.setItem('hours', state.hours);
-  try{
-    const m = await fetchOpenMeteo(state.lat, state.lon, state.hours);
-    state.clouds = m.clouds;
-    localStorage.setItem('clouds', String(state.clouds));
-    $('#cloudSlider').value = state.clouds;
-    $('#cloudPct').textContent = `${state.clouds}%`;
-    $('#humidity').textContent = `${m.rh}%`;
-    const t = transparencyScore(m);
-    applyTransparency(t.label, m, t.score);
-    recalcGoNoGo();
-    toast('Targets updated');
-  }catch(e){ console.error(e); toast('Update failed'); }
-});
+$('#calcNow').onclick=async()=>{ state.lat=parseFloat($('#lat').value); state.lon=parseFloat($('#lon').value); state.hours=parseInt($('#hours').value)||3;
+  localStorage.setItem('lat',state.lat); localStorage.setItem('lon',state.lon); localStorage.setItem('hours',state.hours);
+  try{ const m=await fetchOpenMeteo(state.lat,state.lon,state.hours); state.clouds=m.clouds; localStorage.setItem('clouds',String(state.clouds));
+    $('#cloudSlider').value=state.clouds; $('#cloudPct').textContent=`${state.clouds}%`; $('#humidity').textContent=`${m.rh}%`;
+    const t=transparencyScore(m); applyTransparency(t.label,m,t.score); refreshBanner(); toast('Targets updated'); }catch(e){ console.error(e); toast('Update failed'); } };
 
-/* Initial compute */
-(async ()=>{
-  try{
-    const m = await fetchOpenMeteo(state.lat, state.lon, state.hours);
-    state.clouds = m.clouds;
-    $('#cloudSlider').value = state.clouds;
-    $('#cloudPct').textContent = `${state.clouds}%`;
-    $('#humidity').textContent = `${m.rh}%`;
-    const t = transparencyScore(m);
-    applyTransparency(t.label, m, t.score);
-  }catch(e){ console.warn(e); }
-  recalcGoNoGo();
-})();
+/* Init */
+(async()=>{ try{ const m=await fetchOpenMeteo(state.lat,state.lon,state.hours); state.clouds=m.clouds;
+  $('#cloudSlider').value=state.clouds; $('#cloudPct').textContent=`${state.clouds}%`; $('#humidity').textContent=`${m.rh}%`;
+  const t=transparencyScore(m); applyTransparency(t.label,m,t.score); }catch(e){ console.warn(e); }
+  refreshBanner(); })();
 </script>
 </body>
 </html>
