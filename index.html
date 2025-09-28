@@ -1,417 +1,375 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Go/No-Go v27.6</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Go/No-Go v27.7</title>
 <style>
-  /* ====== Design tokens ====== */
   :root{
-    --bg: #0c1b23;
-    --bg-2:#0f2330;
-    --card:#102633;
-    --card-2:#0e202b;
-    --text:#e7f2f7;
-    --muted:#a8c3cf;
-    --pill:#173244;
-    --pill-text:#cde6f2;
-    --accent:#23a6d5;
-    --ok:#21d07b;
-    --warn:#ffcc00;
-    --bad:#ff5a5f;
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --radius: 18px;
-    --radius-sm:14px;
+    --bg:#0c1b23;--bg-2:#0f2330;--card:#102633;--card-2:#0e202b;
+    --text:#e7f2f7;--muted:#a8c3cf;--pill:#173244;--pill-text:#cde6f2;
+    --accent:#23a6d5;--ok:#21d07b;--warn:#ffcc00;--bad:#ff5a5f;
+    --shadow:0 10px 30px rgba(0,0,0,.35);--radius:18px;--radius-sm:14px;
   }
-  /* Night (red) */
   .night{
-    --bg:#070707;
-    --bg-2:#0a0a0a;
-    --card:#0e0e0e;
-    --card-2:#0c0c0c;
-    --text:#ffb9b9;
-    --muted:#ff9f9f;
-    --pill:#1b1b1b;
-    --pill-text:#ffcaca;
-    --accent:#ff6b6b;
-    --ok:#ff8da0;
-    --warn:#ffcd7a;
-    --bad:#ff7979;
-    --shadow: 0 10px 30px rgba(0,0,0,.6);
+    --bg:#070707;--bg-2:#0a0a0a;--card:#0e0e0e;--card-2:#0c0c0c;
+    --text:#ffb9b9;--muted:#ff9f9f;--pill:#1b1b1b;--pill-text:#ffcaca;
+    --accent:#ff6b6b;--ok:#ff8da0;--warn:#ffcd7a;--bad:#ff7979;
+    --shadow:0 10px 30px rgba(0,0,0,.6);
   }
-
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    background: radial-gradient(1200px 800px at 50% -10%, #14334a 0%, var(--bg) 60%) no-repeat fixed;
-    color:var(--text);
-  }
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,Noto Sans,sans-serif;
+       background:radial-gradient(1200px 800px at 50% -10%,#14334a 0%,var(--bg) 60%) no-repeat fixed;color:var(--text)}
   .wrap{max-width:980px;margin:28px auto;padding:0 18px}
-
-  h1{font-size:44px;line-height:1.05;margin:.2rem 0 .6rem;font-weight:800;letter-spacing:.5px;text-shadow:var(--shadow)}
+  h1{font-size:44px;line-height:1.05;margin:.2rem 0 .6rem;font-weight:800;text-shadow:var(--shadow)}
   .version{font-size:34px;opacity:.6;margin-left:10px;font-weight:700}
-
-  /* Buttons */
-  .btn{
-    display:inline-flex;align-items:center;gap:10px;
-    padding:10px 18px;border-radius:999px;border:1px solid transparent;
-    background:var(--pill);color:var(--pill-text);cursor:pointer;
-    user-select:none;box-shadow:var(--shadow);transition:.2s;
-  }
+  .controls{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 22px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid transparent;
+       background:var(--pill);color:var(--pill-text);cursor:pointer;user-select:none;box-shadow:var(--shadow);transition:.2s}
   .btn:active{transform:translateY(1px)}
   .btn-outline{background:transparent;border-color:rgba(255,255,255,.12)}
-  .btn-ok{background:rgba(33,208,123,.12);color:var(--ok);border-color:rgba(33,208,123,.25)}
-  .btn-bad{background:rgba(255,90,95,.12);color:var(--bad);border-color:rgba(255,90,95,.25)}
 
-  .controls{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 22px}
-
-  /* Cards */
   .card{background:linear-gradient(180deg,var(--card) 0%,var(--card-2) 100%);
-        border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 18px 16px;margin:18px 0;position:relative}
+        border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:18px 0;position:relative}
   .card h2{margin:0 0 8px;font-size:28px}
-  .pill{
-    display:inline-flex;align-items:center;gap:10px;
-    padding:10px 16px;border-radius:999px;background:var(--pill);
-    color:var(--pill-text);font-weight:600;margin:8px 10px 0 0
-  }
-
-  /* Collapse */
-  .collapse-toggle{
-    position:absolute;right:14px;top:14px;height:48px;width:48px;border-radius:14px;
-    background:rgba(255,255,255,.06);backdrop-filter: blur(4px);display:grid;place-items:center;cursor:pointer;
-    border:1px solid rgba(255,255,255,.08)
-  }
+  .collapse-toggle{position:absolute;right:14px;top:14px;height:48px;width:48px;border-radius:14px;
+    background:rgba(255,255,255,.06);backdrop-filter:blur(4px);display:grid;place-items:center;cursor:pointer;
+    border:1px solid rgba(255,255,255,.08)}
   .collapse-toggle svg{transition:.2s;opacity:.75}
   .card.collapsed .card-body{display:none}
   .card.collapsed .collapse-toggle svg{transform:rotate(180deg)}
-
-  /* Status banner */
-  .status-line{font-size:28px;font-weight:800;line-height:1.25;margin:6px 0 2px}
-  .status-line .bad{color:var(--bad)}
-  .status-line .ok{color:var(--ok)}
-  .badge{
-    display:inline-flex;align-items:center;justify-content:center;
-    min-width:56px;height:44px;border-radius:18px;padding:0 14px;margin:2px 12px 8px 0;
-    font-weight:800;letter-spacing:.5px
-  }
+  .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:var(--pill);
+        color:var(--pill-text);font-weight:600;margin:8px 10px 0 0}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:44px;border-radius:18px;
+         padding:0 14px;margin:2px 12px 8px 0;font-weight:800;letter-spacing:.5px;user-select:none}
   .badge.go{background:rgba(33,208,123,.14);color:var(--ok);border:1px solid rgba(33,208,123,.35)}
   .badge.no{background:rgba(255,90,95,.14);color:var(--bad);border:1px solid rgba(255,90,95,.35)}
-
+  .status-line{font-size:28px;font-weight:800;line-height:1.25;margin:6px 0 2px;user-select:none}
+  .status-line .bad{color:var(--bad)} .status-line .ok{color:var(--ok)}
   .chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
 
-  /* Sky grid */
-  .sky-grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px
-  }
+  .sky-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
   .sky-cell{border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;background:rgba(255,255,255,.02)}
   .sky-title{font-size:16px;color:var(--muted);margin:0 0 8px}
   .sky-value{font-size:28px;font-weight:800}
   .sky-sub{font-size:14px;color:var(--muted);margin-top:2px}
 
-  /* Catalog */
   .table-wrap{overflow:hidden;border-radius:var(--radius);border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.08)}
   .table{width:100%;border-collapse:separate;border-spacing:0}
   .table th,.table td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
   .table th{color:var(--muted);font-weight:700;text-align:left}
-  .thumb{width:64px;height:64px;border-radius:14px;background:#0b1b24 url('') center/cover no-repeat;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+  .thumb{width:64px;height:64px;border-radius:14px;background:#0b1b24 center/cover no-repeat;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
   .thumb span{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.45);padding:3px 8px;border-radius:999px;font-size:12px;color:#fff}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 
-  /* Toasts */
   .toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;flex-direction:column;gap:10px;z-index:9999}
-  .toast{
-    min-width:220px;max-width:90vw;padding:12px 16px;border-radius:14px;
-    background:rgba(12,12,12,.85);color:#fff;border:1px solid rgba(255,255,255,.15);
-    box-shadow:var(--shadow);font-weight:600;opacity:0;transform:translateY(8px);animation:toastIn .25s forwards
-  }
-  .toast.ok{border-color:rgba(33,208,123,.45)}
-  .toast.bad{border-color:rgba(255,90,95,.45)}
+  .toast{min-width:220px;max-width:90vw;padding:12px 16px;border-radius:14px;background:rgba(12,12,12,.85);color:#fff;
+         border:1px solid rgba(255,255,255,.15);box-shadow:var(--shadow);font-weight:600;opacity:0;transform:translateY(8px);animation:toastIn .25s forwards}
+  .toast.ok{border-color:rgba(33,208,123,.45)} .toast.bad{border-color:rgba(255,90,95,.45)}
   @keyframes toastIn{to{opacity:1;transform:translateY(0)}}
-
-  /* Compact */
   .compact h1{font-size:38px}
   .compact .card{padding:14px}
   .compact .status-line{font-size:24px}
   .compact .sky-value{font-size:24px}
-
-  /* Small */
-  @media (max-width:540px){
-    h1{font-size:38px}
-    .version{font-size:28px}
-    .sky-grid{grid-template-columns:1fr 1fr}
-  }
+  @media(max-width:540px){h1{font-size:38px}.version{font-size:28px}}
+  a{color:#9cc3ff}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Go/No-Go <span class="version">v27.6</span></h1>
+<div class="wrap">
+  <h1>Go/No-Go <span class="version">v27.7</span></h1>
 
-    <div class="controls">
-      <button class="btn" id="btn-compact">Compact On</button>
-      <button class="btn" id="btn-night">Night Mode</button>
-    </div>
-
-    <!-- Status -->
-    <section class="card" id="card-status">
-      <button class="collapse-toggle" data-target="card-status">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <div class="card-body">
-        <div class="badge no" id="status-badge">NO</div>
-        <div class="status-line"><span class="bad" id="status-phrase">NO-GO</span> · <span id="status-clouds">Clouds ~100%</span> · <span id="status-vis">Vis 18 km</span> · <span id="status-dark">Astro dark</span></div>
-
-        <div class="chips" id="status-chips">
-          <div class="pill" id="chip-updated">Updated --:--</div>
-          <div class="pill">Sun alt -45°</div>
-          <div class="pill">Moon 7%</div>
-          <div class="pill">Alt -29°</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sky -->
-    <section class="card" id="card-sky">
-      <button class="collapse-toggle" data-target="card-sky">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <h2>Sky</h2>
-      <div class="card-body">
-        <div class="sky-grid">
-          <div class="sky-cell">
-            <div class="sky-title">Astronomical dark</div>
-            <div class="sky-value" id="sky-dark">Yes</div>
-            <div class="sky-sub" id="sky-sunalt">Sun alt -44°</div>
-          </div>
-          <div class="sky-cell">
-            <div class="sky-title">Moon illum</div>
-            <div class="sky-value" id="sky-moon">7%</div>
-            <div class="sky-sub" id="sky-moonalt">Alt -29°</div>
-          </div>
-          <div class="sky-cell">
-            <div class="sky-title">Humidity</div>
-            <div class="sky-value" id="sky-hum">91%</div>
-          </div>
-          <div class="sky-cell">
-            <div class="sky-title">Transparency</div>
-            <div class="sky-value" id="sky-trans">Bad</div>
-            <div class="sky-sub" id="sky-trans-meta">AOD 0.12 · PM2.5 2µg/m³ · RH 96% · Vis 12km · ΔT 0.7°C · 0</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Clouds -->
-    <section class="card" id="card-clouds">
-      <button class="collapse-toggle" data-target="card-clouds">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <h2>Clouds (avg)</h2>
-      <div class="card-body">
-        <input id="cloud-slider" type="range" min="0" max="100" value="100" style="width:100%;margin:12px 0 10px">
-        <div class="chips">
-          <button class="btn btn-outline" id="btn-cloud-use">Use</button>
-          <button class="btn btn-outline" id="btn-cloud-calc">Calculate</button>
-          <div class="pill" id="cloud-source">From Open-Meteo (hourly) • slider overrides</div>
-          <div class="pill" id="cloud-pill">100%</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Quick setup -->
-    <section class="card" id="card-quick">
-      <button class="collapse-toggle" data-target="card-quick">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <h2>Quick setup</h2>
-      <div class="card-body">
-        <div style="display:grid;gap:14px">
-          <label>Latitude (°)
-            <input id="lat" class="input" value="37.16558" />
-          </label>
-          <label>Longitude (°)
-            <input id="lon" class="input" value="-76.56841" />
-          </label>
-          <label>Hours (window)
-            <input id="hours" class="input" value="3" />
-          </label>
-          <div class="controls">
-            <button class="btn" id="btn-gps">Use GPS</button>
-            <button class="btn" id="btn-calc">Calculate Now</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Top 5 -->
-    <section class="card" id="card-top5">
-      <button class="collapse-toggle" data-target="card-top5">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <h2>Top 5 Recommendations</h2>
-      <div class="card-body" id="top5">
-        <ol style="margin:0;padding-left:24px;line-height:1.6">
-          <li><a href="#">M27</a> — Dumbbell Nebula — alt 82° — 142° from Moon — 196%</li>
-          <li><a href="#">M31</a> — Andromeda Galaxy — alt 45° — 140° from Moon — 183%</li>
-          <li><a href="#">M33</a> — Triangulum Galaxy — alt 46° — 145° from Moon — 175%</li>
-          <li><a href="#">M57</a> — Ring Nebula — alt 44° — 115° from Moon — 155%</li>
-          <li><a href="#">M13</a> — Hercules Globular — alt 24° — 90° from Moon — 120%</li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- Catalog -->
-    <section class="card" id="card-catalog">
-      <button class="collapse-toggle" data-target="card-catalog">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <h2>Catalog (subset)</h2>
-      <div class="card-body">
-        <div class="table-wrap">
-          <table class="table" id="cat">
-            <thead><tr>
-              <th style="width:90px">Type</th>
-              <th style="width:90px">RA</th>
-              <th style="width:90px">Dec</th>
-              <th style="width:120px">Image</th>
-            </tr></thead>
-            <tbody>
-              <!-- rows injected -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Toasts -->
-    <div class="toasts" id="toasts"></div>
+  <div class="controls">
+    <button class="btn" id="btn-compact">Compact On</button>
+    <button class="btn" id="btn-night">Night Mode</button>
   </div>
 
-  <script>
-    // ===== Utility: toast =====
-    function toast(msg, type="info", timeout=2200){
-      const wrap = document.getElementById('toasts');
-      const el = document.createElement('div');
-      el.className = 'toast ' + (type==='ok'?'ok': type==='bad'?'bad':'');
-      el.textContent = msg;
-      wrap.appendChild(el);
-      setTimeout(()=>{ el.style.transition = 'opacity .25s, transform .25s';
-        el.style.opacity = 0; el.style.transform='translateY(8px)';
-        setTimeout(()=>wrap.removeChild(el), 260);
-      }, timeout);
+  <!-- Status -->
+  <section class="card" id="card-status">
+    <button class="collapse-toggle" data-target="card-status">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="card-body">
+      <div class="badge no" id="status-badge">NO</div>
+      <div class="status-line"><span class="bad" id="status-phrase">NO-GO</span> · <span id="status-clouds">Clouds ~100%</span> · <span id="status-vis">Vis 18 km</span> · <span id="status-dark">Astro dark</span></div>
+      <div class="chips" id="status-chips">
+        <div class="pill" id="chip-updated">Updated --:--</div>
+        <div class="pill" id="chip-sun">Sun alt -45°</div>
+        <div class="pill" id="chip-moon">Moon 7%</div>
+        <div class="pill" id="chip-alt">Alt -29°</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sky -->
+  <section class="card" id="card-sky">
+    <button class="collapse-toggle" data-target="card-sky">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h2>Sky</h2>
+    <div class="card-body">
+      <div class="sky-grid">
+        <div class="sky-cell">
+          <div class="sky-title">Astronomical dark</div>
+          <div class="sky-value" id="sky-dark">Yes</div>
+          <div class="sky-sub" id="sky-sunalt">Sun alt -44°</div>
+        </div>
+        <div class="sky-cell">
+          <div class="sky-title">Moon illum</div>
+          <div class="sky-value" id="sky-moon">7%</div>
+          <div class="sky-sub" id="sky-moonalt">Alt -29°</div>
+        </div>
+        <div class="sky-cell">
+          <div class="sky-title">Humidity</div>
+          <div class="sky-value" id="sky-hum">91%</div>
+        </div>
+        <div class="sky-cell">
+          <div class="sky-title">Transparency</div>
+          <div class="sky-value" id="sky-trans">Bad</div>
+          <div class="sky-sub" id="sky-trans-meta">AOD 0.12 · PM2.5 2µg/m³ · RH 96% · Vis 12km · ΔT 0.7°C · 0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clouds -->
+  <section class="card" id="card-clouds">
+    <button class="collapse-toggle" data-target="card-clouds">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h2>Clouds (avg)</h2>
+    <div class="card-body">
+      <input id="cloud-slider" type="range" min="0" max="100" value="100" style="width:100%;margin:12px 0 10px">
+      <div class="chips">
+        <button class="btn btn-outline" id="btn-cloud-use">Use</button>
+        <button class="btn btn-outline" id="btn-cloud-calc">Calculate</button>
+        <div class="pill" id="cloud-source">From Open-Meteo (hourly) • slider overrides</div>
+        <div class="pill" id="cloud-pill">100%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick setup -->
+  <section class="card" id="card-quick">
+    <button class="collapse-toggle" data-target="card-quick">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h2>Quick setup</h2>
+    <div class="card-body">
+      <div style="display:grid;gap:14px">
+        <label>Latitude (°)
+          <input id="lat" class="input" value="37.16558" />
+        </label>
+        <label>Longitude (°)
+          <input id="lon" class="input" value="-76.56841" />
+        </label>
+        <label>Hours (window)
+          <input id="hours" class="input" value="3" />
+        </label>
+        <div class="controls">
+          <button class="btn" id="btn-gps">Use GPS</button>
+          <button class="btn" id="btn-calc">Calculate Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 5 -->
+  <section class="card" id="card-top5">
+    <button class="collapse-toggle" data-target="card-top5">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h2>Top 5 Recommendations</h2>
+    <div class="card-body" id="top5">
+      <ol style="margin:0;padding-left:24px;line-height:1.6" id="top5-list"></ol>
+    </div>
+  </section>
+
+  <!-- Catalog -->
+  <section class="card" id="card-catalog">
+    <button class="collapse-toggle" data-target="card-catalog">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h2>Catalog (subset)</h2>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table class="table" id="cat">
+          <thead><tr>
+            <th style="width:130px">Name</th>
+            <th style="width:80px">Type</th>
+            <th style="width:90px">RA</th>
+            <th style="width:90px">Dec</th>
+            <th style="width:120px">Image</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="toasts" id="toasts"></div>
+</div>
+
+<script>
+  // ---------- Toast ----------
+  function toast(msg,type="info",timeout=2200){
+    const wrap=document.getElementById('toasts');
+    const el=document.createElement('div');
+    el.className='toast '+(type==='ok'?'ok':type==='bad'?'bad':'');
+    el.textContent=msg; wrap.appendChild(el);
+    setTimeout(()=>{el.style.transition='opacity .25s, transform .25s';
+      el.style.opacity=0; el.style.transform='translateY(8px)';
+      setTimeout(()=>wrap.removeChild(el),260);
+    },timeout);
+  }
+
+  // ---------- Collapsible ----------
+  document.querySelectorAll('.collapse-toggle').forEach(b=>{
+    b.addEventListener('click',()=>{document.getElementById(b.dataset.target).classList.toggle('collapsed');});
+  });
+
+  // ---------- Toggles ----------
+  const body=document.body;
+  const btnNight=document.getElementById('btn-night');
+  const btnCompact=document.getElementById('btn-compact');
+  btnNight.addEventListener('click',()=>{
+    body.classList.toggle('night');
+    btnNight.textContent=body.classList.contains('night')?'Normal Mode':'Night Mode';
+    toast(body.classList.contains('night')?'Night Mode On':'Night Mode Off','ok');
+  });
+  btnCompact.addEventListener('click',()=>{
+    body.classList.toggle('compact');
+    btnCompact.textContent=body.classList.contains('compact')?'Compact Off':'Compact On';
+    toast(body.classList.contains('compact')?'Compact Mode On':'Compact Mode Off','ok');
+  });
+
+  // ---------- Status helpers ----------
+  function setGoNo(state){
+    const badge=document.getElementById('status-badge');
+    const phr=document.getElementById('status-phrase');
+    if(state==='GO'){badge.className='badge go';badge.textContent='GO';phr.className='ok';phr.textContent='GO';}
+    else{badge.className='badge no';badge.textContent='NO';phr.className='bad';phr.textContent='NO-GO';}
+    document.getElementById('chip-updated').textContent='Updated '+new Date().toLocaleTimeString();
+  }
+
+  // ---------- Clouds ----------
+  const cloudSlider=document.getElementById('cloud-slider');
+  const cloudPill=document.getElementById('cloud-pill');
+  const statusClouds=document.getElementById('status-clouds');
+  cloudSlider.addEventListener('input',()=>{cloudPill.textContent=cloudSlider.value+'%';});
+  document.getElementById('btn-cloud-use').addEventListener('click',()=>{
+    const v=Number(cloudSlider.value);
+    statusClouds.textContent='Clouds ~'+v+'%'; setGoNo(v>70?'NO':'GO');
+    toast('Cloud override set to '+v+'%','ok');
+  });
+
+  // Calculate using Open-Meteo
+  async function calcClouds(){
+    const lat=parseFloat(document.getElementById('lat').value);
+    const lon=parseFloat(document.getElementById('lon').value);
+    const hours=Math.max(1,Math.min(24, parseInt(document.getElementById('hours').value||'3',10)));
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloudcover&timezone=auto`;
+    try{
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data=await res.json();
+      const times=data.hourly.time, vals=data.hourly.cloudcover;
+      const nowIso=new Date().toISOString().slice(0,13); // YYYY-MM-DDTHH
+      let idx=times.findIndex(t=>t.startsWith(nowIso));
+      if(idx<0) idx=0;
+      const slice=vals.slice(idx, idx+hours);
+      const avg=Math.round(slice.reduce((a,b)=>a+b,0)/slice.length);
+      cloudSlider.value=avg; cloudPill.textContent=avg+'%';
+      statusClouds.textContent='Clouds ~'+avg+'%';
+      setGoNo(avg>70?'NO':'GO');
+      toast(`Clouds calculated from Open-Meteo: ${avg}%`,'ok');
+    }catch(e){
+      toast('Cloud calc failed — using slider','bad');
     }
+  }
+  document.getElementById('btn-cloud-calc').addEventListener('click', calcClouds);
 
-    // ===== Collapsible cards =====
-    document.querySelectorAll('.collapse-toggle').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const id = btn.getAttribute('data-target');
-        const card = document.getElementById(id);
-        card.classList.toggle('collapsed');
-      });
-    });
+  // ---------- Quick actions ----------
+  document.getElementById('btn-gps').addEventListener('click',()=>{
+    if(!navigator.geolocation){toast('GPS not available','bad');return;}
+    navigator.geolocation.getCurrentPosition(pos=>{
+      document.getElementById('lat').value=pos.coords.latitude.toFixed(5);
+      document.getElementById('lon').value=pos.coords.longitude.toFixed(5);
+      toast('Location set from GPS','ok');
+    },()=>toast('GPS permission denied','bad'),{enableHighAccuracy:true,timeout:5000});
+  });
+  document.getElementById('btn-calc').addEventListener('click',()=>{
+    toast('Recalculating targets…','ok'); setTimeout(()=>toast('Targets updated','ok'),650);
+  });
 
-    // ===== Toggles =====
-    const root = document.documentElement;
-    const body = document.body;
-    const btnNight = document.getElementById('btn-night');
-    const btnCompact = document.getElementById('btn-compact');
-    btnNight.addEventListener('click', ()=>{
-      body.classList.toggle('night');
-      btnNight.textContent = body.classList.contains('night') ? 'Normal Mode' : 'Night Mode';
-      toast(body.classList.contains('night') ? 'Night Mode On' : 'Night Mode Off','ok');
-    });
-    btnCompact.addEventListener('click', ()=>{
-      body.classList.toggle('compact');
-      btnCompact.textContent = body.classList.contains('compact') ? 'Compact Off' : 'Compact On';
-      toast(body.classList.contains('compact') ? 'Compact Mode On' : 'Compact Mode Off','ok');
-    });
+  // ---------- Top 5 (real links) ----------
+  const recs=[
+    {id:'M27', name:'Dumbbell Nebula', url:'https://en.wikipedia.org/wiki/Messier_27',  pct:196, alt:'82°', moon:'142°'},
+    {id:'M31', name:'Andromeda Galaxy', url:'https://en.wikipedia.org/wiki/Andromeda_Galaxy', pct:183, alt:'45°', moon:'140°'},
+    {id:'M33', name:'Triangulum Galaxy', url:'https://en.wikipedia.org/wiki/Triangulum_Galaxy', pct:175, alt:'46°', moon:'145°'},
+    {id:'M57', name:'Ring Nebula', url:'https://en.wikipedia.org/wiki/Ring_Nebula', pct:155, alt:'44°', moon:'115°'},
+    {id:'M13', name:'Hercules Globular', url:'https://en.wikipedia.org/wiki/Messier_13', pct:120, alt:'24°', moon:'90°'}
+  ];
+  const top5List=document.getElementById('top5-list');
+  top5List.innerHTML=recs.map((r,i)=>(
+    `<li><a href="${r.url}" target="_blank" rel="noopener">${r.id}</a> — ${r.name} — alt ${r.alt} — ${r.moon} from Moon — ${r.pct}%</li>`
+  )).join('');
 
-    // ===== Cloud slider and buttons =====
-    const cloudSlider = document.getElementById('cloud-slider');
-    const cloudPill = document.getElementById('cloud-pill');
-    const statusClouds = document.getElementById('status-clouds');
-    cloudSlider.addEventListener('input', ()=>{
-      cloudPill.textContent = cloudSlider.value + '%';
-    });
-    document.getElementById('btn-cloud-use').addEventListener('click', ()=>{
-      statusClouds.textContent = 'Clouds ~' + cloudSlider.value + '%';
-      // change GO/NO simplistically for demo
-      setGoNo(Number(cloudSlider.value) > 70 ? 'NO' : 'GO');
-      toast('Cloud override set to ' + cloudSlider.value + '%','ok');
-    });
-    document.getElementById('btn-cloud-calc').addEventListener('click', ()=>{
-      // placeholder computation result:
-      const simulated = 35;
-      cloudSlider.value = simulated;
-      cloudPill.textContent = simulated + '%';
-      statusClouds.textContent = 'Clouds ~' + simulated + '%';
-      setGoNo(simulated > 70 ? 'NO' : 'GO');
-      toast('Clouds calculated from Open-Meteo: ' + simulated + '%','ok');
-    });
+  // ---------- Catalog with fallback thumbs ----------
+  const thumbSources={
+    M31:[
+      'https://www.nasa.gov/wp-content/uploads/2023/03/edu_andromeda.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/5/54/Andromeda_galaxy_2.jpg'
+    ],
+    M33:[
+      'https://upload.wikimedia.org/wikipedia/commons/5/5f/Triangulum_Galaxy_M33.jpg',
+      'https://www.nasa.gov/wp-content/uploads/2023/02/m33-4x3-1.jpg'
+    ],
+    M27:[
+      'https://upload.wikimedia.org/wikipedia/commons/3/3f/M27_-_Dumbbell_Nebula.jpg',
+      'https://www.nasa.gov/wp-content/uploads/2023/03/potw2026a.jpg'
+    ],
+    M57:[
+      'https://upload.wikimedia.org/wikipedia/commons/8/88/M57_The_Ring_Nebula.JPG',
+      'https://www.nasa.gov/wp-content/uploads/2023/03/m57_ring_nebula.jpg'
+    ],
+    M13:[
+      'https://upload.wikimedia.org/wikipedia/commons/6/66/Messier_object_13.jpg',
+      'https://www.nasa.gov/wp-content/uploads/2023/04/hubble_m13_globular_cluster.jpg'
+    ]
+  };
+  const catRows=[
+    {id:'M31', name:'Andromeda Galaxy', type:'GX', ra:'0.71h', dec:'41.3°'},
+    {id:'M33', name:'Triangulum Galaxy', type:'GX', ra:'1.55h', dec:'30.7°'},
+    {id:'M27', name:'Dumbbell Nebula', type:'PN', ra:'19.89h', dec:'22.7°'},
+    {id:'M57', name:'Ring Nebula', type:'PN', ra:'18.89h', dec:'33.0°'},
+    {id:'M13', name:'Hercules Globular', type:'GC', ra:'16.70h', dec:'36.5°'}
+  ];
+  const catBody=document.querySelector('#cat tbody');
 
-    // ===== Quick actions =====
-    document.getElementById('btn-gps').addEventListener('click', async ()=>{
-      if(!navigator.geolocation){ toast('GPS not available','bad'); return; }
-      navigator.geolocation.getCurrentPosition(pos=>{
-        document.getElementById('lat').value = pos.coords.latitude.toFixed(5);
-        document.getElementById('lon').value = pos.coords.longitude.toFixed(5);
-        toast('Location set from GPS','ok');
-      }, ()=> toast('GPS permission denied','bad'), {enableHighAccuracy:true, timeout:5000});
-    });
-    document.getElementById('btn-calc').addEventListener('click', ()=>{
-      toast('Recalculating targets…','ok');
-      // Hook your real recompute here
-      setTimeout(()=> toast('Targets updated','ok'), 650);
-    });
+  function makeThumbCell(id){
+    const div=document.createElement('div'); div.className='thumb';
+    const img=document.createElement('img'); let idx=0;
+    const list=(thumbSources[id]||[]);
+    function tryNext(){ if(idx>=list.length){ img.style.display='none'; return; } img.src=list[idx++]; }
+    img.onerror=tryNext; tryNext();
+    div.appendChild(img);
+    const tag=document.createElement('span'); tag.textContent=id; div.appendChild(tag);
+    return div;
+  }
+  catRows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const tdName=document.createElement('td'); tdName.textContent=r.name; tr.appendChild(tdName);
+    const tdT=document.createElement('td'); tdT.textContent=r.type; tr.appendChild(tdT);
+    const tdRA=document.createElement('td'); tdRA.textContent=r.ra; tr.appendChild(tdRA);
+    const tdDec=document.createElement('td'); tdDec.textContent=r.dec; tr.appendChild(tdDec);
+    const tdImg=document.createElement('td'); tdImg.appendChild(makeThumbCell(r.id)); tr.appendChild(tdImg);
+    catBody.appendChild(tr);
+  });
 
-    // ===== Status helpers =====
-    function setGoNo(state){
-      const badge = document.getElementById('status-badge');
-      const phr = document.getElementById('status-phrase');
-      if(state === 'GO'){
-        badge.className='badge go'; badge.textContent='GO';
-        phr.className='ok'; phr.textContent='GO';
-      }else{
-        badge.className='badge no'; badge.textContent='NO';
-        phr.className='bad'; phr.textContent='NO-GO';
-      }
-      document.getElementById('chip-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
-    }
-
-    // ===== Catalog thumbnails =====
-    const thumbs = {
-      M31:'https://images-assets.nasa.gov/image/GSFC_20171208_Archive_e001283/GSFC_20171208_Archive_e001283~orig.jpg',
-      M33:'https://www.nasa.gov/wp-content/uploads/2023/02/m33-4x3-1.jpg',
-      M27:'https://www.nasa.gov/wp-content/uploads/2023/03/potw2026a.jpg',
-      M57:'https://www.nasa.gov/wp-content/uploads/2023/03/m57_ring_nebula.jpg',
-      M13:'https://www.nasa.gov/wp-content/uploads/2023/04/hubble_m13_globular_cluster.jpg'
-    };
-    const rows = [
-      {type:'GX', ra:'0.71h', dec:'41.3°', id:'M31'},
-      {type:'GX', ra:'1.55h', dec:'30.7°', id:'M33'},
-      {type:'PN', ra:'19.89h', dec:'22.7°', id:'M27'},
-      {type:'PN', ra:'18.89h', dec:'33.0°', id:'M57'},
-      {type:'GC', ra:'16.70h', dec:'36.5°', id:'M13'},
-    ];
-    const tbody = document.querySelector('#cat tbody');
-    rows.forEach(r=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.type}</td>
-        <td>${r.ra}</td>
-        <td>${r.dec}</td>
-        <td>
-          <div class="thumb">
-            <img src="${thumbs[r.id]||''}" alt="${r.id}" onerror="this.style.display='none'; this.parentElement.style.background='#122a37';" />
-            <span>${r.id}</span>
-          </div>
-        </td>`;
-      tbody.appendChild(tr);
-    });
-
-    // Init
-    setGoNo('NO'); // initial demo state
-  </script>
+  // ---------- Init ----------
+  setGoNo('NO'); // demo default
+  cloudPill.textContent=cloudSlider.value+'%';
+</script>
 </body>
 </html>
