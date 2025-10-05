@@ -1,402 +1,547 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Go/No-Go v28.2</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>Go/No-Go</title>
 <style>
-:root{
-  --bg:#0a1116; --panel:#0f1720; --panel2:#0b131a;
-  --text:#e8f4ff; --muted:#99b8cc; --ring:#21313c; --chip:#121b23;
-  --accent:#59c4ff; --ok:#7ad2a5; --warn:#ffd76a; --bad:#ff8f8f;
-  --shadow:0 10px 35px rgba(0,0,0,.45);
-  --radius:16px;
-  --pill-r:22px;
-  font-synthesis-weight:none;
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:radial-gradient(1200px 600px at 50% -80px,#0e2a3b 0%,#0b1821 50%,#0a1116 100%);color:var(--text);font:500 16px/1.5 system-ui,Segoe UI,Roboto,Inter,Helvetica,Arial}
-h1,h2,h3{margin:0 0 12px}
-a{color:#9fd0ff;text-decoration:none}
-.wrap{max-width:980px;margin:24px auto;padding:0 16px}
-.header{display:flex;align-items:flex-end;gap:12px;margin:12px 0 20px}
-.title{font-weight:800;font-size:42px;letter-spacing:.5px}
-.ver{opacity:.7;font-weight:700;font-size:32px}
-.btn{background:var(--chip);border:1px solid var(--ring);color:var(--text);padding:10px 16px;border-radius:999px;box-shadow:var(--shadow);cursor:pointer;user-select:none}
-.btn:active{transform:translateY(1px)}
-.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--ring);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:18px 0;position:relative}
-.card-title{font-size:28px;font-weight:800;margin:2px 0 14px}
-.pills{display:flex;flex-wrap:wrap;gap:10px}
-.pill{background:var(--chip);border:1px solid var(--ring);padding:7px 12px;border-radius:999px;color:var(--text);display:inline-flex;align-items:center;gap:8px}
-.pill.bad{color:var(--bad);border-color:#442224;background:#1b0f12}
-.pill.ok{color:var(--ok);border-color:#1d3328;background:#0d1812}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.kv .box{border:1px solid var(--ring);border-radius:14px;padding:14px;background:#0d151d}
-.kv .big{font-size:34px;font-weight:900;letter-spacing:.5px;display:block;margin-top:4px}
-hr.sep{border:0;height:1px;background:linear-gradient(90deg,transparent,#20303b,transparent);margin:16px 0}
-
-.toggle{position:absolute;right:14px;top:14px}
-.chev{width:46px;height:46px;border-radius:12px;border:1px solid var(--ring);background:#0d141a;display:grid;place-items:center;cursor:pointer}
-.chev:after{content:"⌄";font-size:20px;transform:rotate(180deg);opacity:.8}
-.card[data-collapsed="true"] .chev:after{transform:none}
-.card[data-collapsed="true"] .collapse{display:none}
-
-.slider{appearance:none;width:100%;height:10px;border-radius:8px;background:#e9edf1;outline:none}
-.slider::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#428cff;border:2px solid #173554;box-shadow:0 2px 6px rgba(0,0,0,.4)}
-.slider-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center;margin:10px 0}
-.slider-help{color:var(--muted);font-size:13px;margin-top:-4px}
-
-.tbl{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
-.tbl-head,.tbl-row{display:grid;grid-template-columns:1.3fr .6fr .6fr .6fr 96px}
-.tbl-head{position:sticky;top:0;z-index:1;background:rgba(255,255,255,.06);backdrop-filter:saturate(120%) blur(6px)}
-.cell{padding:10px 12px;border-bottom:1px solid var(--ring);display:flex;align-items:center;min-height:56px}
-.tbl-row{cursor:pointer}
-.tbl-row:hover{background:rgba(255,255,255,.04)}
-.gallery{max-height:360px;overflow:auto}
-.thumb{width:60px;height:60px;border-radius:12px;border:1px solid var(--ring);background:#0b1b23 center/cover no-repeat;position:relative}
-.thumb img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
-.badge{position:absolute;bottom:-8px;right:-8px;background:#0b1b23;border:1px solid var(--ring);border-radius:16px;padding:2px 8px;color:#cfeaff;font-size:12px}
-
-.controls{display:flex;gap:10px;flex-wrap:wrap}
-
-/* toasts */
-.toast{position:fixed;left:16px;right:16px;bottom:16px;display:grid;place-items:center;pointer-events:none}
-.toast>div{background:#0f1720;border:1px solid var(--ring);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);max-width:520px}
-.toast.hide{display:none}
-
-/* compact */
-.compact .kv{grid-template-columns:1fr 1fr;gap:10px}
-.compact .cell{padding:8px 10px;min-height:50px}
-.compact .thumb{width:52px;height:52px}
+  :root{
+    --bg:#0b1a22;--bg2:#0f2430;--card:#0e2a36;--ink:#e8f0f4;--muted:#a9c0cb;
+    --ok:#10b981;--warn:#f59e0b;--bad:#ef4444;--chip:#123544;--chip2:#132e3a;
+    --accent:#69a7ff;--ring:#2a5363;--shadow:rgba(0,0,0,.25);
+  }
+  .night:root{ /* softer contrast for night */
+    --bg:#0a0b0d;--bg2:#0e0f11;--card:#121317;--ink:#ffd9df;--muted:#e3b7bf;
+    --chip:#1b1c22;--chip2:#17181f;--ring:#2b2d35;--accent:#8bb4ff;
+  }
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.4 system-ui,Segoe UI,Roboto,Inter,Arial}
+  .wrap{max-width:980px;margin:0 auto;padding:18px}
+  h1{font-size:44px;letter-spacing:.5px;margin:8px 0 10px}
+  .version{opacity:.6;font-weight:700;margin-left:10px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{background:var(--chip);border:1px solid var(--ring);color:var(--ink);padding:10px 16px;border-radius:999px;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .card{background:var(--card);border:1px solid var(--ring);border-radius:18px;padding:16px;box-shadow:0 6px 20px var(--shadow);margin:14px 0}
+  .card.hdr{display:flex;align-items:center;justify-content:space-between}
+  .title{font-weight:800;font-size:28px}
+  .chev{width:42px;height:42px;border-radius:12px;background:var(--chip2);display:grid;place-items:center;border:1px solid var(--ring);cursor:pointer}
+  .collapse{display:none}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:var(--chip);border:1px solid var(--ring);padding:10px 14px;border-radius:999px;white-space:nowrap}
+  .chip.ok{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.35);color:var(--ink)}
+  .chip.bad{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:720px){.grid2{grid-template-columns:1fr}}
+  .tile{background:var(--bg2);border-radius:16px;padding:16px;border:1px solid var(--ring)}
+  .tile h4{margin:0 0 6px;font-weight:700;color:var(--muted)}
+  .big{font-size:34px;font-weight:900}
+  .table{width:100%;border-collapse:separate;border-spacing:0}
+  .thead th{font-weight:700;color:var(--muted);text-align:left;padding:14px}
+  .tbody td{padding:14px;border-top:1px solid var(--ring)}
+  .thumb{width:72px;height:72px;border-radius:12px;background:var(--chip2);border:1px solid var(--ring);object-fit:cover}
+  a{color:#9cc9ff}
+  input[type="text"], input[type="number"]{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--ring);background:var(--bg2);color:var(--ink)}
+  .sl{accent-color:var(--accent);width:100%}
+  .right{margin-left:auto}
+  .muted{color:var(--muted)}
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0c0e12;color:#eaf2f7;border:1px solid #405264;padding:12px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.25s}
+  .toast.show{opacity:1;pointer-events:auto}
+  /* compact mode spacing */
+  .compact .card{padding:12px;border-radius:14px}
+  .compact .title{font-size:24px}
+  .compact .chip{padding:8px 12px}
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
-  <div class="header">
-    <div class="title">Go/No-Go</div>
-    <div class="ver">v28.2</div>
-  </div>
-  <div class="controls">
-    <button class="btn" id="toggleCompact">Compact Off</button>
-    <button class="btn" id="toggleTheme">Normal Mode</button>
+<div class="wrap">
+  <h1>Go/No-Go <span class="version">v28.3</span></h1>
+  <div class="row">
+    <button id="compactBtn" class="btn">Compact Off</button>
+    <button id="themeBtn" class="btn">Normal Mode</button>
   </div>
 
-  <!-- STATUS -->
-  <section class="card" id="cardStatus">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Status</div>
-    <div class="pills" id="statusLine"></div>
-    <div class="pills" style="margin-top:12px">
-      <span class="pill" id="pUpdated">Updated —:—</span>
-      <span class="pill" id="pSun">Sun alt —</span>
-      <span class="pill" id="pMoon">Moon —</span>
-      <span class="pill" id="pTrans">Transparency —</span>
+  <!-- Status -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Status</div>
+      <div class="chev" data-target="#statusBody">⌄</div>
     </div>
-    <div class="collapse"></div>
-  </section>
-
-  <!-- CONDITIONS (merged Sky + Clouds) -->
-  <section class="card" id="cardCond">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Conditions</div>
-    <div class="kv">
-      <div class="box">
-        <div>Moon illum</div>
-        <span class="big" id="cMoonPct">—</span>
-        <div class="muted" id="cMoonAlt">Alt —</div>
-      </div>
-      <div class="box">
-        <div>Clouds (window max)</div>
-        <span class="big" id="cClouds">—</span>
-        <div class="muted">From Open-Meteo (window max)</div>
-      </div>
-      <div class="box">
-        <div>Humidity</div>
-        <span class="big" id="cHum">—</span>
-      </div>
-      <div class="box">
-        <div>Transparency</div>
-        <span class="big" id="cTransBig">—</span>
-        <div class="muted" id="cTransLine">—</div>
+    <div id="statusBody">
+      <div class="chips" id="statusChips">
+        <!-- filled by JS -->
       </div>
     </div>
   </section>
 
-  <!-- GO / NO-GO SETTINGS -->
-  <section class="card" id="cardRules">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Go/No-Go Settings</div>
-    <div class="slider-row">
-      <label>Cloud weight <small>(how much clouds drive the decision)</small></label>
-      <input id="wCloud" class="slider" type="range" min="0" max="100" step="1">
+  <!-- Go/No-Go Settings -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Go/No-Go Settings</div>
+      <div class="chev" data-target="#settingsBody">⌄</div>
     </div>
-    <div class="slider-help">Higher = more sensitive to clouds. 0 ignores clouds; 100 makes clouds dominate.</div>
-
-    <div class="slider-row">
-      <label>Transparency weight <small>(impact of transparency)</small></label>
-      <input id="wTrans" class="slider" type="range" min="0" max="100" step="1">
-    </div>
-    <div class="slider-help">Higher = hazy/poor transparency blocks a “GO” sooner.</div>
-
-    <div class="slider-row">
-      <label>Min visibility (km) <small>(below this is likely no-go)</small></label>
-      <input id="minVis" class="slider" type="range" min="2" max="30" step="1">
-    </div>
-
-    <div class="slider-row">
-      <label>Moon tolerance (%) <small>(max illumination allowed for GO)</small></label>
-      <input id="moonTol" class="slider" type="range" min="0" max="100" step="1">
-    </div>
-
-    <div class="slider-row">
-      <label>Humidity penalty <small>(extra caution when RH is high)</small></label>
-      <input id="humPen" class="slider" type="range" min="0" max="100" step="1">
-    </div>
-    <div class="slider-help">This adds to “risk” when humidity is high—useful for dew-prone setups.</div>
-
-    <div style="display:flex;gap:10px;margin-top:10px">
-      <button class="btn" id="saveRules">Save Rules</button>
-      <button class="btn" id="resetRules">Reset Defaults</button>
-      <span id="rulesEcho" style="align-self:center;color:var(--muted)"></span>
-    </div>
-  </section>
-
-  <!-- TOP 5 -->
-  <section class="card" id="cardTop">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Top 5 Recommendations</div>
-    <ol id="topList" style="padding-left:22px;margin:0"></ol>
-  </section>
-
-  <!-- SEARCH -->
-  <section class="card" id="cardSearch">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Search</div>
-    <div class="controls" style="margin-bottom:12px">
-      <input id="searchBox" class="pill" style="width:260px" placeholder="Search catalog (name/type)"/>
-      <button class="btn" id="clearSearch">Clear</button>
-    </div>
-    <div class="tbl">
-      <div class="tbl-head">
-        <div class="cell">Name</div>
-        <div class="cell">Type</div>
-        <div class="cell">RA</div>
-        <div class="cell">Dec</div>
-        <div class="cell">Image</div>
+    <div id="settingsBody">
+      <div class="grid2">
+        <div class="tile">
+          <h4>Cloud weight</h4>
+          <input id="setCloudW" type="range" min="0" max="100" value="60" class="sl">
+          <div class="muted">How strongly clouds affect the decision.</div>
+        </div>
+        <div class="tile">
+          <h4>Min visibility (km)</h4>
+          <input id="setVisMin" type="range" min="5" max="50" value="12" class="sl">
+          <div class="muted">Below this → automatic NO-GO.</div>
+        </div>
+        <div class="tile">
+          <h4>Moon tolerance (%)</h4>
+          <input id="setMoonTol" type="range" min="0" max="100" value="35" class="sl">
+          <div class="muted">Max moon illum allowed when the Moon is above horizon.</div>
+        </div>
+        <div class="tile">
+          <h4>Refresh every (min)</h4>
+          <input id="setRefresh" type="range" min="5" max="60" value="10" class="sl">
+          <div class="muted">Auto update cadence.</div>
+        </div>
       </div>
-      <div class="gallery" id="searchBody"></div>
     </div>
   </section>
 
-  <!-- CATALOG -->
-  <section class="card" id="cardCat">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Catalog (subset)</div>
-    <div class="tbl">
-      <div class="tbl-head">
-        <div class="cell">Name</div>
-        <div class="cell">Type</div>
-        <div class="cell">RA</div>
-        <div class="cell">Dec</div>
-        <div class="cell">Image</div>
+  <!-- Conditions -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Conditions</div>
+      <div class="chev" data-target="#condBody">⌄</div>
+    </div>
+    <div id="condBody">
+      <div class="grid2">
+        <div class="tile"><h4>Moon illum</h4><div class="big" id="moonPct">—</div><div class="muted" id="moonAlt">—</div></div>
+        <div class="tile"><h4>Clouds (window max)</h4><div class="big" id="clouds">—</div><div class="muted">From Open-Meteo (window max)</div></div>
+        <div class="tile"><h4>Humidity</h4><div class="big" id="rh">—</div></div>
+        <div class="tile"><h4>Transparency</h4><div class="big" id="transp">—</div><div class="muted" id="transpInfo">—</div></div>
       </div>
-      <div class="gallery" id="catalogBody"></div>
+      <div class="chips" style="margin-top:12px">
+        <div class="chip" id="updated">Updated —</div>
+        <div class="chip" id="sunAlt">Sun alt —</div>
+        <div class="chip" id="astro">—</div>
+      </div>
     </div>
   </section>
 
-  <!-- RIG SUMMARY (top pills only; full rig editor omitted for length) -->
-  <section class="card" id="cardRig">
-    <div class="toggle"><div class="chev"></div></div>
-    <div class="card-title">Rig (Scope + Camera)</div>
-    <div class="pills">
-      <span class="pill" id="sumEff">Eff. FL —</span>
-      <span class="pill" id="sumFOV">FOV — × —</span>
-      <span class="pill" id="sumScale">Scale — "/px</span>
-      <span class="pill" id="sumScope">560 × 80 mm (f/7.0)</span>
-      <span class="pill">Reducer 0.8×</span>
+  <!-- Quick setup -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Quick setup</div>
+      <div class="chev" data-target="#qsBody">⌄</div>
+    </div>
+    <div id="qsBody">
+      <div class="grid2">
+        <div class="tile"><h4>Latitude (°)</h4><input id="lat" type="number" step="0.00001"></div>
+        <div class="tile"><h4>Longitude (°)</h4><input id="lon" type="number" step="0.00001"></div>
+      </div>
+      <div class="chips" style="margin-top:12px">
+        <button id="gpsBtn" class="btn">Use GPS</button>
+        <button id="calcBtn" class="btn">Calculate Now</button>
+      </div>
     </div>
   </section>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast hide"><div id="toastMsg"></div></div>
+  <!-- Top 5 (example static for now, sorted later by rules) -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Top 5 Recommendations</div>
+      <div class="chev" data-target="#topBody">⌄</div>
+    </div>
+    <div id="topBody">
+      <ol id="topList" style="padding-left:22px;margin:10px 0 0"></ol>
+    </div>
+  </section>
+
+  <!-- Catalog (with built-in search) -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Catalog</div>
+      <div class="chev" data-target="#catBody">⌄</div>
+    </div>
+    <div id="catBody">
+      <div class="row" style="margin:6px 0 10px">
+        <input id="search" type="text" placeholder="Search catalog (name/type)" />
+        <button id="clearSearch" class="btn">Clear</button>
+      </div>
+      <div class="tile">
+        <table class="table">
+          <thead class="thead">
+            <tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr>
+          </thead>
+          <tbody id="catRows" class="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rig -->
+  <section class="card">
+    <div class="card hdr">
+      <div class="title">Rig (Scope + Camera)</div>
+      <div class="chev" data-target="#rigBody">⌄</div>
+    </div>
+    <div id="rigBody">
+      <div class="chips" id="rigSummary"></div>
+      <div class="chips" style="margin-top:10px">
+        <button id="editRigBtn" class="btn">Edit rig</button>
+      </div>
+      <div id="rigEditor" class="collapse" style="margin-top:10px">
+        <div class="grid2">
+          <div class="tile">
+            <h4>Scope (FL × Dia)</h4>
+            <div class="row">
+              <input id="scopeFL" type="number" placeholder="Focal length (mm)" />
+              <input id="scopeDia" type="number" placeholder="Diameter (mm)" />
+            </div>
+          </div>
+          <div class="tile">
+            <h4>Reducer / Barlow</h4>
+            <div class="row">
+              <button class="btn redBtn" data-red="0.63">0.63×</button>
+              <button class="btn redBtn" data-red="0.7">0.7×</button>
+              <button class="btn redBtn" data-red="0.8">0.8×</button>
+              <button class="btn redBtn" data-red="1">1×</button>
+              <button class="btn redBtn" data-red="2">2×</button>
+            </div>
+          </div>
+          <div class="tile">
+            <h4>Camera sensor (mm)</h4>
+            <div class="row">
+              <input id="camW" type="number" step="0.01" placeholder="Width" />
+              <input id="camH" type="number" step="0.01" placeholder="Height" />
+              <input id="pix" type="number" step="0.01" placeholder="Pixel size (µm)" />
+            </div>
+          </div>
+          <div class="tile">
+            <h4>Preset</h4>
+            <input id="presetName" type="text" placeholder="SV503_533_0.8x" />
+            <div class="chips" style="margin-top:10px">
+              <button id="savePreset" class="btn">Save</button>
+              <button id="delPreset" class="btn">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
+<div id="toast" class="toast">—</div>
+
 <script>
-/* ---------- tiny helpers ---------- */
-const $=s=>document.querySelector(s);
-function toast(msg){ const t=$("#toast"); $("#toastMsg").textContent=msg; t.classList.remove("hide"); setTimeout(()=>t.classList.add("hide"),1800); }
-function pill(txt,klass=""){const s=document.createElement("span");s.className="pill"+(klass?(" "+klass):"");s.textContent=txt;return s;}
+/* ---------- helpers ---------- */
+const $=q=>document.querySelector(q);
+const $$=q=>[...document.querySelectorAll(q)];
+const toast=(msg)=>{const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+const fmtPct=x=> (x==null?"—":Math.round(x)+"%");
+const nowStr=()=> new Date().toLocaleTimeString();
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 
-/* ---------- demo data (replace with live later) ---------- */
-const CATALOG=[
-  {name:"M31",type:"GX",ra:"0.71h",dec:"41.3°",img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo.jpg"},
-  {name:"M33",type:"GX",ra:"1.55h",dec:"30.7°",img:"https://upload.wikimedia.org/wikipedia/commons/5/55/Triangulum_Galaxy_Messier_33_from_the_Mount_Lemmon_SkyCenter_Schulman_Telescope_courtesy_Adam_Block.jpg"},
-  {name:"M27",type:"PN",ra:"19.89h",dec:"22.7°",img:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Dumbbell_Nebula_-_HST_-_Potw2029a.jpg"},
-  {name:"M57",type:"PN",ra:"18.89h",dec:"33.0°",img:"https://upload.wikimedia.org/wikipedia/commons/0/0d/M57_The_Ring_Nebula.JPG"},
-  {name:"M13",type:"GC",ra:"16.70h",dec:"36.5°",img:"https://upload.wikimedia.org/wikipedia/commons/4/4d/M13_-_Hercules_Globular_Cluster.jpg"},
-];
-const WIKI_MAP={M31:"Andromeda_Galaxy",M33:"Messier_33",M27:"Messier_27",M57:"Messier_57",M13:"Messier_13"};
-
-/* ---------- user-tunable rules ---------- */
-const DEFAULT_RULES={ wCloud:70, wTrans:40, minVis:12, moonTol:50, humPen:15 };
-const rules = JSON.parse(localStorage.getItem("gng_rules")||"null")||DEFAULT_RULES;
-function bindRules(){
-  $("#wCloud").value=rules.wCloud;
-  $("#wTrans").value=rules.wTrans;
-  $("#minVis").value=rules.minVis;
-  $("#moonTol").value=rules.moonTol;
-  $("#humPen").value=rules.humPen;
-  echoRules();
-}
-function echoRules(){
-  $("#rulesEcho").textContent=`Cloud ${rules.wCloud} · Trans ${rules.wTrans} · Vis ≥ ${rules.minVis}km · Moon ≤ ${rules.moonTol}% · RH pen ${rules.humPen}`;
-}
-$("#saveRules").onclick=()=>{
-  rules.wCloud=+$("#wCloud").value;
-  rules.wTrans=+$("#wTrans").value;
-  rules.minVis=+$("#minVis").value;
-  rules.moonTol=+$("#moonTol").value;
-  rules.humPen=+$("#humPen").value;
-  localStorage.setItem("gng_rules",JSON.stringify(rules));
-  echoRules(); applyStatus();
-  toast("Go/No-Go rules saved");
+/* ---------- theme + compact ---------- */
+const applyTheme=()=>{
+  const night=localStorage.getItem("night")==="1";
+  document.documentElement.classList.toggle("night",night);
+  $("#themeBtn").textContent = night ? "Night Mode" : "Normal Mode";
 };
-$("#resetRules").onclick=()=>{
-  Object.assign(rules,DEFAULT_RULES);
-  localStorage.setItem("gng_rules",JSON.stringify(rules));
-  bindRules(); applyStatus();
-  toast("Rules reset to defaults");
+$("#themeBtn").onclick=()=>{localStorage.setItem("night", localStorage.getItem("night")==="1"?"0":"1");applyTheme();toast("Theme updated");};
+const applyCompact=()=>{
+  const c=localStorage.getItem("compact")==="1";
+  document.body.classList.toggle("compact",c);
+  $("#compactBtn").textContent=c?"Compact On":"Compact Off";
 };
+$("#compactBtn").onclick=()=>{localStorage.setItem("compact", localStorage.getItem("compact")==="1"?"0":"1");applyCompact();};
 
-/* ---------- fake “current conditions” (replace with your real fetch) ---------- */
-const state={
-  updated:new Date(),
-  sunAlt:-45, moonPct:7, moonAlt:-29,
-  clouds:7, vis:14, rh:86,
-  transText:"Great", aod:0.12, pm25:"—", dT:0.7, aqi:0,
-  showFOV:true
-};
+applyTheme();applyCompact();
 
-/* ---------- UI: collapsers, theme, compact ---------- */
-document.querySelectorAll(".card .chev").forEach(c=>{
-  c.addEventListener("click",()=>{
-    const card=c.closest(".card");
-    const col = card.getAttribute("data-collapsed")==="true";
-    card.setAttribute("data-collapsed", col?"false":"true");
+/* ---------- collapsibles ---------- */
+$$(".chev").forEach(ch=>{
+  ch.addEventListener("click",()=> {
+    const tgt=ch.getAttribute("data-target");
+    const el=document.querySelector(tgt);
+    el.classList.toggle("collapse");
+    ch.textContent = el.classList.contains("collapse") ? "˄" : "⌄";
   });
 });
-$("#toggleTheme").onclick=()=>{
-  document.body.classList.toggle("night");
-  $("#toggleTheme").textContent=document.body.classList.contains("night")?"Night Mode":"Normal Mode";
+
+/* ---------- settings (persist) ---------- */
+const settingsKeys=["setCloudW","setVisMin","setMoonTol","setRefresh"];
+settingsKeys.forEach(id=>{
+  const el=$("#"+id);
+  const s=localStorage.getItem(id);
+  if(s!=null) el.value=s;
+  el.addEventListener("input",()=>{localStorage.setItem(id, el.value); liveDecide();});
+});
+
+/* ---------- location ---------- */
+const getLatLon=()=>{
+  const lat=parseFloat($("#lat").value), lon=parseFloat($("#lon").value);
+  if(Number.isFinite(lat)&&Number.isFinite(lon)) return {lat,lon};
+  const ls=localStorage.getItem("latlon");
+  return ls?JSON.parse(ls):null;
 };
-$("#toggleCompact").onclick=()=>{
-  document.body.classList.toggle("compact");
-  $("#toggleCompact").textContent=document.body.classList.contains("compact")?"Compact On":"Compact Off";
+const setLatLon=(lat,lon)=>{ $("#lat").value=lat.toFixed(5); $("#lon").value=lon.toFixed(5); localStorage.setItem("latlon", JSON.stringify({lat,lon}));};
+$("#gpsBtn").onclick=()=>{
+  if(!navigator.geolocation){toast("Geolocation not available");return;}
+  navigator.geolocation.getCurrentPosition(p=>{
+    const {latitude:lat,longitude:lon}=p.coords;
+    setLatLon(lat,lon); toast("GPS location set");
+  }, _=> toast("GPS denied or failed"));
 };
+$("#calcBtn").onclick=()=>{fetchLive();};
 
-/* ---------- status line ---------- */
-function applyStatus(){
-  const s=$("#statusLine"); s.innerHTML="";
-  // compute a risk score 0..100
-  const cloudRisk = state.clouds;               // 0..100
-  const transRisk = ({"Great":10,"Good":25,"OK":40,"Poor":65,"Bad":85}[state.transText]||40);
-  let risk = (rules.wCloud*cloudRisk + rules.wTrans*transRisk) / Math.max(1,(rules.wCloud+rules.wTrans));
-  // humidity penalty
-  risk += (state.rh/100)*rules.humPen;
-  // hard gates
-  const hardBlock = (state.vis < rules.minVis) || (state.moonPct > rules.moonTol && state.moonAlt>-5);
-  const good = !hardBlock && risk < 50;
-
-  s.appendChild(pill(good?"GO":"NO-GO", good?"ok":"bad"));
-  s.appendChild(pill(`Clouds ~${state.clouds}%`));
-  s.appendChild(pill(`Vis ${state.vis} km`));
-  s.appendChild(pill(`Astro dark`));
-
-  $("#pUpdated").textContent="Updated "+state.updated.toLocaleTimeString();
-  $("#pSun").textContent=`Sun alt ${state.sunAlt}°`;
-  $("#pMoon").textContent=`Moon ${state.moonPct}%`;
-  $("#pTrans").textContent=`Transparency ${state.transText}`;
+/* ---------- astronomy (Sun/Moon) – SunCalc mini ---------- */
+/* Minimal functions adapted from SunCalc principles */
+function toRad(d){return d*Math.PI/180;}
+function toDeg(r){return r*180/Math.PI;}
+function julian(date){return date/86400000-0.5+2440588;}
+function eclipticObliquity(){return toRad(23.4397);}
+function solarMeanAnomaly(d){return toRad(357.5291 + 0.98560028*d);}
+function eclipticLongitude(M){return toRad(280.1470 + 360.9856235*M/ (2*Math.PI))} // simple
+function sunDeclination(d){ // rough
+  const n=julian(d)-2451545;
+  const L = toRad((280.46 + 0.9856474*n)%360);
+  const g = toRad((357.528 + 0.9856003*n)%360);
+  const lam = L + toRad(1.915)*Math.sin(g) + toRad(0.02)*Math.sin(2*g);
+  return Math.asin(Math.sin(lam)*Math.sin(eclipticObliquity()));
 }
-function renderConditions(){
-  $("#cMoonPct").textContent=state.moonPct+"%";
-  $("#cMoonAlt").textContent="Alt "+state.moonAlt+"°";
-  $("#cClouds").textContent=state.clouds+"%";
-  $("#cHum").textContent=state.rh+"%";
-  $("#cTransBig").textContent=state.transText;
-  $("#cTransLine").textContent=`AOD ${state.aod} · PM2.5 ${state.pm25} · RH ${state.rh}% · Vis ${state.vis}km · ΔT ${state.dT}°C · ${state.aqi}`;
+function sunAltitude(date,lat,lon){
+  const d = date.getTime();
+  const dec = sunDeclination(d);
+  const lst = ((date.getUTCHours()+date.getUTCMinutes()/60 + lon/15)+24)%24;
+  const ha = toRad((lst*15) - 0); // crude hour angle
+  const alt = Math.asin(Math.sin(toRad(lat))*Math.sin(dec)+Math.cos(toRad(lat))*Math.cos(dec)*Math.cos(ha));
+  return toDeg(alt);
 }
-
-/* ---------- shared table renderer ---------- */
-function rowLink(name){ return `https://en.wikipedia.org/wiki/${WIKI_MAP[name]||encodeURIComponent(name)}`; }
-function renderInto(container, rows){
-  const body=$(container); body.innerHTML="";
-  rows.forEach(r=>{
-    const row=document.createElement("a");
-    row.className="tbl-row";
-    row.href=rowLink(r.name); row.target="_blank"; row.rel="noopener";
-    row.innerHTML=`
-      <div class="cell">${r.name}</div>
-      <div class="cell">${r.type}</div>
-      <div class="cell">${r.ra}</div>
-      <div class="cell">${r.dec}</div>
-      <div class="cell"><div class="thumb"><img loading="lazy" alt="${r.name}"></div></div>`;
-    const img=row.querySelector("img");
-    img.src=r.img;
-    img.onerror=()=>{ img.style.display="none"; };
-    body.appendChild(row);
-  });
+// Simple moon illumination & altitude via SunCalc-like approximations:
+function moonIllumPct(date){ // 0..100
+  const d=(date - new Date("2001-01-01"))/86400000;
+  const syn=29.53058867;
+  const phase=((d % syn)+syn)%syn;
+  return Math.round((1 - Math.cos(2*Math.PI*phase/syn))*50);
+}
+function moonAltRough(date,lat,lon){
+  // crude: shift sun hour angle by ~12h (opposition)
+  const alt = sunAltitude(new Date(date.getTime()+12*3600*1000), lat, lon);
+  return alt;
 }
 
-/* ---------- Top 5 list using same data ---------- */
-function renderTop(){
+/* ---------- weather via Open-Meteo ---------- */
+async function getOpenMeteo(lat,lon){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloudcover,visibility,relativehumidity_2m,temperature_2m,dewpoint_2m&forecast_days=1`;
+  const aq = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm2_5,aerosol_optical_depth&forecast_days=1`;
+  const [wRes, aRes] = await Promise.all([fetch(url), fetch(aq)]);
+  if(!wRes.ok||!aRes.ok) throw new Error("Open-Meteo error");
+  const w=await wRes.json(), a=await aRes.json();
+  const idx=new Date().getHours(); // window start hour; we also peek 3h window
+  const hours=[idx, idx+1, idx+2].map(i=>Math.min(i, w.hourly.cloudcover.length-1));
+  const clouds = Math.max(...hours.map(i=>w.hourly.cloudcover[i])); // window max
+  const vis = Math.min(...hours.map(i=> (w.hourly.visibility[i]||20000)/1000 )); // km (min in window)
+  const rh = Math.max(...hours.map(i=> w.hourly.relativehumidity_2m[i]));
+  const t = w.hourly.temperature_2m[idx], td = w.hourly.dewpoint_2m[idx];
+  const dT = +(t-td).toFixed(1);
+  const pm = a.hourly.pm2_5[idx] ?? 0;
+  const aod = a.hourly.aerosol_optical_depth[idx] ?? 0;
+  return {clouds, vis, rh, dT, pm, aod};
+}
+
+/* ---------- decision engine ---------- */
+function transparencyRating({aod, pm, rh, dT}){
+  // quick heuristic score 0..100
+  let score = 100;
+  score -= clamp(aod*200,0,35); // higher AOD worse
+  score -= clamp(pm*1.2,0,35);
+  score -= clamp((rh-50)*0.6,0,15);
+  score -= clamp((1.5-dT)*18,0,15); // if dewpoint close to temp
+  const text = score>75?"Great": score>55?"Good": score>35?"Fair": score>20?"Poor":"Bad";
+  return {score, text};
+}
+
+function decide(status){
+  const set = {
+    cloudW: +$("#setCloudW").value, visMin:+$("#setVisMin").value,
+    moonTol:+$("#setMoonTol").value
+  };
+  // hard blocks
+  if(status.vis < set.visMin) return "NO-GO";
+  if(status.moonPct > set.moonTol && status.moonAlt > -5) return "NO-GO";
+  // weighted risk
+  const cloudPenalty = status.clouds * (set.cloudW/100);
+  const transPenalty = (100-status.transpScore) * (1 - set.cloudW/100);
+  const risk = cloudPenalty*0.7 + transPenalty*0.3 + (status.rh>90?5:0);
+  return risk<45 ? "GO" : (risk<65? "MAYBE" : "NO-GO");
+}
+
+/* ---------- catalog + images ---------- */
+const CATALOG = [
+  {id:"M31", type:"GX", ra:"0.71h", dec:"41.3°", wiki:"https://en.wikipedia.org/wiki/Andromeda_Galaxy",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Andromeda_Galaxy_%28with_h-alpha%29.jpg/320px-Andromeda_Galaxy_%28with_h-alpha%29.jpg"},
+  {id:"M33", type:"GX", ra:"1.55h", dec:"30.7°", wiki:"https://en.wikipedia.org/wiki/Triangulum_Galaxy",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/M33_-_Triangulum_Galaxy.jpg/320px-M33_-_Triangulum_Galaxy.jpg"},
+  {id:"M27", type:"PN", ra:"19.89h", dec:"22.7°", wiki:"https://en.wikipedia.org/wiki/Dumbbell_Nebula",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/M27_Dumbbell_Nebula.jpg/320px-M27_Dumbbell_Nebula.jpg"},
+  {id:"M57", type:"PN", ra:"18.89h", dec:"33.0°", wiki:"https://en.wikipedia.org/wiki/Ring_Nebula",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/M57_The_Ring_Nebula.JPG/320px-M57_The_Ring_Nebula.JPG"},
+  {id:"M13", type:"GC", ra:"16.70h", dec:"36.5°", wiki:"https://en.wikipedia.org/wiki/Great_Hercules_Cluster",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/M13_-_Great_Hercules_Cluster.jpg/320px-M13_-_Great_Hercules_Cluster.jpg"}
+];
+
+function renderTop5(list){
   const ol=$("#topList"); ol.innerHTML="";
-  CATALOG.forEach((r,i)=>{
+  list.forEach((o,i)=>{
     const li=document.createElement("li");
     li.style.margin="6px 0";
-    const a=document.createElement("a");
-    a.href=rowLink(r.name); a.target="_blank"; a.rel="noopener"; a.textContent=r.name;
-    li.appendChild(a);
-    li.insertAdjacentHTML("beforeend",` — ${(["Dumbbell Nebula","Andromeda Galaxy","Triangulum Galaxy","Ring Nebula","Hercules Globular"][i]||"")}`);
+    li.innerHTML = `<a href="${o.wiki}" target="_blank" rel="noopener">${o.id}</a> — `+
+      `${o.name??o.title??o.id} — alt ${o.alt??'—'} — ${o.sep??''}`;
     ol.appendChild(li);
   });
 }
 
-/* ---------- Search ---------- */
-$("#searchBox").addEventListener("input",()=>{
-  const q=$("#searchBox").value.trim().toLowerCase();
-  const rows = CATALOG.filter(r=>
-    r.name.toLowerCase().includes(q) ||
-    r.type.toLowerCase().includes(q)
-  );
-  renderInto("#searchBody", rows);
-});
-$("#clearSearch").onclick=()=>{ $("#searchBox").value=""; renderInto("#searchBody", CATALOG); }
+function renderCatalog(filter=""){
+  const tbody=$("#catRows"); tbody.innerHTML="";
+  const q=filter.trim().toLowerCase();
+  CATALOG.filter(o=>!q || o.id.toLowerCase().includes(q) || o.type.toLowerCase().includes(q))
+    .forEach(o=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td><a href="${o.wiki}" target="_blank" rel="noopener">${o.id}</a></td>
+        <td>${o.type}</td>
+        <td>${o.ra}</td>
+        <td>${o.dec}</td>
+        <td><a href="${o.wiki}" target="_blank" rel="noopener"><img class="thumb" loading="lazy" src="${o.img}" onerror="this.style.opacity=.25"></a></td>`;
+      tbody.appendChild(tr);
+    });
+}
+$("#search").addEventListener("input", e=> renderCatalog(e.target.value));
+$("#clearSearch").onclick=()=>{$("#search").value="";renderCatalog("");};
 
-/* ---------- Rig summary (static demo values) ---------- */
-function calcRigSummary(){
-  const baseFL=560, ap=80, factor=0.8;
-  const effFL=Math.round(baseFL*factor);
-  const w=11.31, h=11.31, px=3.76;
-  const fovX=(57.2958*w/effFL).toFixed(2), fovY=(57.2958*h/effFL).toFixed(2);
-  const scale=(206.265*px/effFL).toFixed(2);
-  const fRatio=(baseFL/ap).toFixed(1);
-  $("#sumEff").textContent=`Eff. FL ${effFL} mm (0.8×)`;
-  $("#sumFOV").textContent=`FOV ${fovX} × ${fovY}`;
-  $("#sumScale").textContent=`Scale ${scale} "/px`;
-  $("#sumScope").textContent=`${baseFL} × ${ap} mm (f/${fRatio})`;
+/* ---------- rig ---------- */
+function rigLoad(){
+  const d=JSON.parse(localStorage.getItem("rig")||"{}");
+  const rig = {
+    fl: d.fl ?? 560, dia: d.dia ?? 80, red: d.red ?? 0.8,
+    camW:d.camW ?? 11.31, camH:d.camH ?? 11.31, pix:d.pix ?? 3.76,
+    name: d.name ?? "SV503_533_0.8x"
+  };
+  $("#scopeFL").value=rig.fl; $("#scopeDia").value=rig.dia;
+  $("#camW").value=rig.camW; $("#camH").value=rig.camH; $("#pix").value=rig.pix;
+  $("#presetName").value=rig.name;
+  updateRigSummary(rig);
+  return rig;
+}
+function updateRigSummary(r){
+  const eff = Math.round(r.fl * r.red);
+  const scale = (206.265 * r.pix / eff).toFixed(2);
+  // FOV (degrees) ~ 57.3 * sensor(mm) / eff(mm)
+  const fovX = (57.2958 * r.camW / eff).toFixed(2);
+  const fovY = (57.2958 * r.camH / eff).toFixed(2);
+  $("#rigSummary").innerHTML =
+    `<div class="chip">Eff. FL ${eff} mm (${r.red}×)</div>
+     <div class="chip">FOV ${fovX} × ${fovY}</div>
+     <div class="chip">Scale ${scale} "/px</div>
+     <div class="chip">${r.fl} × ${r.dia} mm (f/${(r.fl/r.dia).toFixed(1)})</div>
+     <div class="chip">Reducer ${r.red}×</div>`;
+  localStorage.setItem("rig", JSON.stringify(r));
+}
+let RIG = rigLoad();
+$("#editRigBtn").onclick=()=>{
+  const ed=$("#rigEditor"); ed.classList.toggle("collapse");
+  $("#editRigBtn").textContent = ed.classList.contains("collapse") ? "Edit rig" : "Close editor";
+};
+$$(".redBtn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    RIG.red = parseFloat(b.dataset.red);
+    updateRigSummary(RIG);
+    toast(`Reducer set to ${RIG.red}×`);
+  });
+});
+["scopeFL","scopeDia","camW","camH","pix","presetName"].forEach(id=>{
+  $("#"+id).addEventListener("change",()=>{
+    RIG.fl=+$("#scopeFL").value; RIG.dia=+$("#scopeDia").value;
+    RIG.camW=+$("#camW").value; RIG.camH=+$("#camH").value; RIG.pix=+$("#pix").value;
+    RIG.name=$("#presetName").value || "SV503_533_0.8x";
+    updateRigSummary(RIG);
+  });
+});
+$("#savePreset").onclick=()=>{localStorage.setItem("rigPreset_"+(RIG.name||"SV503_533_0.8x"), JSON.stringify(RIG)); toast("Preset saved");}
+$("#delPreset").onclick=()=>{localStorage.removeItem("rigPreset_"+(RIG.name||"SV503_533_0.8x")); toast("Preset deleted");}
+
+/* ---------- live fetch + render ---------- */
+async function fetchLive(){
+  const ll=getLatLon();
+  if(!ll){toast("Set location (GPS or manual) first");return;}
+  const {lat,lon}=ll;
+
+  // astronomy
+  const now=new Date();
+  const sunA= sunAltitude(now,lat,lon);
+  const astro = sunA<-18 ? "Astro dark" : (sunA<-12?"Nautical":"—");
+  const moonPct= moonIllumPct(now);
+  const moonA = moonAltRough(now,lat,lon);
+
+  // weather
+  let wx;
+  try{
+    wx = await getOpenMeteo(lat,lon);
+  }catch(e){ toast("Weather fetch failed"); return; }
+
+  // transparency
+  const tr = transparencyRating(wx);
+
+  // update Conditions
+  $("#moonPct").textContent = fmtPct(moonPct);
+  $("#moonAlt").textContent = `Alt ${Math.round(moonA)}°`;
+  $("#clouds").textContent = fmtPct(wx.clouds);
+  $("#rh").textContent = fmtPct(wx.rh);
+  $("#transp").textContent = tr.text;
+  $("#transpInfo").textContent = `AOD ${wx.aod.toFixed(2)} · PM2.5 ${wx.pm?.toFixed?.(1)??wx.pm} · RH ${wx.rh}% · Vis ${wx.vis.toFixed(0)}km · ΔT ${wx.dT}°C`;
+  $("#updated").textContent = `Updated ${nowStr()}`;
+  $("#sunAlt").textContent = `Sun alt ${Math.round(sunA)}°`;
+  $("#astro").textContent = astro;
+
+  // decision
+  const status = {
+    clouds: wx.clouds, vis: wx.vis, rh: wx.rh, transpScore: tr.score,
+    moonPct, moonAlt: moonA
+  };
+  const decision = decide(status);
+  renderStatus(decision, wx, astro, moonPct, sunA);
+
+  // top 5 (placeholder order; can bias by FOV later)
+  renderTop5(CATALOG);
+  toast("Live data updated");
+}
+function renderStatus(decision, wx, astro, moonPct, sunAlt){
+  const chips=$("#statusChips"); chips.innerHTML="";
+  const tag=document.createElement("div");
+  tag.className="chip "+(decision==="GO"?"ok": decision==="NO-GO"?"bad":"");
+  tag.textContent=decision; chips.appendChild(tag);
+  [
+    `Clouds ~${Math.round(wx.clouds)}%`,
+    `Vis ${wx.vis.toFixed(0)} km`,
+    astro,
+    `Updated ${nowStr()}`,
+    `Sun alt ${Math.round(sunAlt)}°`,
+    `Moon ${moonPct}%`,
+    `Transparency ${transparencyRating(wx).text}`
+  ].forEach(t=>{const c=document.createElement("div");c.className="chip";c.textContent=t;chips.appendChild(c);});
 }
 
-/* ---------- init ---------- */
-bindRules();
-applyStatus();
-renderConditions();
-renderTop();
-renderInto("#catalogBody", CATALOG);
-renderInto("#searchBody", CATALOG);
-calcRigSummary();
-
-/* ---------- collapse default off ---------- */
-document.querySelectorAll(".card").forEach(c=>c.setAttribute("data-collapsed","false"));
+/* ---------- boot ---------- */
+(function boot(){
+  // initial lat/lon from LS or ask
+  const ll = getLatLon();
+  if(ll){ setLatLon(ll.lat,ll.lon); }
+  renderCatalog("");
+  renderTop5(CATALOG);
+  fetchLive();
+  // auto refresh
+  setInterval(()=>fetchLive(), (+$("#setRefresh").value||10)*60000);
+})();
 </script>
 </body>
 </html>
