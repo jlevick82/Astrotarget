@@ -1,47 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Go/No-Go v27.9</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Go/No-Go v28.0</title>
 <style>
   :root{
-    --bg:#0e2530;--panel:#102b37;--panel-2:#0c222c;--text:#cfe7f5;--muted:#9fb7c4;
-    --pill:#133544;--ok:#27c56d;--warn:#ffc247;--bad:#ff6b6b;--chip:#122e3a;--ring:#1c4454;
-    --accent:#2aa9ff;--shadow:rgba(0,0,0,.35);
+    --bg:#0e2530;--panel:#102b37;--panel2:#0c222c;--text:#cfe7f5;--muted:#9fb7c4;
+    --chip:#122e3a;--ring:#1c4454;--shadow:rgba(0,0,0,.35);
+    --ok:#27c56d;--warn:#ffc247;--bad:#ff6b6b;--accent:#2aa9ff;
   }
   .night{
-    --bg:#07090a;--panel:#0a0e11;--panel-2:#080c0e;--text:#ffd1d6;--muted:#ffb6bf;
-    --pill:#121518;--ok:#ff9fb3;--warn:#ffd86a;--bad:#ff8383;--chip:#121519;--ring:#262b30;
-    --accent:#ff7ea8;--shadow:rgba(0,0,0,.55);
+    --bg:#07090a;--panel:#0a0e11;--panel2:#080c0e;--text:#ffd1d6;--muted:#ffb6bf;
+    --chip:#111417;--ring:#2a3138;--shadow:rgba(0,0,0,.6);
+    --ok:#ff9fb3;--warn:#ffd86a;--bad:#ff8383;--accent:#ff7ea8;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 50% -150px, #17465a 0%, transparent 60%), var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -150px,#17465a 0%,transparent 60%),var(--bg);color:var(--text);
+       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif}
   .wrap{max-width:960px;margin:0 auto;padding:22px 14px 96px}
   h1{margin:0 0 8px;font-size:36px;letter-spacing:.4px}
   .v{opacity:.7;margin-left:8px}
   .row{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 16px}
-  .btn{background:var(--pill);color:var(--text);padding:9px 15px;border-radius:18px;border:1px solid var(--ring);cursor:pointer;user-select:none}
+  .btn{background:var(--chip);color:var(--text);padding:9px 15px;border-radius:18px;border:1px solid var(--ring);cursor:pointer;user-select:none}
   .btn:active{transform:translateY(1px)}
-  .mini{padding:8px 12px;border-radius:14px;background:var(--chip);border:1px solid var(--ring)}
-  .card{background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);border:1px solid var(--ring);box-shadow:0 12px 30px var(--shadow);border-radius:16px;padding:14px 14px 10px;margin:14px 0}
+  .mini{padding:8px 12px;border-radius:14px;background:var(--chip);border:1px solid var(--ring);color:var(--text);cursor:pointer}
+  .card{background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--ring);box-shadow:0 12px 30px var(--shadow);
+        border-radius:16px;padding:14px;margin:14px 0}
   .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
   .card-title{font-size:22px;font-weight:800;letter-spacing:.2px}
   .chev{width:40px;height:40px;border-radius:10px;background:var(--chip);border:1px solid var(--ring);display:grid;place-items:center;cursor:pointer}
-  .chev svg{opacity:.85;transition:transform .2s}
+  .chev svg{transition:transform .2s}
   .content{display:grid;gap:10px}
-  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  @media(max-width:760px){.grid2,.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--chip);border:1px solid var(--ring);color:var(--text);font-weight:600}
-  .chip{display:inline-block;padding:7px 10px;border-radius:12px;background:var(--chip);border:1px solid var(--ring);color:var(--muted)}
+  .pill{display:inline-block;padding:7px 12px;border-radius:999px;background:var(--chip);border:1px solid var(--ring);font-weight:600}
   .status-line{font-size:24px;font-weight:900;letter-spacing:.2px;line-height:1.2;margin:2px 0 4px}
   .sub{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr 1fr}}
   .kard{border:1px solid var(--ring);border-radius:14px;padding:12px;background:var(--chip)}
   .kard h4{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.2px}
   .kard .big{font-size:26px;font-weight:900}
   .kard .small{color:var(--muted);margin-top:2px}
-  .input, select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--ring);background:var(--panel-2);color:var(--text)}
+  .input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--ring);background:var(--panel2);color:var(--text)}
   .tbl{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
   .tbl-head,.tbl-row{display:grid;grid-template-columns:80px 1fr 1fr 1fr 96px}
   .tbl-head{background:rgba(255,255,255,.04);font-weight:800}
@@ -50,108 +50,84 @@
   .thumb{width:60px;height:60px;border-radius:12px;border:1px solid var(--ring);background:#0b1b23 no-repeat center/cover;position:relative}
   .thumb span{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:8px;padding:1px 6px;font-size:12px;font-weight:800}
   .thumb.fov::after{content:"";position:absolute;left:10%;top:10%;right:10%;bottom:10%;border:2px solid #9ae6ff;border-radius:8px;pointer-events:none}
+  .active{outline:2px solid var(--accent);background:rgba(42,169,255,.12)}
+  .summary{display:flex;gap:8px;flex-wrap:wrap}
   .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.25s;z-index:50;pointer-events:none}
   .toast .bubble{background:#0d2a1a;border:1px solid #1f4b34;color:#caffdd;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px var(--shadow);max-width:90vw}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .muted{color:var(--muted)}
-  .compact .card{padding:10px}
-  .compact .card-title{font-size:18px}
-  .compact .status-line{font-size:20px}
-  .compact .kard .big{font-size:22px}
+  .compact .card{padding:10px}.compact .card-title{font-size:18px}.compact .status-line{font-size:20px}.compact .kard .big{font-size:22px}
 </style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <header>
-      <h1>Go/No-Go <span class="v">v27.9</span></h1>
+<div class="wrap" id="app">
+  <header>
+    <h1>Go/No-Go <span class="v">v28.0</span></h1>
+    <div class="row">
+      <button class="btn" id="toggleCompact">Compact Off</button>
+      <button class="btn" id="toggleNight">Night Mode</button>
+    </div>
+  </header>
+
+  <!-- STATUS -->
+  <section class="card" data-card="status">
+    <div class="card-header">
+      <div class="card-title">Status</div>
+      <button class="chev" data-collapse="status"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="content" id="status-content">
+      <div class="status-line" id="statusText">NO-GO · Clouds ~— · Vis — km · Astro dark</div>
+      <div class="sub">
+        <span class="pill" id="updated">Updated --:--</span>
+        <span class="pill" id="sunAlt">Sun alt —</span>
+        <span class="pill" id="moonIllum">Moon —</span>
+        <span class="pill" id="transTag">Transparency —</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONDITIONS (merged Sky + Clouds) -->
+  <section class="card" data-card="cond">
+    <div class="card-header">
+      <div class="card-title">Conditions</div>
+      <button class="chev" data-collapse="cond"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="content" id="cond-content">
+      <div class="grid2">
+        <div class="kard"><h4>Moon illum</h4><div class="big" id="moonPct">—</div><div class="small" id="moonAltSmall">Alt —</div></div>
+        <div class="kard"><h4>Clouds (window max)</h4><div class="big" id="cloudsBig">—</div><div class="small" id="cloudSrc">From Open-Meteo</div></div>
+        <div class="kard"><h4>Humidity</h4><div class="big" id="humidity">—</div></div>
+        <div class="kard"><h4>Transparency</h4><div class="big" id="transWord">—</div><div class="small" id="transDetails">—</div></div>
+      </div>
       <div class="row">
-        <button class="btn" id="toggleCompact">Compact Off</button>
-        <button class="btn" id="toggleNight">Night Mode</button>
+        <input id="cloudSlider" class="input" type="range" min="0" max="100" step="1" value="35" style="flex:1"/>
+        <button class="mini" id="useClouds">Use</button>
+        <button class="mini" id="calcNow">Calculate</button>
+        <span class="pill" id="cloudPct">35%</span>
       </div>
-    </header>
+    </div>
+  </section>
 
-    <!-- STATUS -->
-    <section class="card" data-card="status">
-      <div class="card-header">
-        <div class="card-title">Status</div>
-        <button class="chev" data-collapse="status" aria-label="Collapse or expand">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
+  <!-- RIG (compact with summary) -->
+  <section class="card" data-card="rig">
+    <div class="card-header">
+      <div class="card-title">Rig (Scope + Camera)</div>
+      <button class="chev" data-collapse="rig"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="content" id="rig-content">
+      <div class="summary" id="rigSummary">
+        <span class="pill" id="sumEff">Eff. FL —</span>
+        <span class="pill" id="sumFOV">FOV — × —</span>
+        <span class="pill" id="sumScale">Scale — "/px</span>
       </div>
-      <div class="content" id="status-content">
-        <div class="status-line" id="statusText">NO-GO · Clouds — · Vis — · Astro dark</div>
-        <div class="sub">
-          <span class="pill" id="updated">Updated --:--</span>
-          <span class="pill" id="sunAlt">Sun alt —</span>
-          <span class="pill" id="moonIllum">Moon —</span>
-          <span class="pill" id="alt">Alt —</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- SKY -->
-    <section class="card" data-card="sky">
-      <div class="card-header">
-        <div class="card-title">Sky</div>
-        <button class="chev" data-collapse="sky"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="content" id="sky-content">
-        <div class="grid2">
-          <div class="kard">
-            <h4>Astronomical dark</h4>
-            <div class="big" id="astroDark">Yes</div>
-            <div class="small" id="sunAltSmall">Sun alt -45°</div>
-          </div>
-          <div class="kard">
-            <h4>Moon illum</h4>
-            <div class="big" id="moonPct">7%</div>
-            <div class="small" id="moonAltSmall">Alt -29°</div>
-          </div>
-          <div class="kard">
-            <h4>Humidity</h4>
-            <div class="big" id="humidity">—</div>
-          </div>
-          <div class="kard">
-            <h4>Transparency</h4>
-            <div class="big" id="transWord">Bad</div>
-            <div class="small" id="transDetails">AOD 0.12 · PM2.5 — · RH — · Vis — · ΔT — · 0</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CLOUDS -->
-    <section class="card" data-card="clouds">
-      <div class="card-header">
-        <div class="card-title">Clouds (avg)</div>
-        <button class="chev" data-collapse="clouds"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="content" id="clouds-content">
-        <input id="cloudSlider" class="input" type="range" min="0" max="100" step="1" value="35" />
-        <div class="row">
-          <button class="mini" id="useClouds">Use</button>
-          <button class="mini" id="calcClouds">Calculate</button>
-          <span class="chip" id="cloudSource">From Open-Meteo (hourly) • slider overrides</span>
-          <span class="pill" id="cloudPct">35%</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- RIG: SCOPE + CAMERA (Full + Hooks) -->
-    <section class="card" data-card="rig">
-      <div class="card-header">
-        <div class="card-title">Rig (Scope + Camera)</div>
-        <button class="chev" data-collapse="rig"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="content" id="rig-content">
-        <div class="grid3">
+      <details id="rigDetails"><summary class="pill">Edit rig</summary>
+        <div class="grid2" style="margin-top:10px">
           <div class="kard">
             <h4>Scope</h4>
             <select id="scopeSel" class="input">
-              <option value="sv503">SVBONY SV503 80ED (560mm f/7)</option>
-              <option value="gt71">William Optics GT71 (420mm f/5.9)</option>
-              <option value="redcat">RedCat 51 (250mm f/4.9)</option>
-              <option value="fra400">Askar FRA400 (400mm f/5.6)</option>
+              <option value="sv503">SVBONY SV503 80ED (560mm)</option>
+              <option value="gt71">William Optics GT71 (420mm)</option>
+              <option value="redcat">RedCat 51 (250mm)</option>
+              <option value="fra400">Askar FRA400 (400mm)</option>
               <option value="custom">Custom…</option>
             </select>
             <div class="grid2" style="margin-top:8px">
@@ -159,7 +135,6 @@
               <input id="scopeAp" class="input" type="number" step="1" placeholder="Aperture (mm)" value="80">
             </div>
           </div>
-
           <div class="kard">
             <h4>Reducer / Barlow</h4>
             <div class="row">
@@ -169,395 +144,195 @@
               <button class="mini redbtn" data-f="1.0">1×</button>
               <button class="mini redbtn" data-f="2.0">2×</button>
             </div>
-            <div class="chip" id="effFL">Eff. FL: —</div>
+            <div class="pill" id="effFL">Eff. FL: —</div>
           </div>
-
           <div class="kard">
             <h4>Camera</h4>
             <select id="camSel" class="input">
-              <option value="asi533">ZWO ASI533MC Pro (IMX533)</option>
-              <option value="asi2600">ZWO ASI2600 (APS-C)</option>
-              <option value="asi6200">ZWO ASI6200 (Full Frame)</option>
-              <option value="canon600d">Canon T3i / 600D</option>
+              <option value="asi533">ZWO ASI533MC Pro</option>
+              <option value="asi2600">ZWO ASI2600</option>
+              <option value="asi6200">ZWO ASI6200</option>
+              <option value="canon600d">Canon 600D</option>
               <option value="custom">Custom…</option>
             </select>
             <div class="grid2" style="margin-top:8px">
               <input id="camW" class="input" type="number" step="0.01" placeholder="Sensor width (mm)" value="11.31">
               <input id="camH" class="input" type="number" step="0.01" placeholder="Sensor height (mm)" value="11.31">
             </div>
-            <div style="margin-top:8px">
-              <input id="camPx" class="input" type="number" step="0.01" placeholder="Pixel size (µm)" value="3.76">
-            </div>
+            <div style="margin-top:8px"><input id="camPx" class="input" type="number" step="0.01" placeholder="Pixel size (µm)" value="3.76"></div>
           </div>
-        </div>
-
-        <div class="grid3">
-          <div class="kard"><h4>FOV (°)</h4><div class="big" id="fovOut">— × —</div></div>
-          <div class="kard"><h4>Scale ("/px)</h4><div class="big" id="scaleOut">—</div></div>
           <div class="kard">
             <h4>Hooks</h4>
-            <div class="row">
-              <label><input type="checkbox" id="biasFOV"> Bias Top-5 to FOV</label>
-              <label><input type="checkbox" id="showFOV"> FOV overlay on thumbs</label>
-            </div>
+            <label><input type="checkbox" id="biasFOV"> Bias Top-5 to FOV</label><br/>
+            <label><input type="checkbox" id="showFOV"> FOV overlay on thumbs</label><br/>
             <div class="small">Meridian flip ETA: <span id="flipEta">—</span> <button class="mini" id="calcFlip">Calc</button></div>
           </div>
-        </div>
-
-        <div class="grid3">
           <div class="kard">
             <h4>Preset name</h4>
-            <input id="presetName" class="input" placeholder="e.g., SV503_533_0.8x" />
-          </div>
-          <div class="kard" style="display:flex;align-items:end;gap:10px">
-            <button class="mini" id="savePreset">Save</button>
-            <button class="mini" id="deletePreset">Delete</button>
+            <input id="presetName" class="input" placeholder="SV503_533_0.8x"/>
+            <div class="row" style="margin-top:8px">
+              <button class="mini" id="savePreset">Save</button>
+              <button class="mini" id="deletePreset">Delete</button>
+            </div>
           </div>
           <div class="kard">
             <h4>Load preset</h4>
             <select id="presetList" class="input"><option value="">(none saved)</option></select>
           </div>
         </div>
-      </div>
-    </section>
+      </details>
+    </div>
+  </section>
 
-    <!-- QUICK SETUP -->
-    <section class="card" data-card="quick">
-      <div class="card-header">
-        <div class="card-title">Quick setup</div>
-        <button class="chev" data-collapse="quick"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="content" id="quick-content">
-        <div class="grid2">
-          <label class="kard"><h4>Latitude (°)</h4><input id="lat" type="number" step="0.00001" value="37.16558" class="input"></label>
-          <label class="kard"><h4>Longitude (°)</h4><input id="lon" type="number" step="0.00001" value="-76.56841" class="input"></label>
-        </div>
-        <div class="grid2">
-          <label class="kard"><h4>Hours (window)</h4><input id="hours" type="number" min="1" max="12" value="3" class="input"></label>
-          <div class="kard" style="display:flex;align-items:center;gap:10px">
-            <button class="mini" id="useGPS">Use GPS</button>
-            <button class="mini" id="calcNow">Calculate Now</button>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- TOP 5 -->
+  <section class="card" data-card="top5">
+    <div class="card-header">
+      <div class="card-title">Top 5 Recommendations</div>
+      <button class="chev" data-collapse="top5"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="content" id="top5-content"><ol id="top5List"></ol></div>
+  </section>
 
-    <!-- TOP 5 -->
-    <section class="card" data-card="top5">
-      <div class="card-header">
-        <div class="card-title">Top 5 Recommendations</div>
-        <button class="chev" data-collapse="top5"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <!-- CATALOG -->
+  <section class="card" data-card="catalog">
+    <div class="card-header">
+      <div class="card-title">Catalog (subset)</div>
+      <button class="chev" data-collapse="catalog"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="content" id="catalog-content">
+      <div class="tbl">
+        <div class="tbl-head"><div>Type</div><div>RA</div><div>Dec</div><div>Name</div><div>Image</div></div>
+        <div class="gallery" id="catalogBody"></div>
       </div>
-      <div class="content" id="top5-content">
-        <ol id="top5List"></ol>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- CATALOG -->
-    <section class="card" data-card="catalog">
-      <div class="card-header">
-        <div class="card-title">Catalog (subset)</div>
-        <button class="chev" data-collapse="catalog"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-      </div>
-      <div class="content" id="catalog-content">
-        <div class="tbl">
-          <div class="tbl-head"><div>Type</div><div>RA</div><div>Dec</div><div>Name</div><div>Image</div></div>
-          <div class="gallery" id="catalogBody"></div>
-        </div>
-      </div>
-    </section>
-
-    <div class="toast" id="toast"><div class="bubble" id="toastText">Saved</div></div>
-  </div>
+  <div class="toast" id="toast"><div class="bubble" id="toastText">Saved</div></div>
+</div>
 
 <script>
-/* ========== helpers ========== */
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const toast = (msg) => { const t=$("#toast"); $("#toastText").textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); };
-const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
-const fmtPct = v => `${Math.round(v)}%`;
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
+const toast=msg=>{const t=$("#toast");$("#toastText").textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);};
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));const pct=v=>`${Math.round(v)}%`;
 
-/* ========== state ========== */
-const state = {
-  night:false, compact:false,
-  lat:parseFloat($("#lat").value), lon:parseFloat($("#lon").value), hours:parseInt($("#hours").value,10),
-  clouds:35, humidity:91, visibilityKm:18, moonPct:7, sunAlt:-45, moonAlt:-29, astroDark:true,
-  scope:{id:'sv503', fl:560, ap:80}, factor:1.0,
-  cam:{id:'asi533', w:11.31, h:11.31, px:3.76},
-  showFOV:false, biasFOV:false
+/* ---------- state ---------- */
+const state={night:false,compact:false,lat:37.16558,lon:-76.56841,hours:3,
+  clouds:35,cloudRisk:35,humidity:86,visibilityKm:14,moonPct:7,sunAlt:-45,moonAlt:-29,astroDark:true,
+  factor:1.0,showFOV:false,biasFOV:false
 };
 
-/* ========== toggles & collapses ========== */
-$("#toggleNight").addEventListener("click",()=>{
-  state.night=!state.night; document.body.classList.toggle("night",state.night);
-  $("#toggleNight").textContent = state.night ? "Normal Mode" : "Night Mode";
-  toast(state.night?"Night mode on":"Night mode off");
-});
-$("#toggleCompact").addEventListener("click",()=>{
-  state.compact=!state.compact; $("#app").classList.toggle("compact",state.compact);
-  $("#toggleCompact").textContent = state.compact ? "Compact On" : "Compact Off";
-});
-$$(".chev").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    const key = btn.getAttribute("data-collapse");
-    const area = document.getElementById(`${key}-content`);
-    const open = area.style.display!== "none";
-    area.style.display = open ? "none" : "";
-    btn.querySelector("svg").style.transform = open ? "rotate(180deg)" : "rotate(0)";
-  });
-});
+/* ---------- toggles/collapse ---------- */
+$("#toggleNight").addEventListener("click",()=>{state.night=!state.night;document.body.classList.toggle("night",state.night);$("#toggleNight").textContent=state.night?"Normal Mode":"Night Mode";toast(state.night?"Night mode on":"Night mode off");});
+$("#toggleCompact").addEventListener("click",()=>{state.compact=!state.compact;$("#app").classList.toggle("compact",state.compact);$("#toggleCompact").textContent=state.compact?"Compact On":"Compact Off";});
+$$(".chev").forEach(b=>b.addEventListener("click",()=>{const key=b.dataset.collapse;const area=$(`#${key}-content`);const open=area.style.display!=="none";area.style.display=open?"none":"";b.querySelector("svg").style.transform=open?"rotate(180deg)":"rotate(0)";}));
 
-/* ========== STATUS ========== */
+/* ---------- status ---------- */
 function applyStatus(){
-  const go = state.clouds <= 40 && state.visibilityKm >= 15 && state.astroDark;
-  $("#statusText").textContent = `${go?"GO":"NO-GO"} · Clouds ~${fmtPct(state.clouds)} · Vis ${state.visibilityKm||"—"} km · ${state.astroDark?"Astro dark":"Too bright"}`;
-  $("#updated").textContent = "Updated " + new Date().toLocaleTimeString();
-  $("#sunAlt").textContent = `Sun alt ${state.sunAlt>0?"+":""}${state.sunAlt}°`;
-  $("#moonIllum").textContent = `Moon ${state.moonPct}%`;
-  $("#alt").textContent = `Alt ${state.moonAlt}°`;
-  $("#sunAltSmall").textContent = `Sun alt ${state.sunAlt}°`;
-  $("#moonPct").textContent = `${state.moonPct}%`;
-  $("#moonAltSmall").textContent = `Alt ${state.moonAlt}°`;
+  const go = (state.cloudRisk<=60) && (state.visibilityKm>=12) && state.astroDark;
+  $("#statusText").textContent = `${go?"GO":"NO-GO"} · Clouds ~${pct(state.cloudRisk)} · Vis ${state.visibilityKm} km · ${state.astroDark?"Astro dark":"Too bright"}`;
+  $("#updated").textContent="Updated "+new Date().toLocaleTimeString();
+  $("#sunAlt").textContent=`Sun alt ${state.sunAlt}°`;
+  $("#moonIllum").textContent=`Moon ${state.moonPct}%`;
+  $("#transTag").textContent=`Transparency ${$("#transWord").textContent||"—"}`;
 }
 
-/* ========== SKY & CLOUDS ========== */
-$("#cloudSlider").addEventListener("input",e=>{
-  state.clouds = parseInt(e.target.value,10);
-  $("#cloudPct").textContent = fmtPct(state.clouds);
-});
-$("#useClouds").addEventListener("click",()=>{ applyStatus(); toast(`Clouds set to ${fmtPct(state.clouds)}`); });
-
-$("#calcNow").addEventListener("click",async ()=>{
-  await calcClouds(); applyStatus(); toast("Calculated sky & clouds");
-});
-$("#calcClouds").addEventListener("click",async ()=>{
-  await calcClouds(); toast(`Clouds calculated: ${fmtPct(state.clouds)}`);
-});
-$("#useGPS").addEventListener("click",()=>{
-  if(!navigator.geolocation){ toast("GPS unavailable"); return; }
-  navigator.geolocation.getCurrentPosition(p=>{
-    state.lat = +p.coords.latitude.toFixed(5);
-    state.lon = +p.coords.longitude.toFixed(5);
-    $("#lat").value=state.lat; $("#lon").value=state.lon;
-    toast("GPS set");
-  },()=>toast("GPS denied"));
-});
-
-$("#lat").addEventListener("change",e=>state.lat=parseFloat(e.target.value));
-$("#lon").addEventListener("change",e=>state.lon=parseFloat(e.target.value));
-$("#hours").addEventListener("change",e=>state.hours=parseInt(e.target.value,10));
-
-async function calcClouds(){
-  const {lat,lon,hours}=state;
+/* ---------- conditions ---------- */
+$("#cloudSlider").addEventListener("input",e=>{state.clouds=+e.target.value;state.cloudRisk=state.clouds;$("#cloudPct").textContent=pct(state.clouds);$("#cloudsBig").textContent=pct(state.clouds);applyStatus();});
+$("#useClouds").addEventListener("click",()=>{toast(`Clouds set to ${pct(state.clouds)}`);});
+$("#calcNow").addEventListener("click",async()=>{await calcWeather();toast(`Calculated (cloud risk ${pct(state.cloudRisk)})`);});
+async function calcWeather(){
   try{
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover,relative_humidity_2m,visibility&timezone=auto`;
-    const r = await fetch(url,{cache:"no-store"});
-    const j = await r.json();
-    const cc = j?.hourly?.cloud_cover || [];
-    const rh = j?.hourly?.relative_humidity_2m || [];
-    const vis = j?.hourly?.visibility || [];
-    const n = clamp(hours,1,12);
-    const mean = arr => arr.slice(0,n).reduce((a,b)=>a+(+b||0),0)/Math.max(1,Math.min(n,arr.length));
-    const ccAvg = Math.round(mean(cc));
-    const rhAvg = Math.round(mean(rh));
-    const visAvgKm = Math.round((mean(vis)||0)/1000);
-    if(Number.isFinite(ccAvg)) state.clouds = ccAvg;
-    if(Number.isFinite(rhAvg)) state.humidity = rhAvg;
-    if(Number.isFinite(visAvgKm)) state.visibilityKm = visAvgKm;
-    $("#cloudSlider").value = state.clouds;
-    $("#cloudPct").textContent = fmtPct(state.clouds);
-    $("#cloudSource").textContent = "From Open-Meteo (hourly) • slider overrides";
-    const aod = 0.12; // placeholder
-    const score = (100-state.clouds) - (state.humidity*0.2) + (state.visibilityKm*1.2) - (aod*100*0.6);
-    const word = score>75 ? "Great" : score>55 ? "Good" : score>35 ? "Fair" : "Bad";
-    $("#transWord").textContent = word;
-    $("#humidity").textContent = `${state.humidity}%`;
-    $("#transDetails").textContent = `AOD ${aod.toFixed(2)} · PM2.5 — · RH ${state.humidity}% · Vis ${state.visibilityKm}km · ΔT 0.7°C · 0`;
-  }catch(e){
-    $("#cloudSource").textContent = "From slider (Open-Meteo unavailable)";
-    toast("Open-Meteo unavailable — using slider");
-  }
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${state.lat}&longitude=${state.lon}&hourly=cloud_cover,relative_humidity_2m,visibility&timezone=auto`;
+    const r=await fetch(url,{cache:"no-store"});const j=await r.json();
+    const n=clamp(state.hours,1,12);
+    const cc=j?.hourly?.cloud_cover||[];const rh=j?.hourly?.relative_humidity_2m||[];const vis=j?.hourly?.visibility||[];
+    const slice=(a)=>a.slice(0,n).map(x=>+x||0);
+    const ccArr=slice(cc); const rhArr=slice(rh); const visArr=slice(vis);
+    const mean=a=>a.reduce((s,v)=>s+v,0)/Math.max(1,a.length);
+    state.clouds=Math.round(mean(ccArr));
+    state.cloudRisk=Math.round(Math.max(...ccArr)); // window max -> more realistic for “is it going to be cloudy”
+    state.humidity=Math.round(mean(rhArr));
+    state.visibilityKm=Math.round((mean(visArr)||0)/1000);
+    $("#cloudPct").textContent=pct(state.clouds);$("#cloudsBig").textContent=pct(state.cloudRisk);
+    $("#cloudSrc").textContent="From Open-Meteo (window max)";
+    const aod=0.12;const score=(100-state.cloudRisk)-(state.humidity*0.2)+(state.visibilityKm*1.2)-(aod*100*0.6);
+    const word=score>75?"Great":score>55?"Good":score>35?"Fair":"Bad";
+    $("#transWord").textContent=word;
+    $("#transDetails").textContent=`AOD ${aod.toFixed(2)} · PM2.5 — · RH ${state.humidity}% · Vis ${state.visibilityKm}km · ΔT 0.7°C · 0`;
+    $("#humidity").textContent=`${state.humidity}%`;
+    $("#moonPct").textContent=`${state.moonPct}%`;$("#moonAltSmall").textContent=`Alt ${state.moonAlt}°`;
+    applyStatus();
+  }catch(e){$("#cloudSrc").textContent="From slider (Open-Meteo unavailable)";toast("Open-Meteo unavailable — using slider");}
 }
 
-/* ========== RIG: data & compute ========== */
-const SCOPES = {
-  sv503:{name:"SVBONY SV503 80ED", fl:560, ap:80},
-  gt71:{name:"William Optics GT71", fl:420, ap:71},
-  redcat:{name:"RedCat 51", fl:250, ap:51},
-  fra400:{name:"Askar FRA400", fl:400, ap:72},
-  custom:{name:"Custom", fl:null, ap:null}
-};
-const CAMS = {
-  asi533:{name:"ZWO ASI533", w:11.31, h:11.31, px:3.76},
-  asi2600:{name:"ZWO ASI2600", w:23.50, h:15.70, px:3.76},
-  asi6200:{name:"ZWO ASI6200", w:36.00, h:24.00, px:3.76},
-  canon600d:{name:"Canon T3i / 600D", w:22.30, h:14.90, px:4.30},
-  custom:{name:"Custom", w:null, h:null, px:null}
-};
-function effFL(){ return (parseFloat($("#scopeFL").value)||0) * (state.factor||1); }
-function calcFOVScale(){
-  const fl = effFL();
-  const w = parseFloat($("#camW").value)||0;
-  const h = parseFloat($("#camH").value)||0;
-  const px = parseFloat($("#camPx").value)||0;
-  const fovX = fl>0 && w>0 ? (57.2958 * w / fl) : 0;
-  const fovY = fl>0 && h>0 ? (57.2958 * h / fl) : 0;
-  const scale = fl>0 && px>0 ? (206.265 * px / fl) : 0;
-  $("#effFL").textContent = fl>0 ? `Eff. FL: ${fl.toFixed(0)} mm` : "Eff. FL: —";
-  $("#fovOut").textContent = (fovX&&fovY) ? `${fovX.toFixed(2)} × ${fovY.toFixed(2)}` : "— × —";
-  $("#scaleOut").textContent = scale ? scale.toFixed(2) : "—";
+/* ---------- rig compute + UI ---------- */
+const SCOPES={sv503:{fl:560,ap:80},gt71:{fl:420,ap:71},redcat:{fl:250,ap:51},fra400:{fl:400,ap:72},custom:{fl:null,ap:null}};
+const CAMS={asi533:{w:11.31,h:11.31,px:3.76},asi2600:{w:23.5,h:15.7,px:3.76},asi6200:{w:36,h:24,px:3.76},canon600d:{w:22.3,h:14.9,px:4.3},custom:{w:null,h:null,px:null}};
+function effFL(){return (+$("#scopeFL").value||0)*(state.factor||1);}
+function calcRig(){
+  const fl=effFL();const w=+$("#camW").value||0;const h=+$("#camH").value||0;const px=+$("#camPx").value||0;
+  const fovX=fl>0&&w>0?57.2958*w/fl:0;const fovY=fl>0&&h>0?57.2958*h/fl:0;const scale=fl>0&&px>0?206.265*px/fl:0;
+  $("#effFL").textContent=fl?`Eff. FL: ${fl.toFixed(0)} mm`:"Eff. FL: —";
+  const fovTxt=(fovX&&fovY)?`${fovX.toFixed(2)} × ${fovY.toFixed(2)}`:"— × —";
+  $("#sumEff").textContent=fl?`Eff. FL ${fl.toFixed(0)} mm`:"Eff. FL —";
+  $("#sumFOV").textContent=`FOV ${fovTxt}`;
+  $("#sumScale").textContent=scale?`Scale ${scale.toFixed(2)} "/px`:`Scale — "/px`;
 }
-$("#scopeSel").addEventListener("change",()=>{
-  const s = SCOPES[$("#scopeSel").value];
-  if(s){ $("#scopeFL").value = s.fl ?? ""; $("#scopeAp").value = s.ap ?? ""; }
-  calcFOVScale();
-});
-$("#camSel").addEventListener("change",()=>{
-  const c = CAMS[$("#camSel").value];
-  if(c){ $("#camW").value=c.w??""; $("#camH").value=c.h??""; $("#camPx").value=c.px??""; }
-  calcFOVScale();
-});
-$$(".redbtn").forEach(b=>{
-  b.addEventListener("click",()=>{
-    state.factor = parseFloat(b.dataset.f);
-    $$(".redbtn").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");
-    calcFOVScale();
-    toast(`Optical factor ${state.factor}×`);
-  });
-});
-["#scopeFL","#scopeAp","#camW","#camH","#camPx"].forEach(id=>{
-  $(id).addEventListener("input", calcFOVScale);
-});
-$("#biasFOV").addEventListener("change",(e)=>{ state.biasFOV = e.target.checked; toast(state.biasFOV?"Bias to FOV: on":"Bias to FOV: off"); });
-$("#showFOV").addEventListener("change",(e)=>{
-  state.showFOV = e.target.checked;
-  $$(".thumb").forEach(t=> t.classList.toggle("fov", state.showFOV));
-});
-$("#calcFlip").addEventListener("click",()=>{
-  $("#flipEta").textContent = "≈ 2h (stub)";
-  toast("Meridian flip ETA is a placeholder; needs target RA/Dec");
-});
-
-/* Presets (localStorage) */
-function loadPresetList(){
-  const list = JSON.parse(localStorage.getItem("rig.presets")||"[]");
-  const sel = $("#presetList");
-  sel.innerHTML = '<option value="">(none saved)</option>' + list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("");
-  return list;
+function setActiveFactor(){
+  $$(".redbtn").forEach(x=>x.classList.toggle("active",x.dataset.f===String(state.factor)));
 }
-function savePresetList(list){ localStorage.setItem("rig.presets", JSON.stringify(list)); }
-$("#savePreset").addEventListener("click",()=>{
-  const name = ($("#presetName").value||"").trim();
-  if(!name){ toast("Enter a preset name"); return; }
-  const list = loadPresetList();
-  const obj = {
-    name,
-    scopeSel: $("#scopeSel").value,
-    scopeFL: $("#scopeFL").value,
-    scopeAp: $("#scopeAp").value,
-    factor: state.factor,
-    camSel: $("#camSel").value,
-    camW: $("#camW").value,
-    camH: $("#camH").value,
-    camPx: $("#camPx").value
-  };
-  const idx = list.findIndex(p=>p.name.toLowerCase()===name.toLowerCase());
-  if(idx>=0) list[idx]=obj; else list.push(obj);
-  savePresetList(list); loadPresetList();
-  toast("Preset saved");
-});
-$("#deletePreset").addEventListener("click",()=>{
-  const list = loadPresetList();
-  const sel = $("#presetList");
-  if(!sel.value){ toast("Select a preset to delete"); return; }
-  list.splice(parseInt(sel.value,10),1);
-  savePresetList(list); loadPresetList();
-  toast("Preset deleted");
-});
-$("#presetList").addEventListener("change",()=>{
-  const list = loadPresetList();
-  const i = parseInt($("#presetList").value,10);
-  if(Number.isFinite(i) && list[i]){
-    const p = list[i];
-    $("#presetName").value = p.name;
-    $("#scopeSel").value = p.scopeSel; $("#scopeFL").value = p.scopeFL; $("#scopeAp").value = p.scopeAp;
-    state.factor = parseFloat(p.factor)||1.0; $$(".redbtn").forEach(x=>x.classList.toggle("active", x.dataset.f==String(state.factor)));
-    $("#camSel").value = p.camSel; $("#camW").value = p.camW; $("#camH").value = p.camH; $("#camPx").value = p.camPx;
-    calcFOVScale();
-    toast("Preset loaded");
-  }
-});
+$("#scopeSel").addEventListener("change",()=>{const s=SCOPES[$("#scopeSel").value];if(s){$("#scopeFL").value=s.fl??"";$("#scopeAp").value=s.ap??"";}calcRig();});
+$("#camSel").addEventListener("change",()=>{const c=CAMS[$("#camSel").value];if(c){$("#camW").value=c.w??"";$("#camH").value=c.h??"";$("#camPx").value=c.px??"";}calcRig();});
+$$(".redbtn").forEach(b=>b.addEventListener("click",()=>{state.factor=parseFloat(b.dataset.f);setActiveFactor();calcRig();toast(`Optical factor ${state.factor}×`);}));
+["#scopeFL","#scopeAp","#camW","#camH","#camPx"].forEach(id=>$(id).addEventListener("input",calcRig));
+$("#biasFOV").addEventListener("change",(e)=>{state.biasFOV=e.target.checked;toast(state.biasFOV?"Bias to FOV: on":"Bias to FOV: off");});
+$("#showFOV").addEventListener("change",(e)=>{$$(".thumb").forEach(t=>t.classList.toggle("fov",e.target.checked));});
+$("#calcFlip").addEventListener("click",()=>{$("#flipEta").textContent="≈ 2h (stub)";toast("Meridian flip ETA is a placeholder; needs target RA/Dec");});
 
-/* ========== TOP 5 (external links) ========== */
-const TOP5 = [
-  {id:"M27", name:"Dumbbell Nebula", score:196, alt:"82°", sep:"142°"},
-  {id:"M31", name:"Andromeda Galaxy", score:183, alt:"45°", sep:"140°"},
-  {id:"M33", name:"Triangulum Galaxy", score:175, alt:"46°", sep:"145°"},
-  {id:"M57", name:"Ring Nebula", score:155, alt:"44°", sep:"115°"},
-  {id:"M13", name:"Hercules Globular", score:120, alt:"24°", sep:"90°"}
+/* presets */
+function loadPresetList(){const list=JSON.parse(localStorage.getItem("rig.presets")||"[]");const sel=$("#presetList");sel.innerHTML='<option value="">(none saved)</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("");return list;}
+function savePresetList(list){localStorage.setItem("rig.presets",JSON.stringify(list));}
+$("#savePreset").addEventListener("click",()=>{const name=($("#presetName").value||"").trim();if(!name){toast("Enter a preset name");return;}const list=loadPresetList();const obj={name,scopeSel:$("#scopeSel").value,scopeFL:$("#scopeFL").value,scopeAp:$("#scopeAp").value,factor:state.factor,camSel:$("#camSel").value,camW:$("#camW").value,camH:$("#camH").value,camPx:$("#camPx").value};const idx=list.findIndex(p=>p.name.toLowerCase()===name.toLowerCase());if(idx>=0)list[idx]=obj;else list.push(obj);savePresetList(list);loadPresetList();toast("Preset saved");});
+$("#deletePreset").addEventListener("click",()=>{const list=loadPresetList();const sel=$("#presetList");if(!sel.value){toast("Select a preset to delete");return;}list.splice(parseInt(sel.value,10),1);savePresetList(list);loadPresetList();toast("Preset deleted");});
+$("#presetList").addEventListener("change",()=>{const list=loadPresetList();const i=parseInt($("#presetList").value,10);if(Number.isFinite(i)&&list[i]){const p=list[i];$("#presetName").value=p.name;$("#scopeSel").value=p.scopeSel;$("#scopeFL").value=p.scopeFL;$("#scopeAp").value=p.scopeAp;state.factor=parseFloat(p.factor)||1.0;setActiveFactor();$("#camSel").value=p.camSel;$("#camW").value=p.camW;$("#camH").value=p.camH;$("#camPx").value=p.camPx;calcRig();toast("Preset loaded");}});
+
+/* ---------- Top 5 (fixed links) ---------- */
+const TOP5=[
+  {id:"M27",name:"Dumbbell Nebula",score:196,alt:"82°",sep:"142°",wiki:"Messier_27"},
+  {id:"M31",name:"Andromeda Galaxy",score:183,alt:"45°",sep:"140°",wiki:"Andromeda_Galaxy"},
+  {id:"M33",name:"Triangulum Galaxy",score:175,alt:"46°",sep:"145°",wiki:"Messier_33"},
+  {id:"M57",name:"Ring Nebula",score:155,alt:"44°",sep:"115°",wiki:"Messier_57"},
+  {id:"M13",name:"Hercules Globular",score:120,alt:"24°",sep:"90°",wiki:"Messier_13"}
 ];
-const M_WIKI = id => `https://en.wikipedia.org/wiki/${id}`;
-function renderTop5(){
-  const ol=$("#top5List"); ol.innerHTML="";
-  TOP5.forEach(o=>{
-    const li=document.createElement("li");
-    li.innerHTML = `<a href="${M_WIKI(o.id)}" target="_blank" rel="noopener">${o.id}</a> — ${o.name} — alt ${o.alt} — ${o.sep} from Moon — ${o.score}%`;
-    ol.appendChild(li);
-  });
-}
+function renderTop5(){const ol=$("#top5List");ol.innerHTML="";TOP5.forEach(o=>{const li=document.createElement("li");li.innerHTML=`<a href="https://en.wikipedia.org/wiki/${o.wiki}" target="_blank" rel="noopener">${o.id}</a> — ${o.name} — alt ${o.alt} — ${o.sep} from Moon — ${o.score}%`;ol.appendChild(li);});}
 
-/* ========== CATALOG (scroll + fallback + FOV overlay) ========== */
-const CATALOG = [
-  {type:"GX", ra:"0.71h", dec:"41.3°", name:"M31", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/M31bobo.jpg/256px-M31bobo.jpg"},
-  {type:"GX", ra:"1.55h", dec:"30.7°", name:"M33", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Triangulum_Galaxy_by_Gianni_Puga.jpg/256px-Triangulum_Galaxy_by_Gianni_Puga.jpg"},
-  {type:"PN", ra:"19.89h", dec:"22.7°", name:"M27", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/M27_-_Dumbbell_Nebula.jpg/256px-M27_-_Dumbbell_Nebula.jpg"},
-  {type:"PN", ra:"18.89h", dec:"33.0°", name:"M57", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/M57_The_Ring_Nebula.JPG/256px-M57_The_Ring_Nebula.JPG"},
-  {type:"GC", ra:"16.70h", dec:"36.5°", name:"M13", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/M13_-_The_Great_Hercules_Cluster.jpg/256px-M13_-_The_Great_Hercules_Cluster.jpg"},
+/* ---------- Catalog ---------- */
+const CATALOG=[
+  {type:"GX",ra:"0.71h",dec:"41.3°",name:"M31",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/M31bobo.jpg/256px-M31bobo.jpg"},
+  {type:"GX",ra:"1.55h",dec:"30.7°",name:"M33",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Triangulum_Galaxy_by_Gianni_Puga.jpg/256px-Triangulum_Galaxy_by_Gianni_Puga.jpg"},
+  {type:"PN",ra:"19.89h",dec:"22.7°",name:"M27",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/M27_-_Dumbbell_Nebula.jpg/256px-M27_-_Dumbbell_Nebula.jpg"},
+  {type:"PN",ra:"18.89h",dec:"33.0°",name:"M57",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/M57_The_Ring_Nebula.JPG/256px-M57_The_Ring_Nebula.JPG"},
+  {type:"GC",ra:"16.70h",dec:"36.5°",name:"M13",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/M13_-_The_Great_Hercules_Cluster.jpg/256px-M13_-_The_Great_Hercules_Cluster.jpg"},
 ];
 function renderCatalog(){
-  const body=$("#catalogBody"); body.innerHTML="";
+  const body=$("#catalogBody");body.innerHTML="";
   CATALOG.forEach(r=>{
-    const row=document.createElement("div");
-    row.className="tbl-row";
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-    if(state.showFOV) thumb.classList.add("fov");
-    thumb.style.backgroundImage = `url('${r.img}')`;
-    thumb.innerHTML = `<span>${r.name}</span>`;
-    // fallback if image fails to load
-    const imgTest = new Image();
-    imgTest.onload = ()=>{}; imgTest.onerror=()=>{ thumb.style.backgroundImage='none'; thumb.style.background='#0b1b23'; };
-    imgTest.src = r.img;
-
-    row.innerHTML = `
-      <div class="cell">${r.type}</div>
-      <div class="cell">${r.ra}</div>
-      <div class="cell">${r.dec}</div>
-      <div class="cell">${r.name}</div>
-      <div class="cell"></div>`;
+    const row=document.createElement("div");row.className="tbl-row";
+    const thumb=document.createElement("div");thumb.className="thumb";thumb.style.backgroundImage=`url('${r.img}')`;thumb.innerHTML=`<span>${r.name}</span>`;
+    const test=new Image();test.onerror=()=>{thumb.style.background="linear-gradient(180deg,#0b1b23,#0b1b23)";};test.src=r.img;
+    row.innerHTML=`<div class="cell">${r.type}</div><div class="cell">${r.ra}</div><div class="cell">${r.dec}</div><div class="cell">${r.name}</div><div class="cell"></div>`;
     row.querySelectorAll(".cell")[4].appendChild(thumb);
     body.appendChild(row);
   });
 }
 
-/* ========== init ========== */
-function initRigDefaults(){
-  $("#presetName").placeholder = "SV503_533_0.8x";
-  $("#scopeSel").value = "sv503";
-  $("#camSel").value = "asi533";
-  state.factor = 1.0;
-  $$(".redbtn").forEach(x=>x.classList.toggle("active", x.dataset.f==="1.0"));
-  calcFOVScale();
-  loadPresetList(); // first run empty; user can save
+/* ---------- init ---------- */
+function initRig(){
+  $("#scopeSel").value="sv503";$("#camSel").value="asi533";state.factor=0.8; // default to 0.8x for your preset
+  setActiveFactor();calcRig();loadPresetList();
 }
-renderTop5();
-renderCatalog();
-initRigDefaults();
-applyStatus();
-$("#cloudPct").textContent = fmtPct(state.clouds);
-setTimeout(()=>calcClouds().then(applyStatus), 180);
+renderTop5();renderCatalog();initRig();calcWeather();
 </script>
 </body>
 </html>
