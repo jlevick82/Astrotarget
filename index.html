@@ -1,500 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Go/No-Go v28.9</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go/No-Go v28.5</title>
 <style>
-  :root{
-    --bg:#0f1b22; --panel:#111c23; --panel-2:#0c151b;
-    --text:#dbe7ef; --muted:#9fb3c1; --accent:#8bd3ff;
-    --ok:#2dc070; --bad:#ff6b6b; --ring:rgba(255,255,255,.08);
-    --shadow:0 12px 36px rgba(0,0,0,.35); --radius:16px;
-  }
-  .night{--bg:#060707;--panel:#090a0b;--panel-2:#070808;--text:#ffddd3;--muted:#f2b7a6;--accent:#ff9b7a;--ok:#ff5d5d;--bad:#ff8a8a;--ring:rgba(255,170,150,.15)}
-  html,body{height:100%}
-  body{margin:0;background:radial-gradient(1200px 700px at 50% -200px,#123,#0a1217) fixed,var(--bg);color:var(--text);font:15.5px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-  body.night{background:radial-gradient(1200px 700px at 50% -200px,#230e0e,#090909) fixed,var(--bg)}
-  *{box-sizing:border-box}
-  a{color:#9fd1ff}.night a{color:#ffb7a6}
-  .wrap{max-width:980px;margin:20px auto;padding:0 14px 80px}
-  header.app{display:flex;align-items:flex-end;gap:12px;margin:0 0 10px}
-  .title{font-weight:900;letter-spacing:.5px;font-size:38px}
-  .ver{opacity:.65;font-weight:800;font-size:28px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{appearance:none;border:0;outline:0;padding:10px 14px;border-radius:999px;background:linear-gradient(#1a2a34,#141f26);color:var(--text);box-shadow:var(--shadow);cursor:pointer}
-  .night .btn{background:linear-gradient(#1a0f0f,#120b0b)}
-  .btn.small{padding:7px 10px;font-size:13px}
-  .btn.tiny{padding:6px 9px;font-size:12px}
-  .badge{padding:6px 10px;border-radius:999px;border:1px solid var(--ring);background:#0e171c;white-space:nowrap}
-  .night .badge{background:#150b0b}
-  .chip{display:inline-flex;align-items:center;padding:10px 14px;border-radius:999px;background:#0f1a20;border:1px solid var(--ring)}
-  .chip.ok{background:#0e2216;border-color:#205b35}.night .chip.ok{background:#2a0e0e;border-color:#6b2a2a}
-  .chip.bad{background:#2a1414;border-color:#6b2a2a}
-  .pill{display:inline-flex;align-items:center;padding:8px 12px;background:#0f1a20;border:1px solid var(--ring);border-radius:999px}
-  .night .pill{background:#150b0b}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--ring);border-radius:var(--radius);box-shadow:var(--shadow);margin:12px 0;overflow:hidden}
-  .card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 14px}
-  .card-title{font-size:24px;font-weight:850;letter-spacing:.2px}
-  .chev{width:38px;height:38px;border-radius:12px;background:linear-gradient(#18242c,#121b22);border:1px solid var(--ring);display:grid;place-items:center;color:#a9bdc9;cursor:pointer}
-  .night .chev{background:linear-gradient(#2a1515,#180d0d);color:#f0b4a3}
-  .chev svg{transition:transform .2s ease}.chev[aria-expanded="true"] svg{transform:rotate(180deg)}
-  .card-body{padding:12px 14px 16px}
-  .grid{display:grid;gap:10px}
-  .cols2fixed{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .cols3{grid-template-columns:repeat(3,1fr)}
-  @media (max-width:820px){.cols2fixed,.cols3{grid-template-columns:1fr}}
-  .kv{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--ring);background:#0f1a20}
-  .night .kv{background:#160b0b}
-  .kv h4{margin:0;font-weight:700;letter-spacing:.2px;color:#b7c7d1;font-size:13.5px}.night .kv h4{color:#ffbcae}
-  .big{font-size:28px;font-weight:900}
-  input[type="text"],input[type="number"],select{width:100%;padding:10px 12px;border-radius:12px;color:var(--text);background:#0f1a20;border:1px solid var(--ring)}
-  .night input,.night select{background:#160b0b}
-  .seg{display:flex;gap:8px;flex-wrap:wrap}
-  .seg .toggle{padding:8px 12px;border-radius:12px;border:1px solid var(--ring);background:#0f1a20;cursor:pointer;user-select:none}
-  .night .seg .toggle{background:#160b0b}
-  .seg .toggle.active{outline:2px solid var(--accent);box-shadow:0 0 0 6px rgba(139,211,255,.08) inset}
-  .night .seg .toggle.active{outline:2px solid #ff9b7a;box-shadow:0 0 0 6px rgba(255,155,122,.1) inset}
-  table{width:100%;border-collapse:separate;border-spacing:0 8px}
-  thead th{font-weight:700;color:#a9bdc9;text-align:left;padding:4px 8px}.night thead th{color:#f2b7a6}
-  tbody td{padding:12px 8px;background:#0f1a20;border-top:1px solid var(--ring);border-bottom:1px solid var(--ring)}
-  .night tbody td{background:#160b0b}
-  tbody tr td:first-child{border-left:1px solid var(--ring);border-top-left-radius:10px;border-bottom-left-radius:10px}
-  tbody tr td:last-child{border-right:1px solid var(--ring);border-top-right-radius:10px;border-bottom-right-radius:10px}
-  .thumb{position:relative;width:64px;height:64px;border-radius:12px;background:#0a141a;border:1px solid var(--ring);overflow:hidden;display:grid;place-items:center;color:#a9bdc9;font-weight:700}
-  .night .thumb{background:#140909}
-  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .thumb.fov:after{content:"";position:absolute;inset:18% 18%;border:2px dashed rgba(255,255,255,.7);border-radius:6px}
-  .night .thumb.fov:after{border-color:rgba(255,200,180,.85)}
-  .toast-wrap{position:fixed;left:0;right:0;bottom:18px;display:grid;place-items:center;pointer-events:none;z-index:9999}
-  .toast{pointer-events:auto;background:#0f1a20;border:1px solid var(--ring);box-shadow:var(--shadow);color:var(--text);border-radius:12px;padding:10px 12px;min-width:240px;text-align:center}
-  .compact .card-body{padding:10px}
-  .compact .kv{padding:10px}
-  .action-row{display:flex;gap:6px;flex-wrap:wrap}
-  .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-left:8px}
-  .flash{animation:flash 1s ease 1}@keyframes flash{0%{box-shadow:0 0 0 0 rgba(139,211,255,.0)}60%{box-shadow:0 0 0 10px rgba(139,211,255,.12)}100%{box-shadow:0 0 0 0 rgba(139,211,255,.0)}}
+body {
+  font-family: system-ui, sans-serif;
+  background: #0d1a20;
+  color: #d8e0e4;
+  margin: 0;
+  padding: 1rem;
+}
+h1 {
+  font-size: 2.2em;
+  font-weight: 700;
+  color: #f4f5f6;
+  margin-bottom: .2em;
+}
+button {
+  background: #1e2b33;
+  color: #d8e0e4;
+  border: 1px solid #2a3a45;
+  border-radius: 1em;
+  padding: .4em 1.2em;
+  margin: .25em;
+}
+button:hover { background: #283944; }
+.card {
+  background: #102027;
+  border-radius: 1em;
+  padding: 1em;
+  margin: .75em 0;
+  box-shadow: 0 0 4px #0008;
+}
+.grid {
+  display: grid;
+  gap: .6em;
+}
+.cols2fixed {
+  grid-template-columns: repeat(2,1fr);
+}
+.cols3 {
+  grid-template-columns: repeat(3,1fr);
+}
+
+/* Keep 2 columns longer */
+@media (max-width:480px){ .cols2fixed{grid-template-columns:1fr} }
+@media (max-width:680px){ .cols3{grid-template-columns:1fr} }
+
+input, select {
+  width: 100%;
+  border: 1px solid #2a3a45;
+  border-radius: .6em;
+  padding: .4em;
+  background: #14242c;
+  color: #d8e0e4;
+}
+.toast {
+  position: fixed;
+  bottom: 1.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2b3a44;
+  color: #fff;
+  padding: .6em 1.2em;
+  border-radius: 1em;
+  display: none;
+  z-index: 99;
+}
+.badge {
+  display:inline-block;
+  background:#0f4;
+  color:#021;
+  padding:.2em .8em;
+  border-radius:1em;
+  font-weight:600;
+  margin-left:.4em;
+}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="app">
-      <div class="title">Go/No-Go</div><div class="ver">v28.9</div>
-    </header>
 
-    <div class="toolbar">
-      <button id="btn-compact" class="btn">Compact Off</button>
-      <button id="btn-night" class="btn">Night Mode</button>
-    </div>
+<h1>Go/No-Go <span style="opacity:.6">v28.5</span></h1>
+<div>
+  <button id="btnCompact">Compact Off</button>
+  <button id="btnNight">Night Mode</button>
+</div>
 
-    <!-- 1) STATUS -->
-    <section id="card-status" class="card">
-      <div class="card-header">
-        <div class="card-title">Status</div>
-        <button class="chev" data-target="card-status" aria-expanded="true" title="Collapse/Expand">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="grid cols2fixed">
-          <div class="kv"><h4>Decision</h4><div id="status-decision" class="chip ok">GO</div></div>
-          <div class="kv"><h4>Clouds</h4><div id="status-clouds" class="pill">~—%</div></div>
-          <div class="kv"><h4>Visibility</h4><div id="status-vis" class="pill">Vis — km</div></div>
-          <div class="kv"><h4>Astro</h4><div class="pill" id="status-astro">Astro dark</div></div>
-        </div>
-        <div class="grid cols2fixed" style="margin-top:8px">
-          <div class="pill" id="status-updated">Updated —:—</div>
-          <div class="pill" id="status-sun">Sun alt —°</div>
-          <div class="pill" id="status-moon">Moon —%</div>
-          <div class="pill" id="status-transp">Transparency —</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 2) CONDITIONS -->
-    <section id="card-conditions" class="card">
-      <div class="card-header">
-        <div class="card-title">Conditions</div>
-        <button class="chev" data-target="card-conditions" aria-expanded="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="grid cols2fixed">
-          <div class="kv"><h4>Moon illum</h4><div class="big" id="cond-moon">—%</div><div class="muted" id="cond-moon-alt">Alt —°</div></div>
-          <div class="kv"><h4>Clouds (window max)</h4><div class="big" id="cond-clouds">—%</div><div class="muted">From Open-Meteo (window max)</div></div>
-          <div class="kv"><h4>Humidity</h4><div class="big" id="cond-hum">—%</div></div>
-          <div class="kv"><h4>Transparency</h4><div class="big" id="cond-transp">—</div><div class="muted" id="cond-transp-detail"></div></div>
-        </div>
-        <div class="pill" id="cond-updated" style="margin-top:8px">Updated —:—</div>
-      </div>
-    </section>
-
-    <!-- 3) QUICK SETUP -->
-    <section id="card-quicksetup" class="card">
-      <div class="card-header">
-        <div class="card-title">Quick setup</div>
-        <button class="chev" data-target="card-quicksetup" aria-expanded="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="grid cols3">
-          <div class="kv"><h4>Latitude (°)</h4><input id="in-lat" type="text" inputmode="decimal" placeholder="e.g. 37.16"></div>
-          <div class="kv"><h4>Longitude (°)</h4><input id="in-lon" type="text" inputmode="decimal" placeholder="e.g. -76.56"></div>
-          <div class="kv"><h4>Hours (window)</h4><input id="in-window" type="number" min="1" max="12" value="3"></div>
-        </div>
-        <div class="grid cols3" style="margin-top:8px">
-          <div class="kv"><h4>Location name</h4><input id="in-locname" type="text" placeholder="e.g., Backyard"></div>
-          <div class="kv"><h4>Saved locations</h4><select id="sel-locations"><option value="">(none)</option></select></div>
-          <div class="kv">
-            <h4>&nbsp;</h4>
-            <div class="action-row">
-              <button id="btn-gps" class="btn tiny">Use GPS</button>
-              <button id="btn-loc-save" class="btn tiny">Save</button>
-              <button id="btn-loc-load" class="btn tiny">Load</button>
-              <button id="btn-loc-del" class="btn tiny">Delete</button>
-              <button id="btn-calc" class="btn tiny">Calculate</button>
-            </div>
-            <div id="loc-badge" class="badge" style="display:none;margin-top:6px"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4) RIG -->
-    <section id="card-rig" class="card">
-      <div class="card-header">
-        <div class="card-title">Rig (Scope + Camera) <span id="rig-ready-dot" class="status-dot" style="display:none"></span></div>
-        <button class="chev" data-target="card-rig" aria-expanded="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="grid cols3" style="margin-bottom:8px">
-          <span id="rig-efffl" class="badge">Eff. FL — mm</span>
-          <span id="rig-fov" class="badge">FOV — × —</span>
-          <span id="rig-scale" class="badge">Scale — "/px</span>
-        </div>
-
-        <div class="grid cols3" style="margin-bottom:6px">
-          <div class="kv"><h4>Profile name</h4><input id="in-profile" type="text" placeholder="e.g., SV503_533_0.8x_Backyard"></div>
-          <div class="kv"><h4>Saved profiles</h4><select id="sel-profiles"><option value="">(none)</option></select></div>
-          <div class="kv">
-            <h4>&nbsp;</h4>
-            <div class="action-row">
-              <button id="btn-prof-save" class="btn tiny">Save</button>
-              <button id="btn-prof-load" class="btn tiny">Load</button>
-              <button id="btn-prof-del"  class="btn tiny">Delete</button>
-            </div>
-            <div id="scope-badge" class="badge" style="display:none;margin-top:6px"></div>
-          </div>
-        </div>
-
-        <div id="rig-editor">
-          <div class="kv">
-            <h4>Step 1 — Select Scope</h4>
-            <select id="sel-scope">
-              <option value="" selected disabled>Select Scope</option>
-              <option value="SVBONY SV503|560|80">SVBONY SV503 (560 × 80)</option>
-              <option value="William Z61|360|61">William Z61 (360 × 61)</option>
-              <option value="Celestron C8|2032|203">Celestron C8 (2032 × 203)</option>
-              <option value="custom">Custom…</option>
-            </select>
-            <div class="grid cols2" id="scope-custom" style="display:none;margin-top:8px">
-              <input id="in-fl" type="number" placeholder="Focal length (mm)">
-              <input id="in-dia" type="number" placeholder="Diameter (mm)">
-            </div>
-          </div>
-
-          <div class="kv">
-            <h4>Step 2 — Reducer / Barlow</h4>
-            <div class="seg" id="seg-reducer">
-              <span class="toggle" data-mul="0.63">0.63×</span>
-              <span class="toggle" data-mul="0.7">0.7×</span>
-              <span class="toggle" data-mul="0.8">0.8×</span>
-              <span class="toggle active" data-mul="1">1×</span>
-              <span class="toggle" data-mul="2">2×</span>
-            </div>
-            <div class="big" id="rig-efffl-editor" style="margin-top:6px">— mm</div>
-          </div>
-
-          <div class="kv">
-            <h4>Step 3 — Select Camera</h4>
-            <select id="sel-cam">
-              <option value="" selected disabled>Select Camera</option>
-              <option value="ZWO ASI533MC|11.31|11.31|3.76">ZWO ASI533MC (11.31×11.31 / 3.76µm)</option>
-              <option value="ZWO ASI294MC|19.1|13.0|4.63">ZWO ASI294MC (19.1×13.0 / 4.63µm)</option>
-              <option value="Sony A7 III|35.9|24.0|5.94">Sony A7 III (35.9×24.0 / 5.94µm)</option>
-              <option value="custom">Custom…</option>
-            </select>
-            <div class="grid cols3" id="cam-custom" style="display:none;margin-top:8px">
-              <input id="in-sx" type="number" step="0.01" placeholder="Sensor X (mm)">
-              <input id="in-sy" type="number" step="0.01" placeholder="Sensor Y (mm)">
-              <input id="in-px" type="number" step="0.01" placeholder="Pixel (µm)">
-            </div>
-          </div>
-
-          <div class="kv">
-            <h4>Step 4 — Options</h4>
-            <div class="seg" style="margin-bottom:8px">
-              <span id="hook-bias" class="toggle active">Bias Top-5 to FOV</span>
-              <span id="hook-fov" class="toggle active">FOV overlay on thumbs</span>
-            </div>
-            <div class="action-row">
-              <button id="btn-rig-calc" class="btn small">Recalculate</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5) TOP 5 -->
-    <section id="card-top5" class="card">
-      <div class="card-header"><div class="card-title">Top 5 Recommendations</div>
-        <button class="chev" data-target="card-top5" aria-expanded="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button></div>
-      <div class="card-body"><ol id="top5-list" style="padding-left:18px;margin:0;display:grid;gap:8px"></ol></div>
-    </section>
-
-    <!-- 6) CATALOG -->
-    <section id="card-catalog" class="card">
-      <div class="card-header"><div class="card-title">Catalog</div>
-        <button class="chev" data-target="card-catalog" aria-expanded="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button></div>
-      <div class="card-body" style="display:none">
-        <div class="grid cols2fixed">
-          <div class="kv"><h4>Search catalog (name/type)</h4><input id="search" type="text" placeholder="e.g., M31, galaxy, nebula…"></div>
-          <div class="kv"><h4>&nbsp;</h4><button id="btn-clear-search" class="btn small">Clear</button></div>
-        </div>
-        <div style="overflow:auto;margin-top:4px">
-          <table id="tbl-catalog">
-            <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
-            <tbody id="cat-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- 7) GO/NO-GO SETTINGS -->
-    <section id="card-gng-settings" class="card">
-      <div class="card-header"><div class="card-title">Go/No-Go Settings</div>
-        <button class="chev" data-target="card-gng-settings" aria-expanded="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button></div>
-      <div class="card-body" style="display:none">
-        <div class="grid cols3">
-          <div class="kv"><h4>Clouds threshold (max in window)</h4><input id="th-clouds" type="number" value="35" min="0" max="100"><div class="muted">GO if ≤ this %</div></div>
-          <div class="kv"><h4>Humidity threshold</h4><input id="th-hum" type="number" value="90" min="0" max="100"><div class="muted">Warn if ≥ this %</div></div>
-          <div class="kv"><h4>Visibility threshold (km)</h4><input id="th-vis" type="number" value="10" min="1" max="50"><div class="muted">Warn if &lt; this</div></div>
-        </div>
-        <div class="toolbar" style="gap:8px;margin-top:8px">
-          <button id="btn-save-gng" class="btn small">Save</button>
-          <span class="muted">Applies on next calculation</span>
-        </div>
-      </div>
-    </section>
-
-    <div class="toast-wrap" id="toast-wrap" style="display:none"><div class="toast" id="toast"></div></div>
+<!-- STATUS -->
+<div class="card">
+  <h2>Status</h2>
+  <div class="grid cols2fixed">
+    <div><strong>Decision</strong><br><span id="status-decision">GO</span></div>
+    <div><strong>Clouds</strong><br><span id="status-clouds">~0%</span></div>
+    <div><strong>Visibility</strong><br><span id="status-vis">15 km</span></div>
+    <div><strong>Astro</strong><br><span id="status-astro">Astro dark</span></div>
+    <div><strong>Updated</strong><br><span id="status-time">--:--</span></div>
+    <div><strong>Sun alt</strong><br><span id="status-sun">--</span></div>
+    <div><strong>Moon</strong><br><span id="status-moon">7%</span></div>
+    <div><strong>Transparency</strong><br><span id="status-trans">Okay</span></div>
   </div>
+</div>
+
+<!-- CONDITIONS -->
+<div class="card">
+  <h2>Conditions</h2>
+  <div class="grid cols2fixed">
+    <div><strong>Moon illum</strong><br><span id="cond-moon">7%</span></div>
+    <div><strong>Alt</strong><br><span id="cond-alt">-29°</span></div>
+    <div><strong>Clouds</strong><br><span id="cond-clouds">0%</span></div>
+    <div><strong>Humidity</strong><br><span id="cond-hum">74%</span></div>
+  </div>
+</div>
+
+<!-- QUICK SETUP -->
+<div class="card">
+  <h2>Quick setup</h2>
+  <div class="grid cols2fixed">
+    <div><label>Latitude (°)</label><input id="in-lat" value="37.16556"></div>
+    <div><label>Longitude (°)</label><input id="in-lon" value="-76.5684"></div>
+    <div><label>Hours (window)</label><input id="in-window" value="3"></div>
+    <div><label>Location name</label><input id="in-locname" placeholder="e.g., Backyard"></div>
+  </div>
+  <div style="margin-top:.5em;">
+    <label>Saved locations</label>
+    <select id="sel-locations"><option value="">(none)</option></select>
+  </div>
+  <div style="margin-top:.5em;">
+    <button id="btn-loc-gps">Use GPS</button>
+    <button id="btn-loc-save">Save</button>
+    <button id="btn-loc-load">Load</button>
+    <button id="btn-loc-del">Delete</button>
+    <button id="btn-calc">Calculate</button>
+    <span id="loc-badge" class="badge" style="display:none;">Loaded</span>
+  </div>
+</div>
+
+<!-- RIG -->
+<div class="card">
+  <h2>Rig (Scope + Camera)</h2>
+  <div class="grid cols2fixed">
+    <div><strong>Eff. FL</strong><br><span id="rig-fl">448 mm (0.8×)</span></div>
+    <div><strong>FOV</strong><br><span id="rig-fov">1.45 × 1.45</span></div>
+    <div><strong>Scale</strong><br><span id="rig-scale">1.73 "/px</span></div>
+    <div><strong>Scope</strong><br><span id="rig-scope">SV503 (560×80)</span></div>
+  </div>
+</div>
+
+<!-- TOP 5 -->
+<div class="card">
+  <h2>Top 5 Recommendations</h2>
+  <ol id="top5">
+    <li><a href="#">M33 – Triangulum Galaxy</a></li>
+    <li><a href="#">M31 – Andromeda Galaxy</a></li>
+    <li><a href="#">M27 – Dumbbell Nebula</a></li>
+    <li><a href="#">M57 – Ring Nebula</a></li>
+    <li><a href="#">M13 – Hercules Globular</a></li>
+  </ol>
+</div>
+
+<!-- CATALOG -->
+<div class="card">
+  <h2>Catalog</h2>
+  <input id="search" placeholder="e.g., M31, galaxy, nebula …">
+  <button id="btnClear">Clear</button>
+  <table style="width:100%;margin-top:.6em;border-collapse:collapse;">
+    <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
+    <tbody id="catalog-body">
+      <tr><td>M31 – Andromeda Galaxy</td><td>GX</td><td>0.71h</td><td>41.3°</td><td>[img]</td></tr>
+      <tr><td>M33 – Triangulum Galaxy</td><td>GX</td><td>1.55h</td><td>30.7°</td><td>[img]</td></tr>
+      <tr><td>M27 – Dumbbell Nebula</td><td>PN</td><td>19.89h</td><td>22.7°</td><td>[img]</td></tr>
+      <tr><td>M57 – Ring Nebula</td><td>PN</td><td>18.89h</td><td>33.0°</td><td>[img]</td></tr>
+      <tr><td>M13 – Hercules Globular</td><td>GC</td><td>16.70h</td><td>36.5°</td><td>[img]</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const ls = (k,v) => (v===undefined? JSON.parse(localStorage.getItem(k)||'null') : localStorage.setItem(k,JSON.stringify(v)));
-function toast(msg){ const w=$("#toast-wrap"), t=$("#toast"); t.textContent=msg; w.style.display="grid"; clearTimeout(toast._t); toast._t=setTimeout(()=>w.style.display="none",1500); }
-function setOpen(id,open){ const card=document.getElementById(id); const body=card.querySelector('.card-body'); const btn=card.querySelector('.chev'); body.style.display=open?"":"none"; btn.setAttribute('aria-expanded',String(open)); }
-function showBadge(el,msg){ el.textContent=msg; el.style.display="inline-block"; el.classList.add('flash'); clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.display="none"; el.classList.remove('flash'); },1500); }
+const $ = s=>document.querySelector(s);
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',2000);
+}
+function ls(k,v){ if(v!==undefined)localStorage.setItem(k,JSON.stringify(v)); return JSON.parse(localStorage.getItem(k)||'null'); }
 
-/* STATE */
-const state = {
-  lat: ls('lat') ?? null, lon: ls('lon') ?? null, windowH: ls('windowH') ?? 3,
-  locations: ls('locations') ?? {},
-  thresholds: ls('gng') ?? {clouds:35, hum:90, vis:10},
-  rig: ls('rig') ?? {initialized:false, reducer:1, hooks:{fov:true,bias:true}},
-  profiles: ls('profiles') ?? {},
-  catalog: [
-    {id:"M31", name:"Andromeda Galaxy", type:"GX", ra:"0.71h", dec:"41.3°", img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo11.jpg"},
-    {id:"M33", name:"Triangulum Galaxy", type:"GX", ra:"1.55h", dec:"30.7°", img:"https://upload.wikimedia.org/wikipedia/commons/9/94/Triangulum_Galaxy_Messier_33_from_the_Mount_Lemmon_SkyCenter_Schmidt-Camera.jpg"},
-    {id:"M27", name:"Dumbbell Nebula", type:"PN", ra:"19.89h", dec:"22.7°", img:"https://upload.wikimedia.org/wikipedia/commons/1/16/M27_Dumbbell_Nebula.jpg"},
-    {id:"M57", name:"Ring Nebula", type:"PN", ra:"18.89h", dec:"33.0°", img:"https://upload.wikimedia.org/wikipedia/commons/8/8e/M57_The_Ring_Nebula.JPG"},
-    {id:"M13", name:"Hercules Globular", type:"GC", ra:"16.70h", dec:"36.5°", img:"https://upload.wikimedia.org/wikipedia/commons/5/57/M13_-_The_Great_Globular_Cluster_in_Hercules.jpg"}
-  ],
-  wx:{clouds:null,vis:null,hum:null,aod:0.12,pm25:2.0,dT:0.7,astroDark:true,sunAlt:-45,moonPct:7,moonAlt:-29,updated:null,transpText:"—"}
+const state={locations:ls('locations')||{}, lat:37.16556, lon:-76.5684, windowH:3};
+
+// save location
+$("#btn-loc-save").onclick=()=>{
+  const name=$("#in-locname").value.trim();
+  if(!name){toast("Enter location name");return;}
+  state.locations[name]={lat:+$("#in-lat").value, lon:+$("#in-lon").value, windowH:+$("#in-window").value};
+  ls('locations',state.locations);
+  rebuildLocList(); toast("Location saved");
 };
 
-/* THEME / CHEVRONS */
-$("#btn-compact").addEventListener('click',()=>{ document.body.classList.toggle('compact'); $("#btn-compact").textContent=document.body.classList.contains('compact')?"Compact On":"Compact Off"; });
-$("#btn-night").addEventListener('click',()=>{ document.body.classList.toggle('night'); $("#btn-night").textContent=document.body.classList.contains('night')?"Normal Mode":"Night Mode"; });
-document.addEventListener('click',e=>{ const c=e.target.closest('.chev'); if(!c) return; const id=c.getAttribute('data-target')||c.closest('.card').id; setOpen(id, c.getAttribute('aria-expanded')!=='true'); });
+// load location
+$("#btn-loc-load").onclick=()=>{
+  const name=$("#sel-locations").value;
+  if(!name || !state.locations[name]){toast("Select a saved location");return;}
+  const loc=state.locations[name];
+  state.lat=loc.lat; state.lon=loc.lon; state.windowH=loc.windowH;
+  $("#in-lat").value=state.lat;
+  $("#in-lon").value=state.lon;
+  $("#in-window").value=state.windowH;
+  $("#in-locname").value=name;
+  $("#sel-locations").value=name;
+  ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH);
+  showBadge($("#loc-badge"),"Location loaded");
+};
 
-/* Helpers */
-function saveRig(){ ls('rig',state.rig); }
-function computeRig(r){ if(!r.fl||!r.dia||!r.reducer||!r.cam||!r.cam.sx||!r.cam.sy||!r.cam.px) return null;
-  const effFL=Math.round(r.fl*r.reducer), fovX=57.296*r.cam.sx/effFL, fovY=57.296*r.cam.sy/effFL, scale=206.265*r.cam.px/effFL; return {effFL,fovX,fovY,scale}; }
-function renderRigSummary(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null;
-  $("#rig-efffl").textContent=c?`Eff. FL ${c.effFL} mm (${r.reducer}×)`:"Eff. FL — mm";
-  $("#rig-fov").textContent=c?`FOV ${c.fovX.toFixed(2)} × ${c.fovY.toFixed(2)}`:"FOV — × —";
-  $("#rig-scale").textContent=c?`Scale ${c.scale.toFixed(2)} \"/px`:"Scale — \"/px";
-  $("#rig-ready-dot").style.display=r?"" :"none";
-}
-function hideScopeBadge(){ $("#scope-badge").style.display="none"; }
-
-/* Editor select matching */
-function chooseScopeOptionFromValues(fl,dia){
-  const sel=$("#sel-scope"); let matched=false;
-  [...sel.options].forEach(o=>{
-    if(!o.value || o.value==="custom") return;
-    const [,ofl,odia]=o.value.split("|").map(x=>x.trim());
-    if(Number(ofl)==fl && Number(odia)==dia){ sel.value=o.value; matched=true; }
-  });
-  if(!matched){ sel.value="custom"; $("#scope-custom").style.display=""; $("#in-fl").value=fl||""; $("#in-dia").value=dia||""; }
-  else { $("#scope-custom").style.display="none"; }
-}
-
-function chooseCamOptionFromValues(sx,sy,px){
-  const sel=$("#sel-cam"); let matched=false;
-  [...sel.options].forEach(o=>{
-    if(!o.value || o.value==="custom") return;
-    const [,osx,osy,opx]=o.value.split("|").map(x=>x.trim());
-    if(Number(osx)==sx && Number(osy)==sy && Number(opx)==px){ sel.value=o.value; matched=true; }
-  });
-  if(!matched){ sel.value="custom"; $("#cam-custom").style.display=""; $("#in-sx").value=sx||""; $("#in-sy").value=sy||""; $("#in-px").value=px||""; }
-  else { $("#cam-custom").style.display="none"; }
-}
-
-function syncReducerSeg(val){ $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active', Number(t.dataset.mul)===val)); }
-
-/* Sync editor from state */
-function syncEditorFromRig(){
-  if(!state.rig.initialized){
-    $("#sel-scope").value=""; $("#sel-cam").value="";
-    $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none";
-    $("#rig-efffl-editor").textContent="— mm"; syncReducerSeg(1); $("#rig-ready-dot").style.display="none"; return;
-  }
-  chooseScopeOptionFromValues(state.rig.fl,state.rig.dia);
-  chooseCamOptionFromValues(state.rig.cam?.sx,state.rig.cam?.sy,state.rig.cam?.px);
-  syncReducerSeg(state.rig.reducer||1);
-  const c=computeRig(state.rig); $("#rig-efffl-editor").textContent=c?`${c.effFL} mm`:"— mm";
-  $("#rig-ready-dot").style.display="";
-}
-function touchRig(){ renderRigSummary(); renderCatalog(); saveRig(); hideScopeBadge(); }
-
-/* Scope/Cam events */
-$("#sel-scope").addEventListener('change',e=>{ const v=e.target.value;
-  if(v==="custom"){ $("#scope-custom").style.display=""; }
-  else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; showBadge($("#scope-badge"),"Scope loaded"); }
-  $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
-
-["#in-fl","#in-dia"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.fl=Number($("#in-fl").value||0); state.rig.dia=Number($("#in-dia").value||0); state.rig.initialized=true; showBadge($("#scope-badge"),"Scope updated"); $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
-
-$("#seg-reducer").addEventListener('click',e=>{ const t=e.target.closest('.toggle'); if(!t) return; syncReducerSeg(Number(t.dataset.mul)); state.rig.reducer=Number(t.dataset.mul); state.rig.initialized=true; showBadge($("#scope-badge"),`${state.rig.reducer}× selected`); $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
-
-$("#sel-cam").addEventListener('change',e=>{ const v=e.target.value;
-  if(v==="custom"){ $("#cam-custom").style.display=""; state.rig.initialized=true; }
-  else{ const [,sx,sy,px]=v.split("|"); $("#cam-custom").style.display="none"; state.rig.cam={sx:Number(sx),sy:Number(sy),px:Number(px)}; state.rig.initialized=true; showBadge($("#scope-badge"),"Camera loaded"); }
-  $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
-
-["#in-sx","#in-sy","#in-px"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; state.rig.initialized=true; showBadge($("#scope-badge"),"Camera updated"); $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
-
-$("#hook-fov").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.fov = e.currentTarget.classList.contains('active'); touchRig(); });
-$("#hook-bias").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.bias = e.currentTarget.classList.contains('active'); saveRig(); toast(state.rig.hooks.bias?"Top-5 will bias to your FOV":"Top-5 bias disabled"); });
-
-/* Catalog + Search (consistent labels) */
-function messierWikiLink(id){ return `https://en.wikipedia.org/wiki/Messier_${id.replace('M','')}`; }
-function renderCatalog(){
-  const body=$("#cat-body"); if(!body) return; body.innerHTML="";
-  const q=($("#search")?.value||"").trim().toLowerCase();
-  const items=state.catalog.filter(x=>{
-    const n=(x.name||"").toLowerCase();
-    return !q || x.id.toLowerCase().includes(q) || x.type.toLowerCase().includes(q) || n.includes(q);
-  });
-  items.forEach(m=>{
-    const tr=document.createElement('tr');
-    const img=document.createElement('img');
-    img.loading="lazy"; img.referrerPolicy="no-referrer"; img.alt=m.id; img.src=m.img;
-    img.onerror=()=>{ const p=tr.querySelector('.thumb'); if(p){ p.classList.add('noimg'); p.innerHTML=m.id; } };
-    const thumb=document.createElement('div');
-    thumb.className=`thumb ${state.rig?.hooks?.fov?'fov':''}`;
-    thumb.appendChild(img);
-    const tdImg=document.createElement('td'); tdImg.appendChild(thumb);
-    tr.innerHTML=`<td><a href="${messierWikiLink(m.id)}" target="_blank">${m.id} — ${m.name}</a></td><td>${m.type}</td><td>${m.ra}</td><td>${m.dec}</td>`;
-    tr.appendChild(tdImg);
-    body.appendChild(tr);
+// delete
+$("#btn-loc-del").onclick=()=>{
+  const name=$("#sel-locations").value;
+  if(name&&state.locations[name]){delete state.locations[name];ls('locations',state.locations);rebuildLocList();toast("Deleted");}
+};
+function rebuildLocList(){
+  const sel=$("#sel-locations"); sel.innerHTML='<option value="">(none)</option>';
+  Object.keys(state.locations).forEach(k=>{
+    const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o);
   });
 }
-$("#search")?.addEventListener('input',renderCatalog);
-$("#btn-clear-search")?.addEventListener('click',()=>{ $("#search").value=""; renderCatalog(); });
+rebuildLocList();
 
-/* Weather / Decision */
-function decideGoNoGo(){
-  const th=state.thresholds; const clouds=state.wx.clouds ?? 100; const vis=state.wx.vis ?? 0; const hum=state.wx.hum ?? 100;
-  const go=(clouds<=th.clouds)&&(vis>=th.vis);
-  $("#status-decision").textContent=go?"GO":"NO-GO"; $("#status-decision").className=`chip ${go?'ok':'bad'}`;
-  $("#status-clouds").textContent=`~${clouds}%`; $("#status-vis").textContent=`Vis ${vis} km`;
-  $("#status-astro").textContent=state.wx.astroDark?"Astro dark":"Not astro dark";
-  $("#status-updated").textContent=state.wx.updated?`Updated ${state.wx.updated.toLocaleTimeString()}`:"Updated —:—";
-  $("#status-sun").textContent=`Sun alt ${state.wx.sunAlt}°`; $("#status-moon").textContent=`Moon ${state.wx.moonPct}%`;
-  $("#status-transp").textContent=`Transparency ${state.wx.transpText}`;
-  $("#cond-moon").textContent=`${state.wx.moonPct}%`; $("#cond-moon-alt").textContent=`Alt ${state.wx.moonAlt}°`;
-  $("#cond-clouds").textContent=`${clouds}%`; $("#cond-hum").textContent=`${hum}%`;
-  $("#cond-transp").textContent=state.wx.transpText; $("#cond-transp-detail").textContent=`AOD ${state.wx.aod} · PM2.5 ${state.wx.pm25} · RH ${hum}% · Vis ${vis}km · ΔT ${state.wx.dT}°C · 0`;
-  $("#cond-updated").textContent=$("#status-updated").textContent;
+function showBadge(el,text){
+  el.textContent=text; el.style.display='inline-block';
+  setTimeout(()=>el.style.display='none',2500);
 }
-$("#btn-save-gng").addEventListener('click',()=>{ state.thresholds.clouds=Number($("#th-clouds").value||state.thresholds.clouds); state.thresholds.hum=Number($("#th-hum").value||state.thresholds.hum); state.thresholds.vis=Number($("#th-vis").value||state.thresholds.vis); ls('gng',state.thresholds); toast("Go/No-Go thresholds saved"); });
-
-async function fetchWeather(){
-  if(state.lat==null || state.lon==null) return;
-  const hours=Math.max(1,Math.min(12,state.windowH));
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${state.lat}&longitude=${state.lon}&hourly=cloud_cover,relative_humidity_2m,visibility&forecast_days=1`;
-  try{ const r=await fetch(url); const j=await r.json();
-    const cc=j.hourly.cloud_cover.slice(0,hours), rh=j.hourly.relative_humidity_2m.slice(0,hours), vis=j.hourly.visibility.slice(0,hours).map(v=>Math.round(v/1000));
-    state.wx.clouds=Math.max(...cc); state.wx.hum=Math.round(rh.reduce((a,b)=>a+b)/rh.length); state.wx.vis=Math.min(...vis);
-    state.wx.updated=new Date(); let txt="Great"; if(state.wx.hum>90||state.wx.vis<8) txt="Bad"; else if(state.wx.hum>80||state.wx.vis<12) txt="Okay"; state.wx.transpText=txt;
-  }catch(e){ console.error(e); toast("Weather fetch failed"); }
-}
-
-/* Top-5 (consistent text) */
-function computeTop5(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null; const diag=c?Math.hypot(c.fovX,c.fovY):null;
-  const bias=r?.hooks?.bias?(m=>{ const want=(m.type==="GX"?2.0:m.type==="GC"?1.0:1.5); return diag?Math.max(0,1.5-Math.abs(diag-want)):1; }):(()=>1);
-  return state.catalog.map(m=>({m,score:Math.random()*0.8+bias(m)})).sort((a,b)=>b.score-a.score).slice(0,5).map(x=>x.m); }
-function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=`${m.id} — ${m.name}`; li.appendChild(a); ol.appendChild(li); }); setOpen('card-top5',true); }
-
-/* Quick setup + Locations */
-function loadBasics(){ if(state.lat!=null) $("#in-lat").value=state.lat; if(state.lon!=null) $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; refreshLocationDropdown(); refreshProfileDropdown(); }
-function refreshLocationDropdown(){ const sel=$("#sel-locations"); sel.innerHTML='<option value="">(none)</option>'; Object.keys(state.locations).sort().forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }); }
-$("#btn-gps").addEventListener('click',()=>{ if(!navigator.geolocation){ toast("GPS not available"); return; } navigator.geolocation.getCurrentPosition(pos=>{ state.lat=Number(pos.coords.latitude.toFixed(5)); state.lon=Number(pos.coords.longitude.toFixed(5)); $("#in-lat").value=state.lat; $("#in-lon").value=state.lon; ls('lat',state.lat); ls('lon',state.lon); showBadge($("#loc-badge"),"GPS set"); },()=>toast("GPS failed")); });
-$("#btn-loc-save").addEventListener('click',()=>{ const name=($("#in-locname").value||"").trim(); if(!name){ toast("Name the location first"); return; } state.locations[name]={lat:Number($("#in-lat").value||state.lat), lon:Number($("#in-lon").value||state.lon), windowH:Number($("#in-window").value||state.windowH)}; ls('locations',state.locations); refreshLocationDropdown(); $("#sel-locations").value=name; showBadge($("#loc-badge"),"Location saved"); });
-$("#btn-loc-load").addEventListener('click',()=>{ const name=$("#sel-locations").value; if(!name||!state.locations[name]){ toast("Select a saved location"); return; } const loc=state.locations[name]; state.lat=loc.lat; state.lon=loc.lon; state.windowH=loc.windowH; $("#in-lat").value=state.lat; $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); showBadge($("#loc-badge"),"Location loaded"); });
-
-/* Profiles (deep snapshot) */
-function refreshProfileDropdown(){ const sel=$("#sel-profiles"); sel.innerHTML='<option value="">(none)</option>'; Object.keys(state.profiles).sort().forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }); }
-$("#btn-prof-save").addEventListener('click',()=>{ const name=($("#in-profile").value||"").trim(); if(!name){ toast("Name the profile first"); return; }
-  const snap=JSON.parse(JSON.stringify({ rig:state.rig, thresholds:state.thresholds, lat:state.lat, lon:state.lon, windowH:state.windowH }));
-  state.profiles[name]=snap; ls('profiles',state.profiles); refreshProfileDropdown(); $("#sel-profiles").value=name; toast("Profile saved"); });
-$("#btn-prof-load").addEventListener('click',()=>{ const name=$("#sel-profiles").value; if(!name||!state.profiles[name]){ toast("Select a profile"); return; }
-  const s=JSON.parse(JSON.stringify(state.profiles[name]));  // deep copy back
-  state.rig=s.rig; state.thresholds=s.thresholds; state.lat=s.lat; state.lon=s.lon; state.windowH=s.windowH;
-  ls('rig',state.rig); ls('gng',state.thresholds); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH);
-  // reflect in UI
-  syncEditorFromRig(); renderRigSummary(); loadBasics(); renderCatalog(); decideGoNoGo(); showBadge($("#scope-badge"),"Profile loaded"); showBadge($("#loc-badge"),"Location loaded");
-});
-$("#btn-prof-del").addEventListener('click',()=>{ const name=$("#sel-profiles").value; if(!name||!state.profiles[name]){ toast("Select a profile"); return; } delete state.profiles[name]; ls('profiles',state.profiles); refreshProfileDropdown(); toast("Profile deleted"); });
-
-/* Calc buttons */
-async function fullRecalc(){ await fetchWeather(); decideGoNoGo(); renderTop5(computeTop5()); toast("Updated"); }
-$("#btn-calc").addEventListener('click', async ()=>{ state.lat=Number($("#in-lat").value||state.lat); state.lon=Number($("#in-lon").value||state.lon); state.windowH=Number($("#in-window").value||state.windowH); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); await fullRecalc(); });
-$("#btn-rig-calc").addEventListener('click', async ()=>{ await fullRecalc(); });
-
-/* Boot */
-document.addEventListener('DOMContentLoaded',()=>{
-  setOpen('card-status',true); setOpen('card-conditions',true); setOpen('card-quicksetup',true); setOpen('card-rig',true);
-  setOpen('card-top5',false); setOpen('card-catalog',false); setOpen('card-gng-settings',false);
-  $("#th-clouds").value=state.thresholds.clouds; $("#th-hum").value=state.thresholds.hum; $("#th-vis").value=state.thresholds.vis;
-  syncEditorFromRig(); renderRigSummary(); loadBasics(); renderCatalog(); decideGoNoGo();
-  if(state.lat!=null&&state.lon!=null){ (async()=>{ await fetchWeather(); decideGoNoGo(); })(); }
-});
 </script>
+
 </body>
 </html>
