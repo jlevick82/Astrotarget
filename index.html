@@ -1,236 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go/No-Go v28.5</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Go/No-Go v28.9</title>
 <style>
-body {
-  font-family: system-ui, sans-serif;
-  background: #0d1a20;
-  color: #d8e0e4;
-  margin: 0;
-  padding: 1rem;
-}
-h1 {
-  font-size: 2.2em;
-  font-weight: 700;
-  color: #f4f5f6;
-  margin-bottom: .2em;
-}
-button {
-  background: #1e2b33;
-  color: #d8e0e4;
-  border: 1px solid #2a3a45;
-  border-radius: 1em;
-  padding: .4em 1.2em;
-  margin: .25em;
-}
-button:hover { background: #283944; }
-.card {
-  background: #102027;
-  border-radius: 1em;
-  padding: 1em;
-  margin: .75em 0;
-  box-shadow: 0 0 4px #0008;
-}
-.grid {
-  display: grid;
-  gap: .6em;
-}
-.cols2fixed {
-  grid-template-columns: repeat(2,1fr);
-}
-.cols3 {
-  grid-template-columns: repeat(3,1fr);
-}
-
-/* Keep 2 columns longer */
-@media (max-width:480px){ .cols2fixed{grid-template-columns:1fr} }
-@media (max-width:680px){ .cols3{grid-template-columns:1fr} }
-
-input, select {
-  width: 100%;
-  border: 1px solid #2a3a45;
-  border-radius: .6em;
-  padding: .4em;
-  background: #14242c;
-  color: #d8e0e4;
-}
-.toast {
-  position: fixed;
-  bottom: 1.5em;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2b3a44;
-  color: #fff;
-  padding: .6em 1.2em;
-  border-radius: 1em;
-  display: none;
-  z-index: 99;
-}
-.badge {
-  display:inline-block;
-  background:#0f4;
-  color:#021;
-  padding:.2em .8em;
-  border-radius:1em;
-  font-weight:600;
-  margin-left:.4em;
-}
+  :root{
+    --bg:#0c181e;--card:#0f2128;--ink:#dbe3e7;--ink-dim:#b7c2c9;
+    --mut:#2a3a45;--mut2:#18313a;--pill:#14242c;--good:#1f7a3f;--warn:#8a2d2d;
+    --accent:#2a8bbd;
+  }
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial;}
+  h1{font-size:2.2rem;margin:12px 12px 4px}
+  h1 small{opacity:.6;font-weight:700}
+  .toolbar{padding:0 12px 8px}
+  .btn{background:#1c2c34;border:1px solid var(--mut);color:var(--ink);border-radius:999px;padding:.45rem .9rem;margin:.25rem .35rem 0 0}
+  .btn:active{transform:translateY(1px)}
+  .card{background:var(--card);border-radius:14px;margin:12px;padding:14px;box-shadow:0 0 0 1px #0005}
+  .card h2{margin:0 0 10px}
+  .grid{display:grid;gap:.65rem}
+  .cols2{grid-template-columns:repeat(2,1fr)}
+  .cols3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:520px){.cols2{grid-template-columns:1fr}}
+  @media (max-width:720px){.cols3{grid-template-columns:1fr}}
+  .pill{background:var(--pill);border:1px solid var(--mut);border-radius:12px;padding:.55rem .75rem}
+  .mut{color:var(--ink-dim)}
+  input,select{width:100%;background:var(--pill);border:1px solid var(--mut);border-radius:10px;color:var(--ink);padding:.55rem .6rem}
+  .inline-btns{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+  .seg{display:flex;gap:.5rem;flex-wrap:wrap}
+  .seg button{background:transparent;border:1px solid var(--mut);border-radius:12px;color:var(--ink);padding:.5rem .8rem}
+  .seg button.active{outline:2px solid var(--accent);background:#123040}
+  .good{background:#0f2c14;border-color:#1a5d34}
+  .badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-weight:600;background:#134d2a;margin-left:.35rem}
+  table{width:100%;border-collapse:collapse;margin-top:.6rem}
+  th,td{padding:.55rem;border-bottom:1px solid #0a151a;text-align:left}
+  th{color:var(--ink-dim);font-weight:600}
+  a{color:#9ac7ff}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#20343e;color:#fff;padding:.55rem .9rem;border-radius:12px;display:none;z-index:99}
 </style>
 </head>
 <body>
 
-<h1>Go/No-Go <span style="opacity:.6">v28.5</span></h1>
-<div>
-  <button id="btnCompact">Compact Off</button>
-  <button id="btnNight">Night Mode</button>
+<h1>Go/No-Go <small>v28.9</small></h1>
+<div class="toolbar">
+  <button class="btn" id="btnCompact">Compact Off</button>
+  <button class="btn" id="btnNight">Night Mode</button>
 </div>
 
 <!-- STATUS -->
-<div class="card">
+<section class="card" id="card-status">
   <h2>Status</h2>
-  <div class="grid cols2fixed">
-    <div><strong>Decision</strong><br><span id="status-decision">GO</span></div>
-    <div><strong>Clouds</strong><br><span id="status-clouds">~0%</span></div>
-    <div><strong>Visibility</strong><br><span id="status-vis">15 km</span></div>
-    <div><strong>Astro</strong><br><span id="status-astro">Astro dark</span></div>
-    <div><strong>Updated</strong><br><span id="status-time">--:--</span></div>
-    <div><strong>Sun alt</strong><br><span id="status-sun">--</span></div>
-    <div><strong>Moon</strong><br><span id="status-moon">7%</span></div>
-    <div><strong>Transparency</strong><br><span id="status-trans">Okay</span></div>
+  <div class="grid cols2">
+    <div class="pill"><div class="mut">Decision</div><div id="st-decision" style="font-weight:700">GO</div></div>
+    <div class="pill"><div class="mut">Clouds</div><div id="st-clouds">~0%</div></div>
+    <div class="pill"><div class="mut">Visibility</div><div id="st-vis">15 km</div></div>
+    <div class="pill"><div class="mut">Astro</div><div id="st-astro">Astro dark</div></div>
+    <div class="pill"><div class="mut">Updated</div><div id="st-time">--:--</div></div>
+    <div class="pill"><div class="mut">Sun alt</div><div id="st-sun">--</div></div>
+    <div class="pill"><div class="mut">Moon</div><div id="st-moon">7%</div></div>
+    <div class="pill"><div class="mut">Transparency</div><div id="st-trans">Okay</div></div>
   </div>
-</div>
+</section>
 
 <!-- CONDITIONS -->
-<div class="card">
+<section class="card" id="card-cond">
   <h2>Conditions</h2>
-  <div class="grid cols2fixed">
-    <div><strong>Moon illum</strong><br><span id="cond-moon">7%</span></div>
-    <div><strong>Alt</strong><br><span id="cond-alt">-29°</span></div>
-    <div><strong>Clouds</strong><br><span id="cond-clouds">0%</span></div>
-    <div><strong>Humidity</strong><br><span id="cond-hum">74%</span></div>
+  <div class="grid cols2">
+    <div class="pill"><div class="mut">Moon illum</div><div id="cd-moon">7%</div></div>
+    <div class="pill"><div class="mut">Altitude</div><div id="cd-alt">-29°</div></div>
+    <div class="pill"><div class="mut">Clouds (max window)</div><div id="cd-clouds">0%</div></div>
+    <div class="pill"><div class="mut">Humidity</div><div id="cd-hum">74%</div></div>
   </div>
-</div>
+</section>
 
-<!-- QUICK SETUP -->
-<div class="card">
+<!-- QUICK SETUP (LOCATION) -->
+<section class="card" id="card-quick">
   <h2>Quick setup</h2>
-  <div class="grid cols2fixed">
-    <div><label>Latitude (°)</label><input id="in-lat" value="37.16556"></div>
-    <div><label>Longitude (°)</label><input id="in-lon" value="-76.5684"></div>
-    <div><label>Hours (window)</label><input id="in-window" value="3"></div>
-    <div><label>Location name</label><input id="in-locname" placeholder="e.g., Backyard"></div>
+  <div class="grid cols2">
+    <div><label class="mut">Latitude (°)</label><input id="lat" value="37.16556"></div>
+    <div><label class="mut">Longitude (°)</label><input id="lon" value="-76.5684"></div>
+    <div><label class="mut">Hours (window)</label><input id="hours" value="3"></div>
+    <div><label class="mut">Location name</label><input id="locname" placeholder="e.g., Backyard"></div>
   </div>
-  <div style="margin-top:.5em;">
-    <label>Saved locations</label>
-    <select id="sel-locations"><option value="">(none)</option></select>
+  <div style="margin-top:.5rem">
+    <label class="mut">Saved locations</label>
+    <select id="locSaved"><option value="">(none)</option></select>
   </div>
-  <div style="margin-top:.5em;">
-    <button id="btn-loc-gps">Use GPS</button>
-    <button id="btn-loc-save">Save</button>
-    <button id="btn-loc-load">Load</button>
-    <button id="btn-loc-del">Delete</button>
-    <button id="btn-calc">Calculate</button>
-    <span id="loc-badge" class="badge" style="display:none;">Loaded</span>
+  <div class="inline-btns">
+    <button class="btn" id="btnGps">Use GPS</button>
+    <button class="btn" id="btnLocSave">Save</button>
+    <button class="btn" id="btnLocLoad">Load</button>
+    <button class="btn" id="btnLocDelete">Delete</button>
+    <button class="btn" id="btnCalc">Calculate</button>
+    <span id="locBadge" class="badge" style="display:none">Loaded</span>
   </div>
-</div>
+</section>
 
 <!-- RIG -->
-<div class="card">
+<section class="card" id="card-rig">
   <h2>Rig (Scope + Camera)</h2>
-  <div class="grid cols2fixed">
-    <div><strong>Eff. FL</strong><br><span id="rig-fl">448 mm (0.8×)</span></div>
-    <div><strong>FOV</strong><br><span id="rig-fov">1.45 × 1.45</span></div>
-    <div><strong>Scale</strong><br><span id="rig-scale">1.73 "/px</span></div>
-    <div><strong>Scope</strong><br><span id="rig-scope">SV503 (560×80)</span></div>
+
+  <!-- Summary row -->
+  <div class="grid cols2" style="margin-bottom:.6rem">
+    <div class="pill"><div class="mut">Eff. FL</div><div id="sum-fl">448 mm (0.8×)</div></div>
+    <div class="pill"><div class="mut">FOV</div><div id="sum-fov">1.45 × 1.45</div></div>
+    <div class="pill"><div class="mut">Scale</div><div id="sum-scale">1.73 "/px</div></div>
+    <div class="pill"><div class="mut">Scope</div><div id="sum-scope">SV503 (560×80)</div></div>
   </div>
-</div>
+
+  <!-- Presets -->
+  <div class="grid cols2" style="margin:.4rem 0 1rem">
+    <div>
+      <label class="mut">Profile name</label>
+      <input id="rigName" placeholder="e.g., SV503_533_0.8x_Backyard" />
+    </div>
+    <div>
+      <label class="mut">Saved profiles</label>
+      <select id="rigSaved"><option value="">(none)</option></select>
+    </div>
+  </div>
+  <div class="inline-btns">
+    <button class="btn" id="rigSave">Save Profile</button>
+    <button class="btn" id="rigLoad">Load</button>
+    <button class="btn" id="rigDelete">Delete</button>
+    <span id="rigBadge" class="badge" style="display:none">Profile loaded</span>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="pill" style="margin-top:1rem">
+    <div class="mut" style="font-weight:700">Step 1 — Select Scope</div>
+    <select id="scopeSel" style="margin-top:.45rem"></select>
+    <div class="grid cols2" style="margin-top:.5rem">
+      <div><label class="mut">Focal length (mm)</label><input id="scopeFl" placeholder="560"></div>
+      <div><label class="mut">Diameter (mm)</label><input id="scopeDia" placeholder="80"></div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="pill" style="margin-top:.8rem">
+    <div class="mut" style="font-weight:700">Step 2 — Reducer / Barlow</div>
+    <div class="seg" style="margin-top:.45rem">
+      <button data-mf="0.63">0.63×</button>
+      <button data-mf="0.7">0.7×</button>
+      <button data-mf="0.8" class="active">0.8×</button>
+      <button data-mf="1">1×</button>
+      <button data-mf="2">2×</button>
+    </div>
+    <div style="font-size:1.6rem;font-weight:800;margin-top:.4rem"><span id="effFl">448</span> mm</div>
+    <div class="inline-btns"><button class="btn" id="btnRigCalc">Recalculate</button></div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="pill" style="margin-top:.8rem">
+    <div class="mut" style="font-weight:700">Step 3 — Select Camera</div>
+    <select id="camSel" style="margin-top:.45rem"></select>
+    <div class="grid cols3" style="margin-top:.5rem">
+      <div><label class="mut">Sensor X (mm)</label><input id="sensX" placeholder="11.31"></div>
+      <div><label class="mut">Sensor Y (mm)</label><input id="sensY" placeholder="11.31"></div>
+      <div><label class="mut">Pixel (µm)</label><input id="px" placeholder="3.76"></div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="pill" style="margin-top:.8rem">
+    <div class="mut" style="font-weight:700">Step 4 — Options</div>
+    <div class="seg" style="margin-top:.45rem">
+      <button id="optBias" class="">Bias Top-5 to FOV</button>
+      <button id="optFov" class="">FOV overlay on thumbs</button>
+    </div>
+  </div>
+</section>
 
 <!-- TOP 5 -->
-<div class="card">
+<section class="card" id="card-top5">
   <h2>Top 5 Recommendations</h2>
   <ol id="top5">
-    <li><a href="#">M33 – Triangulum Galaxy</a></li>
-    <li><a href="#">M31 – Andromeda Galaxy</a></li>
-    <li><a href="#">M27 – Dumbbell Nebula</a></li>
-    <li><a href="#">M57 – Ring Nebula</a></li>
-    <li><a href="#">M13 – Hercules Globular</a></li>
+    <!-- filled by JS -->
   </ol>
-</div>
+</section>
 
 <!-- CATALOG -->
-<div class="card">
+<section class="card" id="card-cat">
   <h2>Catalog</h2>
-  <input id="search" placeholder="e.g., M31, galaxy, nebula …">
-  <button id="btnClear">Clear</button>
-  <table style="width:100%;margin-top:.6em;border-collapse:collapse;">
+  <input id="catSearch" placeholder="e.g., M31, galaxy, nebula …" />
+  <button class="btn" id="catClear" style="margin-top:.4rem">Clear</button>
+  <table>
     <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
-    <tbody id="catalog-body">
-      <tr><td>M31 – Andromeda Galaxy</td><td>GX</td><td>0.71h</td><td>41.3°</td><td>[img]</td></tr>
-      <tr><td>M33 – Triangulum Galaxy</td><td>GX</td><td>1.55h</td><td>30.7°</td><td>[img]</td></tr>
-      <tr><td>M27 – Dumbbell Nebula</td><td>PN</td><td>19.89h</td><td>22.7°</td><td>[img]</td></tr>
-      <tr><td>M57 – Ring Nebula</td><td>PN</td><td>18.89h</td><td>33.0°</td><td>[img]</td></tr>
-      <tr><td>M13 – Hercules Globular</td><td>GC</td><td>16.70h</td><td>36.5°</td><td>[img]</td></tr>
-    </tbody>
+    <tbody id="catBody"></tbody>
   </table>
-</div>
+</section>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const $ = s=>document.querySelector(s);
-function toast(msg){
-  const t=$("#toast"); t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none',2000);
-}
-function ls(k,v){ if(v!==undefined)localStorage.setItem(k,JSON.stringify(v)); return JSON.parse(localStorage.getItem(k)||'null'); }
-
-const state={locations:ls('locations')||{}, lat:37.16556, lon:-76.5684, windowH:3};
-
-// save location
-$("#btn-loc-save").onclick=()=>{
-  const name=$("#in-locname").value.trim();
-  if(!name){toast("Enter location name");return;}
-  state.locations[name]={lat:+$("#in-lat").value, lon:+$("#in-lon").value, windowH:+$("#in-window").value};
-  ls('locations',state.locations);
-  rebuildLocList(); toast("Location saved");
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const F=Number.parseFloat;
+const to2=n=>Number(n).toFixed(2);
+const toast=msg=>{const t=$("#toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",1800);};
+const LS={
+  get:(k,d=null)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+  del:k=>localStorage.removeItem(k)
 };
 
-// load location
-$("#btn-loc-load").onclick=()=>{
-  const name=$("#sel-locations").value;
-  if(!name || !state.locations[name]){toast("Select a saved location");return;}
-  const loc=state.locations[name];
-  state.lat=loc.lat; state.lon=loc.lon; state.windowH=loc.windowH;
-  $("#in-lat").value=state.lat;
-  $("#in-lon").value=state.lon;
-  $("#in-window").value=state.windowH;
-  $("#in-locname").value=name;
-  $("#sel-locations").value=name;
-  ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH);
-  showBadge($("#loc-badge"),"Location loaded");
+/* ---------- demo data ---------- */
+const SCOPES=[
+  {id:"SV503_560_80",label:"SVBONY SV503 (560 × 80)", fl:560, dia:80},
+  {id:"C8_2032_203",label:"Celestron C8 (2032 × 203)", fl:2032, dia:203},
+  {id:"ED72_420_72",label:"SkyWatcher Evostar 72ED (420 × 72)", fl:420, dia:72}
+];
+const CAMS=[
+  {id:"ASI533",label:"ZWO ASI533MC (11.31×11.31 / 3.76µm)", x:11.31, y:11.31, px:3.76},
+  {id:"A7III",label:"Sony A7 III (35.9×24.0 / 5.94µm)", x:35.9, y:24.0, px:5.94}
+];
+const CATALOG=[
+  {id:"M31", name:"M31 – Andromeda Galaxy", type:"GX", ra:"0.71h", dec:"41.3°"},
+  {id:"M33", name:"M33 – Triangulum Galaxy", type:"GX", ra:"1.55h", dec:"30.7°"},
+  {id:"M27", name:"M27 – Dumbbell Nebula", type:"PN", ra:"19.89h", dec:"22.7°"},
+  {id:"M57", name:"M57 – Ring Nebula", type:"PN", ra:"18.89h", dec:"33.0°"},
+  {id:"M13", name:"M13 – Hercules Globular", type:"GC", ra:"16.70h", dec:"36.5°"}
+];
+
+/* ---------- state ---------- */
+const state={
+  reducer:0.8, scope:SCOPES[0], cam:CAMS[0],
+  options:{bias:false,fov:false},
+  locations:LS.get("locations",{}),
+  rigProfiles:LS.get("rigProfiles",{})
 };
 
-// delete
-$("#btn-loc-del").onclick=()=>{
-  const name=$("#sel-locations").value;
-  if(name&&state.locations[name]){delete state.locations[name];ls('locations',state.locations);rebuildLocList();toast("Deleted");}
-};
-function rebuildLocList(){
-  const sel=$("#sel-locations"); sel.innerHTML='<option value="">(none)</option>';
-  Object.keys(state.locations).forEach(k=>{
-    const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o);
-  });
+/* ---------- init dropdowns ---------- */
+function fillSel(sel,data,fmtKey="label"){
+  sel.innerHTML=data.map(o=>`<option value="${o.id}">${o[fmtKey]}</option>`).join("");
 }
-rebuildLocList();
+fillSel($("#scopeSel"),SCOPES);
+fillSel($("#camSel"),CAMS);
+function fillSaved(sel,store){
+  const keys=Object.keys(store);
+  sel.innerHTML=`<option value="">(none)</option>`+keys.map(k=>`<option value="${k}">${k}</option>`).join("");
+}
+fillSaved($("#locSaved"),state.locations);
+fillSaved($("#rigSaved"),state.rigProfiles);
 
-function showBadge(el,text){
-  el.textContent=text; el.style.display='inline-block';
-  setTimeout(()=>el.style.display='none',2500);
+/* ---------- apply selected scope/cam to inputs ---------- */
+function applyScope(s){
+  $("#scopeSel").value=s.id;
+  $("#scopeFl").value=s.fl;
+  $("#scopeDia").value=s.dia;
+  $("#sum-scope").textContent=`${s.label.split(" (")[0]} (${s.fl}×${s.dia})`;
 }
+function applyCam(c){
+  $("#camSel").value=c.id;
+  $("#sensX").value=c.x;
+  $("#sensY").value=c.y;
+  $("#px").value=c.px;
+}
+
+/* ---------- calc rig ---------- */
+function calcRig(){
+  const fl=F($("#scopeFl").value)||0;
+  const r=state.reducer||1;
+  const eff=fl*r;
+  $("#effFl").textContent=Math.round(eff);
+  $("#sum-fl").textContent=`${Math.round(eff)} mm (${r}×)`;
+
+  const sx=F($("#sensX").value)||0, sy=F($("#sensY").value)||0, px=F($("#px").value)||0;
+  const fovX= (sx/eff)*(180/Math.PI); // deg
+  const fovY= (sy/eff)*(180/Math.PI);
+  $("#sum-fov").textContent=`${to2(fovX)} × ${to2(fovY)}`;
+  const scale=206.265*px/eff; // "/px
+  $("#sum-scale").textContent=`${to2(scale)} "/px`;
+}
+calcRig();
+
+/* reducer buttons */
+$$('#card-rig [data-mf]').forEach(btn=>{
+  btn.onclick=()=>{
+    $$('#card-rig [data-mf]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.reducer=F(btn.dataset.mf);
+    calcRig();
+  };
+});
+$("#btnRigCalc").onclick=calcRig;
+
+/* change handlers */
+$("#scopeSel").onchange=e=>{
+  const s=SCOPES.find(x=>x.id===e.target.value); if(!s) return;
+  state.scope=s; applyScope(s); calcRig();
+};
+$("#scopeFl").oninput=calcRig; $("#scopeDia").oninput=calcRig;
+$("#camSel").onchange=e=>{
+  const c=CAMS.find(x=>x.id===e.target.value); if(!c) return;
+  state.cam=c; applyCam(c); calcRig();
+};
+$("#sensX").oninput=calcRig; $("#sensY").oninput=calcRig; $("#px").oninput=calcRig;
+
+/* options */
+$("#optBias").onclick=()=>{state.options.bias=!state.options.bias; $("#optBias").classList.toggle('active',state.options.bias);};
+$("#optFov").onclick=()=>{state.options.fov=!state.options.fov; $("#optFov").classList.toggle('active',state.options.fov);};
+
+/* ---------- rig profiles ---------- */
+function rebuildRigSaved(){ fillSaved($("#rigSaved"),state.rigProfiles); }
+$("#rigSave").onclick=()=>{
+  const name=$("#rigName").value.trim();
+  if(!name){toast("Enter a profile name");return;}
+  state.rigProfiles[name]={
+    scope:{id:$("#scopeSel").value, fl:F($("#scopeFl").value), dia:F($("#scopeDia").value)},
+    reducer:state.reducer,
+    cam:{id:$("#camSel").value, x:F($("#sensX").value), y:F($("#sensY").value), px:F($("#px").value)},
+    options:state.options
+  };
+  LS.set("rigProfiles",state.rigProfiles); rebuildRigSaved(); toast("Profile saved");
+};
+$("#rigLoad").onclick=()=>{
+  const name=$("#rigSaved").value; if(!name || !state.rigProfiles[name]){toast("Select a saved profile");return;}
+  const p=state.rigProfiles[name];
+  /* scope */
+  const s=SCOPES.find(x=>x.id===p.scope.id) || {id:p.scope.id,label:p.scope.id,fl:p.scope.fl,dia:p.scope.dia};
+  state.scope=s; applyScope({...s,fl:p.scope.fl,dia:p.scope.dia});
+  /* reducer */
+  state.reducer=p.reducer||1;
+  $$('#card-rig [data-mf]').forEach(b=>b.classList.toggle('active',F(b.dataset.mf)===state.reducer));
+  /* cam */
+  const c=CAMS.find(x=>x.id===p.cam.id) || {id:p.cam.id,label:p.cam.id,x:p.cam.x,y:p.cam.y,px:p.cam.px};
+  state.cam=c; applyCam({...c,x:p.cam.x,y:p.cam.y,px:p.cam.px});
+  /* options */
+  state.options=p.options||{bias:false,fov:false};
+  $("#optBias").classList.toggle('active',state.options.bias);
+  $("#optFov").classList.toggle('active',state.options.fov);
+  calcRig();
+  showBadge($("#rigBadge"),"Profile loaded");
+};
+$("#rigDelete").onclick=()=>{
+  const name=$("#rigSaved").value; if(!name||!state.rigProfiles[name]){toast("Select a profile");return;}
+  delete state.rigProfiles[name]; LS.set("rigProfiles",state.rigProfiles); rebuildRigSaved(); toast("Profile deleted");
+};
+function showBadge(el,txt){el.textContent=txt; el.style.display='inline-block'; setTimeout(()=>el.style.display='none',2200);}
+
+/* ---------- locations ---------- */
+function rebuildLocSaved(){ fillSaved($("#locSaved"),state.locations); }
+$("#btnLocSave").onclick=()=>{
+  const name=$("#locname").value.trim(); if(!name){toast("Enter location name");return;}
+  state.locations[name]={lat:$("#lat").value,lon:$("#lon").value,hrs:$("#hours").value};
+  LS.set("locations",state.locations); rebuildLocSaved(); toast("Location saved");
+};
+$("#btnLocLoad").onclick=()=>{
+  const name=$("#locSaved").value; if(!name||!state.locations[name]){toast("Select a saved location");return;}
+  const l=state.locations[name];
+  $("#lat").value=l.lat; $("#lon").value=l.lon; $("#hours").value=l.hrs; $("#locname").value=name;
+  showBadge($("#locBadge"),"Location loaded");
+};
+$("#btnLocDelete").onclick=()=>{
+  const name=$("#locSaved").value; if(!name||!state.locations[name]){toast("Select a saved location");return;}
+  delete state.locations[name]; LS.set("locations",state.locations); rebuildLocSaved(); toast("Location deleted");
+};
+$("#btnGps").onclick=()=>toast("GPS not wired in this demo");
+$("#btnCalc").onclick=()=>toast("Recalculated with current inputs");
+
+/* ---------- top 5 + catalog ---------- */
+function paintTop5(){
+  const list = CATALOG.slice(0,5)
+    .map(o=>`<li><a href="#">${o.name}</a></li>`).join("");
+  $("#top5").innerHTML=list;
+}
+function paintCatalog(filter=""){
+  const q=filter.trim().toLowerCase();
+  const rows=CATALOG.filter(o=>!q || o.name.toLowerCase().includes(q) || o.type.toLowerCase().includes(q))
+    .map(o=>`<tr><td>${o.name}</td><td>${o.type}</td><td>${o.ra}</td><td>${o.dec}</td><td>[img]</td></tr>`).join("");
+  $("#catBody").innerHTML=rows||`<tr><td colspan="5" class="mut">No matches</td></tr>`;
+}
+paintTop5(); paintCatalog();
+$("#catSearch").oninput=e=>paintCatalog(e.target.value); $("#catClear").onclick=()=>{ $("#catSearch").value=""; paintCatalog(""); };
+
+/* ---------- initial select defaults ---------- */
+state.scope=SCOPES[0]; applyScope(state.scope);
+state.cam=CAMS[0]; applyCam(state.cam);
+rebuildLocSaved(); rebuildRigSaved();
+
+/* ---------- night/compact (local only) ---------- */
+let night=false, compact=false;
+$("#btnNight").onclick=()=>{ night=!night; document.body.style.filter=night?"invert(0.02) hue-rotate(0deg)":"none"; $("#btnNight").textContent=night?"Night Mode On":"Night Mode"; };
+$("#btnCompact").onclick=()=>{ compact=!compact; document.querySelectorAll('.pill').forEach(p=>p.style.padding=compact?".35rem .55rem":".55rem .75rem"); $("#btnCompact").textContent=compact?"Compact On":"Compact Off"; };
+
 </script>
-
 </body>
 </html>
