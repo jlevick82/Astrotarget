@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Go/No-Go v28.6</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Go/No-Go v28.7</title>
 <style>
   :root{
     --bg:#0f1b22; --panel:#111c23; --panel-2:#0c151b;
@@ -25,10 +25,11 @@
   header.app{display:flex;align-items:flex-end;gap:12px;margin:0 0 10px}
   .title{font-weight:900;letter-spacing:.5px;font-size:38px}
   .ver{opacity:.65;font-weight:800;font-size:28px}
-  .toolbar{display:flex;gap:10px;margin:10px 0 12px;flex-wrap:wrap}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
   .btn{appearance:none;border:0;outline:0;padding:10px 14px;border-radius:999px;background:linear-gradient(#1a2a34,#141f26);color:var(--text);box-shadow:var(--shadow);cursor:pointer}
   .night .btn{background:linear-gradient(#1a0f0f,#120b0b)}
-  .btn.small{padding:8px 12px;font-size:14px}
+  .btn.small{padding:7px 10px;font-size:13px}
+  .btn.tiny{padding:6px 9px;font-size:12px}
   .badge{padding:6px 10px;border-radius:999px;border:1px solid var(--ring);background:#0e171c;white-space:nowrap}
   .night .badge{background:#150b0b}
   .chip{display:inline-flex;align-items:center;padding:10px 14px;border-radius:999px;background:#0f1a20;border:1px solid var(--ring)}
@@ -45,7 +46,6 @@
   .card-body{padding:12px 14px 16px}
   .grid{display:grid;gap:10px}
   .cols2{grid-template-columns:repeat(2,1fr)} .cols3{grid-template-columns:repeat(3,1fr)}
-  /* NEW: fixed two-up that never collapses */
   .cols2fixed{grid-template-columns:repeat(2,minmax(0,1fr))}
   @media (max-width:820px){.cols2,.cols3{grid-template-columns:1fr}}
   .kv{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--ring);background:#0f1a20}
@@ -65,7 +65,7 @@
   .night tbody td{background:#160b0b}
   tbody tr td:first-child{border-left:1px solid var(--ring);border-top-left-radius:10px;border-bottom-left-radius:10px}
   tbody tr td:last-child{border-right:1px solid var(--ring);border-top-right-radius:10px;border-bottom-right-radius:10px}
-  .thumb{position:relative;width:64px;height:64px;border-radius:12px;background:#0a141a;border:1px solid var(--ring);overflow:hidden}
+  .thumb{position:relative;width:64px;height:64px;border-radius:12px;background:#0a141a;border:1px solid var(--ring);overflow:hidden;display:grid;place-items:center;color:#a9bdc9;font-weight:700}
   .night .thumb{background:#140909}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .thumb.fov:after{content:"";position:absolute;inset:18% 18%;border:2px dashed rgba(255,255,255,.7);border-radius:6px}
@@ -74,12 +74,14 @@
   .toast{pointer-events:auto;background:#0f1a20;border:1px solid var(--ring);box-shadow:var(--shadow);color:var(--text);border-radius:12px;padding:10px 12px;min-width:240px;text-align:center}
   .compact .card-body{padding:10px}
   .compact .kv{padding:10px}
+  /* Tight action rows */
+  .action-row{display:flex;gap:6px;flex-wrap:wrap}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header class="app">
-      <div class="title">Go/No-Go</div><div class="ver">v28.6</div>
+      <div class="title">Go/No-Go</div><div class="ver">v28.7</div>
     </header>
 
     <div class="toolbar">
@@ -96,7 +98,6 @@
         </button>
       </div>
       <div class="card-body">
-        <!-- FIXED TWO COLUMNS -->
         <div class="grid cols2fixed">
           <div class="kv"><h4>Decision</h4><div id="status-decision" class="chip ok">GO</div></div>
           <div class="kv"><h4>Clouds</h4><div id="status-clouds" class="pill">~—%</div></div>
@@ -121,7 +122,6 @@
         </button>
       </div>
       <div class="card-body">
-        <!-- FIXED TWO COLUMNS -->
         <div class="grid cols2fixed">
           <div class="kv"><h4>Moon illum</h4><div class="big" id="cond-moon">—%</div><div class="muted" id="cond-moon-alt">Alt —°</div></div>
           <div class="kv"><h4>Clouds (window max)</h4><div class="big" id="cond-clouds">—%</div><div class="muted">From Open-Meteo (window max)</div></div>
@@ -151,19 +151,19 @@
           <div class="kv"><h4>Saved locations</h4><select id="sel-locations"><option value="">(none)</option></select></div>
           <div class="kv">
             <h4>&nbsp;</h4>
-            <div class="toolbar" style="gap:8px;flex-wrap:wrap">
-              <button id="btn-gps"   class="btn small">Use GPS</button>
-              <button id="btn-loc-save" class="btn small">Save Location</button>
-              <button id="btn-loc-load" class="btn small">Load</button>
-              <button id="btn-loc-del"  class="btn small">Delete</button>
-              <button id="btn-calc" class="btn small">Calculate Now</button>
+            <div class="action-row">
+              <button id="btn-gps" class="btn tiny">Use GPS</button>
+              <button id="btn-loc-save" class="btn tiny">Save</button>
+              <button id="btn-loc-load" class="btn tiny">Load</button>
+              <button id="btn-loc-del" class="btn tiny">Delete</button>
+              <button id="btn-calc" class="btn tiny">Calculate</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 4) RIG (unchanged layout) -->
+    <!-- 4) RIG -->
     <section id="card-rig" class="card">
       <div class="card-header">
         <div class="card-title">Rig (Scope + Camera)</div>
@@ -178,15 +178,15 @@
           <span id="rig-scale" class="badge">Scale — "/px</span>
         </div>
 
-        <div class="grid cols3" style="margin-bottom:10px">
+        <div class="grid cols3" style="margin-bottom:6px">
           <div class="kv"><h4>Profile name</h4><input id="in-profile" type="text" placeholder="e.g., SV503_533_0.8x_Backyard"></div>
           <div class="kv"><h4>Saved profiles</h4><select id="sel-profiles"><option value="">(none)</option></select></div>
           <div class="kv">
             <h4>&nbsp;</h4>
-            <div class="toolbar" style="gap:8px;flex-wrap:wrap">
-              <button id="btn-prof-save" class="btn small">Save Profile</button>
-              <button id="btn-prof-load" class="btn small">Load</button>
-              <button id="btn-prof-del"  class="btn small">Delete</button>
+            <div class="action-row">
+              <button id="btn-prof-save" class="btn tiny">Save</button>
+              <button id="btn-prof-load" class="btn tiny">Load</button>
+              <button id="btn-prof-del"  class="btn tiny">Delete</button>
             </div>
           </div>
         </div>
@@ -301,7 +301,7 @@
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const ls = (k,v) => (v===undefined? JSON.parse(localStorage.getItem(k)||'null') : localStorage.setItem(k,JSON.stringify(v)));
-function toast(msg){ const w=$("#toast-wrap"), t=$("#toast"); t.textContent=msg; w.style.display="grid"; clearTimeout(toast._t); toast._t=setTimeout(()=>w.style.display="none",2000); }
+function toast(msg){ const w=$("#toast-wrap"), t=$("#toast"); t.textContent=msg; w.style.display="grid"; clearTimeout(toast._t); toast._t=setTimeout(()=>w.style.display="none",1800); }
 function setOpen(id,open){ const card=document.getElementById(id); const body=card.querySelector('.card-body'); const btn=card.querySelector('.chev'); body.style.display=open?"":"none"; btn.setAttribute('aria-expanded',String(open)); }
 
 /* STATE */
@@ -309,7 +309,7 @@ const state = {
   lat: ls('lat') ?? null, lon: ls('lon') ?? null, windowH: ls('windowH') ?? 3,
   locations: ls('locations') ?? {},
   thresholds: ls('gng') ?? {clouds:35, hum:90, vis:10},
-  rig: ls('rig') ?? {initialized:false},
+  rig: ls('rig') ?? {initialized:false, reducer:1, hooks:{fov:true,bias:true}},
   profiles: ls('profiles') ?? {},
   catalog: [
     {id:"M31", type:"GX", ra:"0.71h", dec:"41.3°", img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo11.jpg"},
@@ -326,7 +326,8 @@ $("#btn-compact").addEventListener('click',()=>{ document.body.classList.toggle(
 $("#btn-night").addEventListener('click',()=>{ document.body.classList.toggle('night'); $("#btn-night").textContent=document.body.classList.contains('night')?"Normal Mode":"Night Mode"; });
 document.addEventListener('click',e=>{ const c=e.target.closest('.chev'); if(!c) return; const id=c.getAttribute('data-target')||c.closest('.card').id; setOpen(id, c.getAttribute('aria-expanded')!=='true'); });
 
-/* RIG math */
+/* Helpers */
+function saveRig(){ ls('rig',state.rig); }
 function computeRig(r){ if(!r.fl||!r.dia||!r.reducer||!r.cam||!r.cam.sx||!r.cam.sy||!r.cam.px) return null;
   const effFL=Math.round(r.fl*r.reducer), fovX=57.296*r.cam.sx/effFL, fovY=57.296*r.cam.sy/effFL, scale=206.265*r.cam.px/effFL; return {effFL,fovX,fovY,scale}; }
 function renderRigSummary(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null;
@@ -336,17 +337,25 @@ function renderRigSummary(){ const r=state.rig.initialized?state.rig:null; const
 
 /* Editor sync & events */
 function syncEditorFromRig(){
-  if(!state.rig.initialized){ $("#sel-scope").value=""; $("#sel-cam").value=""; $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none"; $("#rig-efffl-editor").textContent="— mm"; $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active',t.dataset.mul==="1")); return; }
+  if(!state.rig.initialized){
+    $("#sel-scope").value=""; $("#sel-cam").value="";
+    $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none";
+    $("#rig-efffl-editor").textContent="— mm";
+    $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active',t.dataset.mul==="1"));
+    return;
+  }
   $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none";
   $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active', Number(t.dataset.mul)===state.rig.reducer));
   $("#in-sx").value=state.rig.cam?.sx??""; $("#in-sy").value=state.rig.cam?.sy??""; $("#in-px").value=state.rig.cam?.px??"";
   const c=computeRig(state.rig); $("#rig-efffl-editor").textContent=c?`${c.effFL} mm`:"— mm";
 }
-function touchRig(){ renderRigSummary(); renderCatalog(); }
+function touchRig(){ renderRigSummary(); renderCatalog(); saveRig(); }
 
 $("#sel-scope").addEventListener('change',e=>{ const v=e.target.value;
-  if(v==="custom"){ $("#scope-custom").style.display=""; }else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; }
+  if(v==="custom"){ $("#scope-custom").style.display=""; }
+  else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; }
   $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+
 $("#in-fl").addEventListener('input',()=>{ state.rig.fl=Number($("#in-fl").value||0); state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 $("#in-dia").addEventListener('input',()=>{ state.rig.dia=Number($("#in-dia").value||0); state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
@@ -356,10 +365,11 @@ $("#sel-cam").addEventListener('change',e=>{ const v=e.target.value;
   if(v==="custom"){ $("#cam-custom").style.display=""; state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; }
   else{ const [,sx,sy,px]=v.split("|"); $("#cam-custom").style.display="none"; state.rig.cam={sx:Number(sx),sy:Number(sy),px:Number(px)}; }
   state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+
 ["#in-sx","#in-sy","#in-px"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
 
-$("#hook-fov").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.fov = e.currentTarget.classList.contains('active'); renderCatalog(); });
-$("#hook-bias").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.bias = e.currentTarget.classList.contains('active'); toast(state.rig.hooks.bias?"Top-5 will bias to your FOV":"Top-5 bias disabled"); });
+$("#hook-fov").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.fov = e.currentTarget.classList.contains('active'); touchRig(); });
+$("#hook-bias").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.bias = e.currentTarget.classList.contains('active'); saveRig(); toast(state.rig.hooks.bias?"Top-5 will bias to your FOV":"Top-5 bias disabled"); });
 
 /* Catalog + Search */
 function messierWikiLink(id){ return `https://en.wikipedia.org/wiki/Messier_${id.replace('M','')}`; }
@@ -369,8 +379,15 @@ function renderCatalog(){
   const items=state.catalog.filter(x=>!q || x.id.toLowerCase().includes(q) || x.type.toLowerCase().includes(q));
   items.forEach(m=>{
     const tr=document.createElement('tr');
-    const imgCell=`<div class="thumb ${state.rig?.hooks?.fov?'fov':''}"><img loading="lazy" referrerpolicy="no-referrer" src="${m.img}" alt="${m.id}"></div>`;
-    tr.innerHTML=`<td><a href="${messierWikiLink(m.id)}" target="_blank">${m.id}</a></td><td>${m.type}</td><td>${m.ra}</td><td>${m.dec}</td><td>${imgCell}</td>`;
+    const img=document.createElement('img');
+    img.loading="lazy"; img.referrerPolicy="no-referrer"; img.alt=m.id; img.src=m.img;
+    img.onerror=()=>{ const p=tr.querySelector('.thumb'); if(p){ p.classList.add('noimg'); p.innerHTML=m.id; } };
+    const thumb=document.createElement('div');
+    thumb.className=`thumb ${state.rig?.hooks?.fov?'fov':''}`;
+    thumb.appendChild(img);
+    const tdImg=document.createElement('td'); tdImg.appendChild(thumb);
+    tr.innerHTML=`<td><a href="${messierWikiLink(m.id)}" target="_blank">${m.id}</a></td><td>${m.type}</td><td>${m.ra}</td><td>${m.dec}</td>`;
+    tr.appendChild(tdImg);
     body.appendChild(tr);
   });
 }
@@ -409,7 +426,7 @@ async function fetchWeather(){
 function computeTop5(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null; const diag=c?Math.hypot(c.fovX,c.fovY):null;
   const bias=r?.hooks?.bias?(m=>{ const want=(m.type==="GX"?2.0:m.type==="GC"?1.0:1.5); return diag?Math.max(0,1.5-Math.abs(diag-want)):1; }):(()=>1);
   return state.catalog.map(m=>({m,score:Math.random()*0.8+bias(m)})).sort((a,b)=>b.score-a.score).slice(0,5).map(x=>x.m); }
-function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=m.id; li.appendChild(a); li.insertAdjacentText('beforeend',` — ${m.id} — alt — —`); ol.appendChild(li); }); setOpen('card-top5',true); }
+function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=m.id; li.appendChild(a); ol.appendChild(li); }); setOpen('card-top5',true); }
 
 /* Quick setup + Locations */
 function loadBasics(){ if(state.lat!=null) $("#in-lat").value=state.lat; if(state.lon!=null) $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; refreshLocationDropdown(); refreshProfileDropdown(); }
