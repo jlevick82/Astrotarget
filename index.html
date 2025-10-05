@@ -3,336 +3,400 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Go/No-Go v28.0</title>
+<title>Go/No-Go v28.2</title>
 <style>
-  :root{
-    --bg:#0e2530;--panel:#102b37;--panel2:#0c222c;--text:#cfe7f5;--muted:#9fb7c4;
-    --chip:#122e3a;--ring:#1c4454;--shadow:rgba(0,0,0,.35);
-    --ok:#27c56d;--warn:#ffc247;--bad:#ff6b6b;--accent:#2aa9ff;
-  }
-  .night{
-    --bg:#07090a;--panel:#0a0e11;--panel2:#080c0e;--text:#ffd1d6;--muted:#ffb6bf;
-    --chip:#111417;--ring:#2a3138;--shadow:rgba(0,0,0,.6);
-    --ok:#ff9fb3;--warn:#ffd86a;--bad:#ff8383;--accent:#ff7ea8;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 50% -150px,#17465a 0%,transparent 60%),var(--bg);color:var(--text);
-       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial,sans-serif}
-  .wrap{max-width:960px;margin:0 auto;padding:22px 14px 96px}
-  h1{margin:0 0 8px;font-size:36px;letter-spacing:.4px}
-  .v{opacity:.7;margin-left:8px}
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 16px}
-  .btn{background:var(--chip);color:var(--text);padding:9px 15px;border-radius:18px;border:1px solid var(--ring);cursor:pointer;user-select:none}
-  .btn:active{transform:translateY(1px)}
-  .mini{padding:8px 12px;border-radius:14px;background:var(--chip);border:1px solid var(--ring);color:var(--text);cursor:pointer}
-  .card{background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--ring);box-shadow:0 12px 30px var(--shadow);
-        border-radius:16px;padding:14px;margin:14px 0}
-  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .card-title{font-size:22px;font-weight:800;letter-spacing:.2px}
-  .chev{width:40px;height:40px;border-radius:10px;background:var(--chip);border:1px solid var(--ring);display:grid;place-items:center;cursor:pointer}
-  .chev svg{transition:transform .2s}
-  .content{display:grid;gap:10px}
-  .pill{display:inline-block;padding:7px 12px;border-radius:999px;background:var(--chip);border:1px solid var(--ring);font-weight:600}
-  .status-line{font-size:24px;font-weight:900;letter-spacing:.2px;line-height:1.2;margin:2px 0 4px}
-  .sub{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0}
-  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr 1fr}}
-  .kard{border:1px solid var(--ring);border-radius:14px;padding:12px;background:var(--chip)}
-  .kard h4{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.2px}
-  .kard .big{font-size:26px;font-weight:900}
-  .kard .small{color:var(--muted);margin-top:2px}
-  .input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--ring);background:var(--panel2);color:var(--text)}
-  .tbl{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
-  .tbl-head,.tbl-row{display:grid;grid-template-columns:80px 1fr 1fr 1fr 96px}
-  .tbl-head{background:rgba(255,255,255,.04);font-weight:800}
-  .tbl-head div,.cell{padding:10px 12px;border-bottom:1px solid var(--ring)}
-  .gallery{max-height:360px;overflow:auto}
-  .thumb{width:60px;height:60px;border-radius:12px;border:1px solid var(--ring);background:#0b1b23 no-repeat center/cover;position:relative}
-  .thumb span{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:8px;padding:1px 6px;font-size:12px;font-weight:800}
-  .thumb.fov::after{content:"";position:absolute;left:10%;top:10%;right:10%;bottom:10%;border:2px solid #9ae6ff;border-radius:8px;pointer-events:none}
-  .active{outline:2px solid var(--accent);background:rgba(42,169,255,.12)}
-  .summary{display:flex;gap:8px;flex-wrap:wrap}
-  .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.25s;z-index:50;pointer-events:none}
-  .toast .bubble{background:#0d2a1a;border:1px solid #1f4b34;color:#caffdd;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px var(--shadow);max-width:90vw}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .compact .card{padding:10px}.compact .card-title{font-size:18px}.compact .status-line{font-size:20px}.compact .kard .big{font-size:22px}
+:root{
+  --bg:#0a1116; --panel:#0f1720; --panel2:#0b131a;
+  --text:#e8f4ff; --muted:#99b8cc; --ring:#21313c; --chip:#121b23;
+  --accent:#59c4ff; --ok:#7ad2a5; --warn:#ffd76a; --bad:#ff8f8f;
+  --shadow:0 10px 35px rgba(0,0,0,.45);
+  --radius:16px;
+  --pill-r:22px;
+  font-synthesis-weight:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(1200px 600px at 50% -80px,#0e2a3b 0%,#0b1821 50%,#0a1116 100%);color:var(--text);font:500 16px/1.5 system-ui,Segoe UI,Roboto,Inter,Helvetica,Arial}
+h1,h2,h3{margin:0 0 12px}
+a{color:#9fd0ff;text-decoration:none}
+.wrap{max-width:980px;margin:24px auto;padding:0 16px}
+.header{display:flex;align-items:flex-end;gap:12px;margin:12px 0 20px}
+.title{font-weight:800;font-size:42px;letter-spacing:.5px}
+.ver{opacity:.7;font-weight:700;font-size:32px}
+.btn{background:var(--chip);border:1px solid var(--ring);color:var(--text);padding:10px 16px;border-radius:999px;box-shadow:var(--shadow);cursor:pointer;user-select:none}
+.btn:active{transform:translateY(1px)}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--ring);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:18px 0;position:relative}
+.card-title{font-size:28px;font-weight:800;margin:2px 0 14px}
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{background:var(--chip);border:1px solid var(--ring);padding:7px 12px;border-radius:999px;color:var(--text);display:inline-flex;align-items:center;gap:8px}
+.pill.bad{color:var(--bad);border-color:#442224;background:#1b0f12}
+.pill.ok{color:var(--ok);border-color:#1d3328;background:#0d1812}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv .box{border:1px solid var(--ring);border-radius:14px;padding:14px;background:#0d151d}
+.kv .big{font-size:34px;font-weight:900;letter-spacing:.5px;display:block;margin-top:4px}
+hr.sep{border:0;height:1px;background:linear-gradient(90deg,transparent,#20303b,transparent);margin:16px 0}
+
+.toggle{position:absolute;right:14px;top:14px}
+.chev{width:46px;height:46px;border-radius:12px;border:1px solid var(--ring);background:#0d141a;display:grid;place-items:center;cursor:pointer}
+.chev:after{content:"⌄";font-size:20px;transform:rotate(180deg);opacity:.8}
+.card[data-collapsed="true"] .chev:after{transform:none}
+.card[data-collapsed="true"] .collapse{display:none}
+
+.slider{appearance:none;width:100%;height:10px;border-radius:8px;background:#e9edf1;outline:none}
+.slider::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#428cff;border:2px solid #173554;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.slider-row{display:grid;grid-template-columns:1fr 86px;gap:12px;align-items:center;margin:10px 0}
+.slider-help{color:var(--muted);font-size:13px;margin-top:-4px}
+
+.tbl{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
+.tbl-head,.tbl-row{display:grid;grid-template-columns:1.3fr .6fr .6fr .6fr 96px}
+.tbl-head{position:sticky;top:0;z-index:1;background:rgba(255,255,255,.06);backdrop-filter:saturate(120%) blur(6px)}
+.cell{padding:10px 12px;border-bottom:1px solid var(--ring);display:flex;align-items:center;min-height:56px}
+.tbl-row{cursor:pointer}
+.tbl-row:hover{background:rgba(255,255,255,.04)}
+.gallery{max-height:360px;overflow:auto}
+.thumb{width:60px;height:60px;border-radius:12px;border:1px solid var(--ring);background:#0b1b23 center/cover no-repeat;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
+.badge{position:absolute;bottom:-8px;right:-8px;background:#0b1b23;border:1px solid var(--ring);border-radius:16px;padding:2px 8px;color:#cfeaff;font-size:12px}
+
+.controls{display:flex;gap:10px;flex-wrap:wrap}
+
+/* toasts */
+.toast{position:fixed;left:16px;right:16px;bottom:16px;display:grid;place-items:center;pointer-events:none}
+.toast>div{background:#0f1720;border:1px solid var(--ring);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);max-width:520px}
+.toast.hide{display:none}
+
+/* compact */
+.compact .kv{grid-template-columns:1fr 1fr;gap:10px}
+.compact .cell{padding:8px 10px;min-height:50px}
+.compact .thumb{width:52px;height:52px}
 </style>
 </head>
 <body>
 <div class="wrap" id="app">
-  <header>
-    <h1>Go/No-Go <span class="v">v28.0</span></h1>
-    <div class="row">
-      <button class="btn" id="toggleCompact">Compact Off</button>
-      <button class="btn" id="toggleNight">Night Mode</button>
-    </div>
-  </header>
+  <div class="header">
+    <div class="title">Go/No-Go</div>
+    <div class="ver">v28.2</div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="toggleCompact">Compact Off</button>
+    <button class="btn" id="toggleTheme">Normal Mode</button>
+  </div>
 
   <!-- STATUS -->
-  <section class="card" data-card="status">
-    <div class="card-header">
-      <div class="card-title">Status</div>
-      <button class="chev" data-collapse="status"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+  <section class="card" id="cardStatus">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Status</div>
+    <div class="pills" id="statusLine"></div>
+    <div class="pills" style="margin-top:12px">
+      <span class="pill" id="pUpdated">Updated —:—</span>
+      <span class="pill" id="pSun">Sun alt —</span>
+      <span class="pill" id="pMoon">Moon —</span>
+      <span class="pill" id="pTrans">Transparency —</span>
     </div>
-    <div class="content" id="status-content">
-      <div class="status-line" id="statusText">NO-GO · Clouds ~— · Vis — km · Astro dark</div>
-      <div class="sub">
-        <span class="pill" id="updated">Updated --:--</span>
-        <span class="pill" id="sunAlt">Sun alt —</span>
-        <span class="pill" id="moonIllum">Moon —</span>
-        <span class="pill" id="transTag">Transparency —</span>
-      </div>
-    </div>
+    <div class="collapse"></div>
   </section>
 
   <!-- CONDITIONS (merged Sky + Clouds) -->
-  <section class="card" data-card="cond">
-    <div class="card-header">
-      <div class="card-title">Conditions</div>
-      <button class="chev" data-collapse="cond"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
-    </div>
-    <div class="content" id="cond-content">
-      <div class="grid2">
-        <div class="kard"><h4>Moon illum</h4><div class="big" id="moonPct">—</div><div class="small" id="moonAltSmall">Alt —</div></div>
-        <div class="kard"><h4>Clouds (window max)</h4><div class="big" id="cloudsBig">—</div><div class="small" id="cloudSrc">From Open-Meteo</div></div>
-        <div class="kard"><h4>Humidity</h4><div class="big" id="humidity">—</div></div>
-        <div class="kard"><h4>Transparency</h4><div class="big" id="transWord">—</div><div class="small" id="transDetails">—</div></div>
+  <section class="card" id="cardCond">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Conditions</div>
+    <div class="kv">
+      <div class="box">
+        <div>Moon illum</div>
+        <span class="big" id="cMoonPct">—</span>
+        <div class="muted" id="cMoonAlt">Alt —</div>
       </div>
-      <div class="row">
-        <input id="cloudSlider" class="input" type="range" min="0" max="100" step="1" value="35" style="flex:1"/>
-        <button class="mini" id="useClouds">Use</button>
-        <button class="mini" id="calcNow">Calculate</button>
-        <span class="pill" id="cloudPct">35%</span>
+      <div class="box">
+        <div>Clouds (window max)</div>
+        <span class="big" id="cClouds">—</span>
+        <div class="muted">From Open-Meteo (window max)</div>
+      </div>
+      <div class="box">
+        <div>Humidity</div>
+        <span class="big" id="cHum">—</span>
+      </div>
+      <div class="box">
+        <div>Transparency</div>
+        <span class="big" id="cTransBig">—</span>
+        <div class="muted" id="cTransLine">—</div>
       </div>
     </div>
   </section>
 
-  <!-- RIG (compact with summary) -->
-  <section class="card" data-card="rig">
-    <div class="card-header">
-      <div class="card-title">Rig (Scope + Camera)</div>
-      <button class="chev" data-collapse="rig"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+  <!-- GO / NO-GO SETTINGS -->
+  <section class="card" id="cardRules">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Go/No-Go Settings</div>
+    <div class="slider-row">
+      <label>Cloud weight <small>(how much clouds drive the decision)</small></label>
+      <input id="wCloud" class="slider" type="range" min="0" max="100" step="1">
     </div>
-    <div class="content" id="rig-content">
-      <div class="summary" id="rigSummary">
-        <span class="pill" id="sumEff">Eff. FL —</span>
-        <span class="pill" id="sumFOV">FOV — × —</span>
-        <span class="pill" id="sumScale">Scale — "/px</span>
-      </div>
-      <details id="rigDetails"><summary class="pill">Edit rig</summary>
-        <div class="grid2" style="margin-top:10px">
-          <div class="kard">
-            <h4>Scope</h4>
-            <select id="scopeSel" class="input">
-              <option value="sv503">SVBONY SV503 80ED (560mm)</option>
-              <option value="gt71">William Optics GT71 (420mm)</option>
-              <option value="redcat">RedCat 51 (250mm)</option>
-              <option value="fra400">Askar FRA400 (400mm)</option>
-              <option value="custom">Custom…</option>
-            </select>
-            <div class="grid2" style="margin-top:8px">
-              <input id="scopeFL" class="input" type="number" step="1" placeholder="Focal length (mm)" value="560">
-              <input id="scopeAp" class="input" type="number" step="1" placeholder="Aperture (mm)" value="80">
-            </div>
-          </div>
-          <div class="kard">
-            <h4>Reducer / Barlow</h4>
-            <div class="row">
-              <button class="mini redbtn" data-f="0.63">0.63×</button>
-              <button class="mini redbtn" data-f="0.7">0.7×</button>
-              <button class="mini redbtn" data-f="0.8">0.8×</button>
-              <button class="mini redbtn" data-f="1.0">1×</button>
-              <button class="mini redbtn" data-f="2.0">2×</button>
-            </div>
-            <div class="pill" id="effFL">Eff. FL: —</div>
-          </div>
-          <div class="kard">
-            <h4>Camera</h4>
-            <select id="camSel" class="input">
-              <option value="asi533">ZWO ASI533MC Pro</option>
-              <option value="asi2600">ZWO ASI2600</option>
-              <option value="asi6200">ZWO ASI6200</option>
-              <option value="canon600d">Canon 600D</option>
-              <option value="custom">Custom…</option>
-            </select>
-            <div class="grid2" style="margin-top:8px">
-              <input id="camW" class="input" type="number" step="0.01" placeholder="Sensor width (mm)" value="11.31">
-              <input id="camH" class="input" type="number" step="0.01" placeholder="Sensor height (mm)" value="11.31">
-            </div>
-            <div style="margin-top:8px"><input id="camPx" class="input" type="number" step="0.01" placeholder="Pixel size (µm)" value="3.76"></div>
-          </div>
-          <div class="kard">
-            <h4>Hooks</h4>
-            <label><input type="checkbox" id="biasFOV"> Bias Top-5 to FOV</label><br/>
-            <label><input type="checkbox" id="showFOV"> FOV overlay on thumbs</label><br/>
-            <div class="small">Meridian flip ETA: <span id="flipEta">—</span> <button class="mini" id="calcFlip">Calc</button></div>
-          </div>
-          <div class="kard">
-            <h4>Preset name</h4>
-            <input id="presetName" class="input" placeholder="SV503_533_0.8x"/>
-            <div class="row" style="margin-top:8px">
-              <button class="mini" id="savePreset">Save</button>
-              <button class="mini" id="deletePreset">Delete</button>
-            </div>
-          </div>
-          <div class="kard">
-            <h4>Load preset</h4>
-            <select id="presetList" class="input"><option value="">(none saved)</option></select>
-          </div>
-        </div>
-      </details>
+    <div class="slider-help">Higher = more sensitive to clouds. 0 ignores clouds; 100 makes clouds dominate.</div>
+
+    <div class="slider-row">
+      <label>Transparency weight <small>(impact of transparency)</small></label>
+      <input id="wTrans" class="slider" type="range" min="0" max="100" step="1">
+    </div>
+    <div class="slider-help">Higher = hazy/poor transparency blocks a “GO” sooner.</div>
+
+    <div class="slider-row">
+      <label>Min visibility (km) <small>(below this is likely no-go)</small></label>
+      <input id="minVis" class="slider" type="range" min="2" max="30" step="1">
+    </div>
+
+    <div class="slider-row">
+      <label>Moon tolerance (%) <small>(max illumination allowed for GO)</small></label>
+      <input id="moonTol" class="slider" type="range" min="0" max="100" step="1">
+    </div>
+
+    <div class="slider-row">
+      <label>Humidity penalty <small>(extra caution when RH is high)</small></label>
+      <input id="humPen" class="slider" type="range" min="0" max="100" step="1">
+    </div>
+    <div class="slider-help">This adds to “risk” when humidity is high—useful for dew-prone setups.</div>
+
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn" id="saveRules">Save Rules</button>
+      <button class="btn" id="resetRules">Reset Defaults</button>
+      <span id="rulesEcho" style="align-self:center;color:var(--muted)"></span>
     </div>
   </section>
 
   <!-- TOP 5 -->
-  <section class="card" data-card="top5">
-    <div class="card-header">
-      <div class="card-title">Top 5 Recommendations</div>
-      <button class="chev" data-collapse="top5"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+  <section class="card" id="cardTop">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Top 5 Recommendations</div>
+    <ol id="topList" style="padding-left:22px;margin:0"></ol>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="card" id="cardSearch">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Search</div>
+    <div class="controls" style="margin-bottom:12px">
+      <input id="searchBox" class="pill" style="width:260px" placeholder="Search catalog (name/type)"/>
+      <button class="btn" id="clearSearch">Clear</button>
     </div>
-    <div class="content" id="top5-content"><ol id="top5List"></ol></div>
+    <div class="tbl">
+      <div class="tbl-head">
+        <div class="cell">Name</div>
+        <div class="cell">Type</div>
+        <div class="cell">RA</div>
+        <div class="cell">Dec</div>
+        <div class="cell">Image</div>
+      </div>
+      <div class="gallery" id="searchBody"></div>
+    </div>
   </section>
 
   <!-- CATALOG -->
-  <section class="card" data-card="catalog">
-    <div class="card-header">
-      <div class="card-title">Catalog (subset)</div>
-      <button class="chev" data-collapse="catalog"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
-    </div>
-    <div class="content" id="catalog-content">
-      <div class="tbl">
-        <div class="tbl-head"><div>Type</div><div>RA</div><div>Dec</div><div>Name</div><div>Image</div></div>
-        <div class="gallery" id="catalogBody"></div>
+  <section class="card" id="cardCat">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Catalog (subset)</div>
+    <div class="tbl">
+      <div class="tbl-head">
+        <div class="cell">Name</div>
+        <div class="cell">Type</div>
+        <div class="cell">RA</div>
+        <div class="cell">Dec</div>
+        <div class="cell">Image</div>
       </div>
+      <div class="gallery" id="catalogBody"></div>
     </div>
   </section>
 
-  <div class="toast" id="toast"><div class="bubble" id="toastText">Saved</div></div>
+  <!-- RIG SUMMARY (top pills only; full rig editor omitted for length) -->
+  <section class="card" id="cardRig">
+    <div class="toggle"><div class="chev"></div></div>
+    <div class="card-title">Rig (Scope + Camera)</div>
+    <div class="pills">
+      <span class="pill" id="sumEff">Eff. FL —</span>
+      <span class="pill" id="sumFOV">FOV — × —</span>
+      <span class="pill" id="sumScale">Scale — "/px</span>
+      <span class="pill" id="sumScope">560 × 80 mm (f/7.0)</span>
+      <span class="pill">Reducer 0.8×</span>
+    </div>
+  </section>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hide"><div id="toastMsg"></div></div>
 </div>
 
 <script>
-/* ---------- helpers ---------- */
-const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
-const toast=msg=>{const t=$("#toast");$("#toastText").textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);};
-const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));const pct=v=>`${Math.round(v)}%`;
+/* ---------- tiny helpers ---------- */
+const $=s=>document.querySelector(s);
+function toast(msg){ const t=$("#toast"); $("#toastMsg").textContent=msg; t.classList.remove("hide"); setTimeout(()=>t.classList.add("hide"),1800); }
+function pill(txt,klass=""){const s=document.createElement("span");s.className="pill"+(klass?(" "+klass):"");s.textContent=txt;return s;}
 
-/* ---------- state ---------- */
-const state={night:false,compact:false,lat:37.16558,lon:-76.56841,hours:3,
-  clouds:35,cloudRisk:35,humidity:86,visibilityKm:14,moonPct:7,sunAlt:-45,moonAlt:-29,astroDark:true,
-  factor:1.0,showFOV:false,biasFOV:false
+/* ---------- demo data (replace with live later) ---------- */
+const CATALOG=[
+  {name:"M31",type:"GX",ra:"0.71h",dec:"41.3°",img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo.jpg"},
+  {name:"M33",type:"GX",ra:"1.55h",dec:"30.7°",img:"https://upload.wikimedia.org/wikipedia/commons/5/55/Triangulum_Galaxy_Messier_33_from_the_Mount_Lemmon_SkyCenter_Schulman_Telescope_courtesy_Adam_Block.jpg"},
+  {name:"M27",type:"PN",ra:"19.89h",dec:"22.7°",img:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Dumbbell_Nebula_-_HST_-_Potw2029a.jpg"},
+  {name:"M57",type:"PN",ra:"18.89h",dec:"33.0°",img:"https://upload.wikimedia.org/wikipedia/commons/0/0d/M57_The_Ring_Nebula.JPG"},
+  {name:"M13",type:"GC",ra:"16.70h",dec:"36.5°",img:"https://upload.wikimedia.org/wikipedia/commons/4/4d/M13_-_Hercules_Globular_Cluster.jpg"},
+];
+const WIKI_MAP={M31:"Andromeda_Galaxy",M33:"Messier_33",M27:"Messier_27",M57:"Messier_57",M13:"Messier_13"};
+
+/* ---------- user-tunable rules ---------- */
+const DEFAULT_RULES={ wCloud:70, wTrans:40, minVis:12, moonTol:50, humPen:15 };
+const rules = JSON.parse(localStorage.getItem("gng_rules")||"null")||DEFAULT_RULES;
+function bindRules(){
+  $("#wCloud").value=rules.wCloud;
+  $("#wTrans").value=rules.wTrans;
+  $("#minVis").value=rules.minVis;
+  $("#moonTol").value=rules.moonTol;
+  $("#humPen").value=rules.humPen;
+  echoRules();
+}
+function echoRules(){
+  $("#rulesEcho").textContent=`Cloud ${rules.wCloud} · Trans ${rules.wTrans} · Vis ≥ ${rules.minVis}km · Moon ≤ ${rules.moonTol}% · RH pen ${rules.humPen}`;
+}
+$("#saveRules").onclick=()=>{
+  rules.wCloud=+$("#wCloud").value;
+  rules.wTrans=+$("#wTrans").value;
+  rules.minVis=+$("#minVis").value;
+  rules.moonTol=+$("#moonTol").value;
+  rules.humPen=+$("#humPen").value;
+  localStorage.setItem("gng_rules",JSON.stringify(rules));
+  echoRules(); applyStatus();
+  toast("Go/No-Go rules saved");
+};
+$("#resetRules").onclick=()=>{
+  Object.assign(rules,DEFAULT_RULES);
+  localStorage.setItem("gng_rules",JSON.stringify(rules));
+  bindRules(); applyStatus();
+  toast("Rules reset to defaults");
 };
 
-/* ---------- toggles/collapse ---------- */
-$("#toggleNight").addEventListener("click",()=>{state.night=!state.night;document.body.classList.toggle("night",state.night);$("#toggleNight").textContent=state.night?"Normal Mode":"Night Mode";toast(state.night?"Night mode on":"Night mode off");});
-$("#toggleCompact").addEventListener("click",()=>{state.compact=!state.compact;$("#app").classList.toggle("compact",state.compact);$("#toggleCompact").textContent=state.compact?"Compact On":"Compact Off";});
-$$(".chev").forEach(b=>b.addEventListener("click",()=>{const key=b.dataset.collapse;const area=$(`#${key}-content`);const open=area.style.display!=="none";area.style.display=open?"none":"";b.querySelector("svg").style.transform=open?"rotate(180deg)":"rotate(0)";}));
+/* ---------- fake “current conditions” (replace with your real fetch) ---------- */
+const state={
+  updated:new Date(),
+  sunAlt:-45, moonPct:7, moonAlt:-29,
+  clouds:7, vis:14, rh:86,
+  transText:"Great", aod:0.12, pm25:"—", dT:0.7, aqi:0,
+  showFOV:true
+};
 
-/* ---------- status ---------- */
+/* ---------- UI: collapsers, theme, compact ---------- */
+document.querySelectorAll(".card .chev").forEach(c=>{
+  c.addEventListener("click",()=>{
+    const card=c.closest(".card");
+    const col = card.getAttribute("data-collapsed")==="true";
+    card.setAttribute("data-collapsed", col?"false":"true");
+  });
+});
+$("#toggleTheme").onclick=()=>{
+  document.body.classList.toggle("night");
+  $("#toggleTheme").textContent=document.body.classList.contains("night")?"Night Mode":"Normal Mode";
+};
+$("#toggleCompact").onclick=()=>{
+  document.body.classList.toggle("compact");
+  $("#toggleCompact").textContent=document.body.classList.contains("compact")?"Compact On":"Compact Off";
+};
+
+/* ---------- status line ---------- */
 function applyStatus(){
-  const go = (state.cloudRisk<=60) && (state.visibilityKm>=12) && state.astroDark;
-  $("#statusText").textContent = `${go?"GO":"NO-GO"} · Clouds ~${pct(state.cloudRisk)} · Vis ${state.visibilityKm} km · ${state.astroDark?"Astro dark":"Too bright"}`;
-  $("#updated").textContent="Updated "+new Date().toLocaleTimeString();
-  $("#sunAlt").textContent=`Sun alt ${state.sunAlt}°`;
-  $("#moonIllum").textContent=`Moon ${state.moonPct}%`;
-  $("#transTag").textContent=`Transparency ${$("#transWord").textContent||"—"}`;
+  const s=$("#statusLine"); s.innerHTML="";
+  // compute a risk score 0..100
+  const cloudRisk = state.clouds;               // 0..100
+  const transRisk = ({"Great":10,"Good":25,"OK":40,"Poor":65,"Bad":85}[state.transText]||40);
+  let risk = (rules.wCloud*cloudRisk + rules.wTrans*transRisk) / Math.max(1,(rules.wCloud+rules.wTrans));
+  // humidity penalty
+  risk += (state.rh/100)*rules.humPen;
+  // hard gates
+  const hardBlock = (state.vis < rules.minVis) || (state.moonPct > rules.moonTol && state.moonAlt>-5);
+  const good = !hardBlock && risk < 50;
+
+  s.appendChild(pill(good?"GO":"NO-GO", good?"ok":"bad"));
+  s.appendChild(pill(`Clouds ~${state.clouds}%`));
+  s.appendChild(pill(`Vis ${state.vis} km`));
+  s.appendChild(pill(`Astro dark`));
+
+  $("#pUpdated").textContent="Updated "+state.updated.toLocaleTimeString();
+  $("#pSun").textContent=`Sun alt ${state.sunAlt}°`;
+  $("#pMoon").textContent=`Moon ${state.moonPct}%`;
+  $("#pTrans").textContent=`Transparency ${state.transText}`;
+}
+function renderConditions(){
+  $("#cMoonPct").textContent=state.moonPct+"%";
+  $("#cMoonAlt").textContent="Alt "+state.moonAlt+"°";
+  $("#cClouds").textContent=state.clouds+"%";
+  $("#cHum").textContent=state.rh+"%";
+  $("#cTransBig").textContent=state.transText;
+  $("#cTransLine").textContent=`AOD ${state.aod} · PM2.5 ${state.pm25} · RH ${state.rh}% · Vis ${state.vis}km · ΔT ${state.dT}°C · ${state.aqi}`;
 }
 
-/* ---------- conditions ---------- */
-$("#cloudSlider").addEventListener("input",e=>{state.clouds=+e.target.value;state.cloudRisk=state.clouds;$("#cloudPct").textContent=pct(state.clouds);$("#cloudsBig").textContent=pct(state.clouds);applyStatus();});
-$("#useClouds").addEventListener("click",()=>{toast(`Clouds set to ${pct(state.clouds)}`);});
-$("#calcNow").addEventListener("click",async()=>{await calcWeather();toast(`Calculated (cloud risk ${pct(state.cloudRisk)})`);});
-async function calcWeather(){
-  try{
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${state.lat}&longitude=${state.lon}&hourly=cloud_cover,relative_humidity_2m,visibility&timezone=auto`;
-    const r=await fetch(url,{cache:"no-store"});const j=await r.json();
-    const n=clamp(state.hours,1,12);
-    const cc=j?.hourly?.cloud_cover||[];const rh=j?.hourly?.relative_humidity_2m||[];const vis=j?.hourly?.visibility||[];
-    const slice=(a)=>a.slice(0,n).map(x=>+x||0);
-    const ccArr=slice(cc); const rhArr=slice(rh); const visArr=slice(vis);
-    const mean=a=>a.reduce((s,v)=>s+v,0)/Math.max(1,a.length);
-    state.clouds=Math.round(mean(ccArr));
-    state.cloudRisk=Math.round(Math.max(...ccArr)); // window max -> more realistic for “is it going to be cloudy”
-    state.humidity=Math.round(mean(rhArr));
-    state.visibilityKm=Math.round((mean(visArr)||0)/1000);
-    $("#cloudPct").textContent=pct(state.clouds);$("#cloudsBig").textContent=pct(state.cloudRisk);
-    $("#cloudSrc").textContent="From Open-Meteo (window max)";
-    const aod=0.12;const score=(100-state.cloudRisk)-(state.humidity*0.2)+(state.visibilityKm*1.2)-(aod*100*0.6);
-    const word=score>75?"Great":score>55?"Good":score>35?"Fair":"Bad";
-    $("#transWord").textContent=word;
-    $("#transDetails").textContent=`AOD ${aod.toFixed(2)} · PM2.5 — · RH ${state.humidity}% · Vis ${state.visibilityKm}km · ΔT 0.7°C · 0`;
-    $("#humidity").textContent=`${state.humidity}%`;
-    $("#moonPct").textContent=`${state.moonPct}%`;$("#moonAltSmall").textContent=`Alt ${state.moonAlt}°`;
-    applyStatus();
-  }catch(e){$("#cloudSrc").textContent="From slider (Open-Meteo unavailable)";toast("Open-Meteo unavailable — using slider");}
-}
-
-/* ---------- rig compute + UI ---------- */
-const SCOPES={sv503:{fl:560,ap:80},gt71:{fl:420,ap:71},redcat:{fl:250,ap:51},fra400:{fl:400,ap:72},custom:{fl:null,ap:null}};
-const CAMS={asi533:{w:11.31,h:11.31,px:3.76},asi2600:{w:23.5,h:15.7,px:3.76},asi6200:{w:36,h:24,px:3.76},canon600d:{w:22.3,h:14.9,px:4.3},custom:{w:null,h:null,px:null}};
-function effFL(){return (+$("#scopeFL").value||0)*(state.factor||1);}
-function calcRig(){
-  const fl=effFL();const w=+$("#camW").value||0;const h=+$("#camH").value||0;const px=+$("#camPx").value||0;
-  const fovX=fl>0&&w>0?57.2958*w/fl:0;const fovY=fl>0&&h>0?57.2958*h/fl:0;const scale=fl>0&&px>0?206.265*px/fl:0;
-  $("#effFL").textContent=fl?`Eff. FL: ${fl.toFixed(0)} mm`:"Eff. FL: —";
-  const fovTxt=(fovX&&fovY)?`${fovX.toFixed(2)} × ${fovY.toFixed(2)}`:"— × —";
-  $("#sumEff").textContent=fl?`Eff. FL ${fl.toFixed(0)} mm`:"Eff. FL —";
-  $("#sumFOV").textContent=`FOV ${fovTxt}`;
-  $("#sumScale").textContent=scale?`Scale ${scale.toFixed(2)} "/px`:`Scale — "/px`;
-}
-function setActiveFactor(){
-  $$(".redbtn").forEach(x=>x.classList.toggle("active",x.dataset.f===String(state.factor)));
-}
-$("#scopeSel").addEventListener("change",()=>{const s=SCOPES[$("#scopeSel").value];if(s){$("#scopeFL").value=s.fl??"";$("#scopeAp").value=s.ap??"";}calcRig();});
-$("#camSel").addEventListener("change",()=>{const c=CAMS[$("#camSel").value];if(c){$("#camW").value=c.w??"";$("#camH").value=c.h??"";$("#camPx").value=c.px??"";}calcRig();});
-$$(".redbtn").forEach(b=>b.addEventListener("click",()=>{state.factor=parseFloat(b.dataset.f);setActiveFactor();calcRig();toast(`Optical factor ${state.factor}×`);}));
-["#scopeFL","#scopeAp","#camW","#camH","#camPx"].forEach(id=>$(id).addEventListener("input",calcRig));
-$("#biasFOV").addEventListener("change",(e)=>{state.biasFOV=e.target.checked;toast(state.biasFOV?"Bias to FOV: on":"Bias to FOV: off");});
-$("#showFOV").addEventListener("change",(e)=>{$$(".thumb").forEach(t=>t.classList.toggle("fov",e.target.checked));});
-$("#calcFlip").addEventListener("click",()=>{$("#flipEta").textContent="≈ 2h (stub)";toast("Meridian flip ETA is a placeholder; needs target RA/Dec");});
-
-/* presets */
-function loadPresetList(){const list=JSON.parse(localStorage.getItem("rig.presets")||"[]");const sel=$("#presetList");sel.innerHTML='<option value="">(none saved)</option>'+list.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("");return list;}
-function savePresetList(list){localStorage.setItem("rig.presets",JSON.stringify(list));}
-$("#savePreset").addEventListener("click",()=>{const name=($("#presetName").value||"").trim();if(!name){toast("Enter a preset name");return;}const list=loadPresetList();const obj={name,scopeSel:$("#scopeSel").value,scopeFL:$("#scopeFL").value,scopeAp:$("#scopeAp").value,factor:state.factor,camSel:$("#camSel").value,camW:$("#camW").value,camH:$("#camH").value,camPx:$("#camPx").value};const idx=list.findIndex(p=>p.name.toLowerCase()===name.toLowerCase());if(idx>=0)list[idx]=obj;else list.push(obj);savePresetList(list);loadPresetList();toast("Preset saved");});
-$("#deletePreset").addEventListener("click",()=>{const list=loadPresetList();const sel=$("#presetList");if(!sel.value){toast("Select a preset to delete");return;}list.splice(parseInt(sel.value,10),1);savePresetList(list);loadPresetList();toast("Preset deleted");});
-$("#presetList").addEventListener("change",()=>{const list=loadPresetList();const i=parseInt($("#presetList").value,10);if(Number.isFinite(i)&&list[i]){const p=list[i];$("#presetName").value=p.name;$("#scopeSel").value=p.scopeSel;$("#scopeFL").value=p.scopeFL;$("#scopeAp").value=p.scopeAp;state.factor=parseFloat(p.factor)||1.0;setActiveFactor();$("#camSel").value=p.camSel;$("#camW").value=p.camW;$("#camH").value=p.camH;$("#camPx").value=p.camPx;calcRig();toast("Preset loaded");}});
-
-/* ---------- Top 5 (fixed links) ---------- */
-const TOP5=[
-  {id:"M27",name:"Dumbbell Nebula",score:196,alt:"82°",sep:"142°",wiki:"Messier_27"},
-  {id:"M31",name:"Andromeda Galaxy",score:183,alt:"45°",sep:"140°",wiki:"Andromeda_Galaxy"},
-  {id:"M33",name:"Triangulum Galaxy",score:175,alt:"46°",sep:"145°",wiki:"Messier_33"},
-  {id:"M57",name:"Ring Nebula",score:155,alt:"44°",sep:"115°",wiki:"Messier_57"},
-  {id:"M13",name:"Hercules Globular",score:120,alt:"24°",sep:"90°",wiki:"Messier_13"}
-];
-function renderTop5(){const ol=$("#top5List");ol.innerHTML="";TOP5.forEach(o=>{const li=document.createElement("li");li.innerHTML=`<a href="https://en.wikipedia.org/wiki/${o.wiki}" target="_blank" rel="noopener">${o.id}</a> — ${o.name} — alt ${o.alt} — ${o.sep} from Moon — ${o.score}%`;ol.appendChild(li);});}
-
-/* ---------- Catalog ---------- */
-const CATALOG=[
-  {type:"GX",ra:"0.71h",dec:"41.3°",name:"M31",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/M31bobo.jpg/256px-M31bobo.jpg"},
-  {type:"GX",ra:"1.55h",dec:"30.7°",name:"M33",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Triangulum_Galaxy_by_Gianni_Puga.jpg/256px-Triangulum_Galaxy_by_Gianni_Puga.jpg"},
-  {type:"PN",ra:"19.89h",dec:"22.7°",name:"M27",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/M27_-_Dumbbell_Nebula.jpg/256px-M27_-_Dumbbell_Nebula.jpg"},
-  {type:"PN",ra:"18.89h",dec:"33.0°",name:"M57",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/M57_The_Ring_Nebula.JPG/256px-M57_The_Ring_Nebula.JPG"},
-  {type:"GC",ra:"16.70h",dec:"36.5°",name:"M13",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/M13_-_The_Great_Hercules_Cluster.jpg/256px-M13_-_The_Great_Hercules_Cluster.jpg"},
-];
-function renderCatalog(){
-  const body=$("#catalogBody");body.innerHTML="";
-  CATALOG.forEach(r=>{
-    const row=document.createElement("div");row.className="tbl-row";
-    const thumb=document.createElement("div");thumb.className="thumb";thumb.style.backgroundImage=`url('${r.img}')`;thumb.innerHTML=`<span>${r.name}</span>`;
-    const test=new Image();test.onerror=()=>{thumb.style.background="linear-gradient(180deg,#0b1b23,#0b1b23)";};test.src=r.img;
-    row.innerHTML=`<div class="cell">${r.type}</div><div class="cell">${r.ra}</div><div class="cell">${r.dec}</div><div class="cell">${r.name}</div><div class="cell"></div>`;
-    row.querySelectorAll(".cell")[4].appendChild(thumb);
+/* ---------- shared table renderer ---------- */
+function rowLink(name){ return `https://en.wikipedia.org/wiki/${WIKI_MAP[name]||encodeURIComponent(name)}`; }
+function renderInto(container, rows){
+  const body=$(container); body.innerHTML="";
+  rows.forEach(r=>{
+    const row=document.createElement("a");
+    row.className="tbl-row";
+    row.href=rowLink(r.name); row.target="_blank"; row.rel="noopener";
+    row.innerHTML=`
+      <div class="cell">${r.name}</div>
+      <div class="cell">${r.type}</div>
+      <div class="cell">${r.ra}</div>
+      <div class="cell">${r.dec}</div>
+      <div class="cell"><div class="thumb"><img loading="lazy" alt="${r.name}"></div></div>`;
+    const img=row.querySelector("img");
+    img.src=r.img;
+    img.onerror=()=>{ img.style.display="none"; };
     body.appendChild(row);
   });
 }
 
-/* ---------- init ---------- */
-function initRig(){
-  $("#scopeSel").value="sv503";$("#camSel").value="asi533";state.factor=0.8; // default to 0.8x for your preset
-  setActiveFactor();calcRig();loadPresetList();
+/* ---------- Top 5 list using same data ---------- */
+function renderTop(){
+  const ol=$("#topList"); ol.innerHTML="";
+  CATALOG.forEach((r,i)=>{
+    const li=document.createElement("li");
+    li.style.margin="6px 0";
+    const a=document.createElement("a");
+    a.href=rowLink(r.name); a.target="_blank"; a.rel="noopener"; a.textContent=r.name;
+    li.appendChild(a);
+    li.insertAdjacentHTML("beforeend",` — ${(["Dumbbell Nebula","Andromeda Galaxy","Triangulum Galaxy","Ring Nebula","Hercules Globular"][i]||"")}`);
+    ol.appendChild(li);
+  });
 }
-renderTop5();renderCatalog();initRig();calcWeather();
+
+/* ---------- Search ---------- */
+$("#searchBox").addEventListener("input",()=>{
+  const q=$("#searchBox").value.trim().toLowerCase();
+  const rows = CATALOG.filter(r=>
+    r.name.toLowerCase().includes(q) ||
+    r.type.toLowerCase().includes(q)
+  );
+  renderInto("#searchBody", rows);
+});
+$("#clearSearch").onclick=()=>{ $("#searchBox").value=""; renderInto("#searchBody", CATALOG); }
+
+/* ---------- Rig summary (static demo values) ---------- */
+function calcRigSummary(){
+  const baseFL=560, ap=80, factor=0.8;
+  const effFL=Math.round(baseFL*factor);
+  const w=11.31, h=11.31, px=3.76;
+  const fovX=(57.2958*w/effFL).toFixed(2), fovY=(57.2958*h/effFL).toFixed(2);
+  const scale=(206.265*px/effFL).toFixed(2);
+  const fRatio=(baseFL/ap).toFixed(1);
+  $("#sumEff").textContent=`Eff. FL ${effFL} mm (0.8×)`;
+  $("#sumFOV").textContent=`FOV ${fovX} × ${fovY}`;
+  $("#sumScale").textContent=`Scale ${scale} "/px`;
+  $("#sumScope").textContent=`${baseFL} × ${ap} mm (f/${fRatio})`;
+}
+
+/* ---------- init ---------- */
+bindRules();
+applyStatus();
+renderConditions();
+renderTop();
+renderInto("#catalogBody", CATALOG);
+renderInto("#searchBody", CATALOG);
+calcRigSummary();
+
+/* ---------- collapse default off ---------- */
+document.querySelectorAll(".card").forEach(c=>c.setAttribute("data-collapsed","false"));
 </script>
 </body>
 </html>
