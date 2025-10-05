@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Go/No-Go v28.8</title>
+<title>Go/No-Go v28.9</title>
 <style>
   :root{
     --bg:#0f1b22; --panel:#111c23; --panel-2:#0c151b;
@@ -11,11 +11,7 @@
     --ok:#2dc070; --bad:#ff6b6b; --ring:rgba(255,255,255,.08);
     --shadow:0 12px 36px rgba(0,0,0,.35); --radius:16px;
   }
-  .night{
-    --bg:#060707; --panel:#090a0b; --panel-2:#070808;
-    --text:#ffddd3; --muted:#f2b7a6; --accent:#ff9b7a;
-    --ok:#ff5d5d; --bad:#ff8a8a; --ring:rgba(255,170,150,.15);
-  }
+  .night{--bg:#060707;--panel:#090a0b;--panel-2:#070808;--text:#ffddd3;--muted:#f2b7a6;--accent:#ff9b7a;--ok:#ff5d5d;--bad:#ff8a8a;--ring:rgba(255,170,150,.15)}
   html,body{height:100%}
   body{margin:0;background:radial-gradient(1200px 700px at 50% -200px,#123,#0a1217) fixed,var(--bg);color:var(--text);font:15.5px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
   body.night{background:radial-gradient(1200px 700px at 50% -200px,#230e0e,#090909) fixed,var(--bg)}
@@ -45,9 +41,9 @@
   .chev svg{transition:transform .2s ease}.chev[aria-expanded="true"] svg{transform:rotate(180deg)}
   .card-body{padding:12px 14px 16px}
   .grid{display:grid;gap:10px}
-  .cols2{grid-template-columns:repeat(2,1fr)} .cols3{grid-template-columns:repeat(3,1fr)}
   .cols2fixed{grid-template-columns:repeat(2,minmax(0,1fr))}
-  @media (max-width:820px){.cols2,.cols3{grid-template-columns:1fr}}
+  .cols3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:820px){.cols2fixed,.cols3{grid-template-columns:1fr}}
   .kv{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--ring);background:#0f1a20}
   .night .kv{background:#160b0b}
   .kv h4{margin:0;font-weight:700;letter-spacing:.2px;color:#b7c7d1;font-size:13.5px}.night .kv h4{color:#ffbcae}
@@ -76,12 +72,13 @@
   .compact .kv{padding:10px}
   .action-row{display:flex;gap:6px;flex-wrap:wrap}
   .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-left:8px}
+  .flash{animation:flash 1s ease 1}@keyframes flash{0%{box-shadow:0 0 0 0 rgba(139,211,255,.0)}60%{box-shadow:0 0 0 10px rgba(139,211,255,.12)}100%{box-shadow:0 0 0 0 rgba(139,211,255,.0)}}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header class="app">
-      <div class="title">Go/No-Go</div><div class="ver">v28.8</div>
+      <div class="title">Go/No-Go</div><div class="ver">v28.9</div>
     </header>
 
     <div class="toolbar">
@@ -158,6 +155,7 @@
               <button id="btn-loc-del" class="btn tiny">Delete</button>
               <button id="btn-calc" class="btn tiny">Calculate</button>
             </div>
+            <div id="loc-badge" class="badge" style="display:none;margin-top:6px"></div>
           </div>
         </div>
       </div>
@@ -188,6 +186,7 @@
               <button id="btn-prof-load" class="btn tiny">Load</button>
               <button id="btn-prof-del"  class="btn tiny">Delete</button>
             </div>
+            <div id="scope-badge" class="badge" style="display:none;margin-top:6px"></div>
           </div>
         </div>
 
@@ -243,7 +242,6 @@
             </div>
             <div class="action-row">
               <button id="btn-rig-calc" class="btn small">Recalculate</button>
-              <span id="scope-loaded" class="badge" style="display:none">Scope loaded</span>
             </div>
           </div>
         </div>
@@ -266,7 +264,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button></div>
       <div class="card-body" style="display:none">
-        <div class="grid cols2">
+        <div class="grid cols2fixed">
           <div class="kv"><h4>Search catalog (name/type)</h4><input id="search" type="text" placeholder="e.g., M31, galaxy, nebula…"></div>
           <div class="kv"><h4>&nbsp;</h4><button id="btn-clear-search" class="btn small">Clear</button></div>
         </div>
@@ -305,8 +303,9 @@
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const ls = (k,v) => (v===undefined? JSON.parse(localStorage.getItem(k)||'null') : localStorage.setItem(k,JSON.stringify(v)));
-function toast(msg){ const w=$("#toast-wrap"), t=$("#toast"); t.textContent=msg; w.style.display="grid"; clearTimeout(toast._t); toast._t=setTimeout(()=>w.style.display="none",1800); }
+function toast(msg){ const w=$("#toast-wrap"), t=$("#toast"); t.textContent=msg; w.style.display="grid"; clearTimeout(toast._t); toast._t=setTimeout(()=>w.style.display="none",1500); }
 function setOpen(id,open){ const card=document.getElementById(id); const body=card.querySelector('.card-body'); const btn=card.querySelector('.chev'); body.style.display=open?"":"none"; btn.setAttribute('aria-expanded',String(open)); }
+function showBadge(el,msg){ el.textContent=msg; el.style.display="inline-block"; el.classList.add('flash'); clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.display="none"; el.classList.remove('flash'); },1500); }
 
 /* STATE */
 const state = {
@@ -340,8 +339,9 @@ function renderRigSummary(){ const r=state.rig.initialized?state.rig:null; const
   $("#rig-scale").textContent=c?`Scale ${c.scale.toFixed(2)} \"/px`:"Scale — \"/px";
   $("#rig-ready-dot").style.display=r?"" :"none";
 }
+function hideScopeBadge(){ $("#scope-badge").style.display="none"; }
 
-/* Editor sync & events */
+/* Editor select matching */
 function chooseScopeOptionFromValues(fl,dia){
   const sel=$("#sel-scope"); let matched=false;
   [...sel.options].forEach(o=>{
@@ -364,44 +364,44 @@ function chooseCamOptionFromValues(sx,sy,px){
   else { $("#cam-custom").style.display="none"; }
 }
 
+function syncReducerSeg(val){ $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active', Number(t.dataset.mul)===val)); }
+
+/* Sync editor from state */
 function syncEditorFromRig(){
   if(!state.rig.initialized){
     $("#sel-scope").value=""; $("#sel-cam").value="";
     $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none";
-    $("#rig-efffl-editor").textContent="— mm";
-    $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active',t.dataset.mul==="1"));
-    $("#rig-ready-dot").style.display="none";
-    return;
+    $("#rig-efffl-editor").textContent="— mm"; syncReducerSeg(1); $("#rig-ready-dot").style.display="none"; return;
   }
   chooseScopeOptionFromValues(state.rig.fl,state.rig.dia);
   chooseCamOptionFromValues(state.rig.cam?.sx,state.rig.cam?.sy,state.rig.cam?.px);
-  $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active', Number(t.dataset.mul)===state.rig.reducer));
+  syncReducerSeg(state.rig.reducer||1);
   const c=computeRig(state.rig); $("#rig-efffl-editor").textContent=c?`${c.effFL} mm`:"— mm";
   $("#rig-ready-dot").style.display="";
 }
-function touchRig(){ renderRigSummary(); renderCatalog(); saveRig(); }
+function touchRig(){ renderRigSummary(); renderCatalog(); saveRig(); hideScopeBadge(); }
 
+/* Scope/Cam events */
 $("#sel-scope").addEventListener('change',e=>{ const v=e.target.value;
   if(v==="custom"){ $("#scope-custom").style.display=""; }
-  else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; $("#scope-loaded").style.display=""; toast("Scope loaded"); }
+  else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; showBadge($("#scope-badge"),"Scope loaded"); }
   $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
-$("#in-fl").addEventListener('input',()=>{ state.rig.fl=Number($("#in-fl").value||0); state.rig.initialized=true; $("#scope-loaded").style.display=""; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
-$("#in-dia").addEventListener('input',()=>{ state.rig.dia=Number($("#in-dia").value||0); state.rig.initialized=true; $("#scope-loaded").style.display=""; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+["#in-fl","#in-dia"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.fl=Number($("#in-fl").value||0); state.rig.dia=Number($("#in-dia").value||0); state.rig.initialized=true; showBadge($("#scope-badge"),"Scope updated"); $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
 
-$("#seg-reducer").addEventListener('click',e=>{ const t=e.target.closest('.toggle'); if(!t) return; $$("#seg-reducer .toggle").forEach(el=>el.classList.remove('active')); t.classList.add('active'); state.rig.reducer=Number(t.dataset.mul); state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+$("#seg-reducer").addEventListener('click',e=>{ const t=e.target.closest('.toggle'); if(!t) return; syncReducerSeg(Number(t.dataset.mul)); state.rig.reducer=Number(t.dataset.mul); state.rig.initialized=true; showBadge($("#scope-badge"),`${state.rig.reducer}× selected`); $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
 $("#sel-cam").addEventListener('change',e=>{ const v=e.target.value;
   if(v==="custom"){ $("#cam-custom").style.display=""; state.rig.initialized=true; }
-  else{ const [,sx,sy,px]=v.split("|"); $("#cam-custom").style.display="none"; state.rig.cam={sx:Number(sx),sy:Number(sy),px:Number(px)}; state.rig.initialized=true; toast("Camera loaded"); }
+  else{ const [,sx,sy,px]=v.split("|"); $("#cam-custom").style.display="none"; state.rig.cam={sx:Number(sx),sy:Number(sy),px:Number(px)}; state.rig.initialized=true; showBadge($("#scope-badge"),"Camera loaded"); }
   $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
-["#in-sx","#in-sy","#in-px"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
+["#in-sx","#in-sy","#in-px"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; state.rig.initialized=true; showBadge($("#scope-badge"),"Camera updated"); $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
 
 $("#hook-fov").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.fov = e.currentTarget.classList.contains('active'); touchRig(); });
 $("#hook-bias").addEventListener('click',e=>{ e.currentTarget.classList.toggle('active'); state.rig.hooks ??= {}; state.rig.hooks.bias = e.currentTarget.classList.contains('active'); saveRig(); toast(state.rig.hooks.bias?"Top-5 will bias to your FOV":"Top-5 bias disabled"); });
 
-/* Catalog + Search */
+/* Catalog + Search (consistent labels) */
 function messierWikiLink(id){ return `https://en.wikipedia.org/wiki/Messier_${id.replace('M','')}`; }
 function renderCatalog(){
   const body=$("#cat-body"); if(!body) return; body.innerHTML="";
@@ -455,35 +455,37 @@ async function fetchWeather(){
   }catch(e){ console.error(e); toast("Weather fetch failed"); }
 }
 
-/* Top-5 */
+/* Top-5 (consistent text) */
 function computeTop5(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null; const diag=c?Math.hypot(c.fovX,c.fovY):null;
   const bias=r?.hooks?.bias?(m=>{ const want=(m.type==="GX"?2.0:m.type==="GC"?1.0:1.5); return diag?Math.max(0,1.5-Math.abs(diag-want)):1; }):(()=>1);
   return state.catalog.map(m=>({m,score:Math.random()*0.8+bias(m)})).sort((a,b)=>b.score-a.score).slice(0,5).map(x=>x.m); }
-function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=`${m.id}`; li.appendChild(a); ol.appendChild(li); }); setOpen('card-top5',true); }
+function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=`${m.id} — ${m.name}`; li.appendChild(a); ol.appendChild(li); }); setOpen('card-top5',true); }
 
 /* Quick setup + Locations */
 function loadBasics(){ if(state.lat!=null) $("#in-lat").value=state.lat; if(state.lon!=null) $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; refreshLocationDropdown(); refreshProfileDropdown(); }
 function refreshLocationDropdown(){ const sel=$("#sel-locations"); sel.innerHTML='<option value="">(none)</option>'; Object.keys(state.locations).sort().forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }); }
-$("#btn-gps").addEventListener('click',()=>{ if(!navigator.geolocation){ toast("GPS not available"); return; } navigator.geolocation.getCurrentPosition(pos=>{ state.lat=Number(pos.coords.latitude.toFixed(5)); state.lon=Number(pos.coords.longitude.toFixed(5)); $("#in-lat").value=state.lat; $("#in-lon").value=state.lon; ls('lat',state.lat); ls('lon',state.lon); toast("GPS location set"); },()=>toast("GPS failed")); });
-$("#btn-loc-save").addEventListener('click',()=>{ const name=($("#in-locname").value||"").trim(); if(!name){ toast("Name the location first"); return; } state.locations[name]={lat:Number($("#in-lat").value||state.lat), lon:Number($("#in-lon").value||state.lon), windowH:Number($("#in-window").value||state.windowH)}; ls('locations',state.locations); refreshLocationDropdown(); $("#sel-locations").value=name; toast("Location saved"); });
-$("#btn-loc-load").addEventListener('click',()=>{ const name=$("#sel-locations").value; if(!name||!state.locations[name]){ toast("Select a saved location"); return; } const loc=state.locations[name]; state.lat=loc.lat; state.lon=loc.lon; state.windowH=loc.windowH; $("#in-lat").value=state.lat; $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); toast("Location loaded"); });
-$("#btn-loc-del").addEventListener('click',()=>{ const name=$("#sel-locations").value; if(!name||!state.locations[name]){ toast("Select a saved location"); return; } delete state.locations[name]; ls('locations',state.locations); refreshLocationDropdown(); toast("Location deleted"); });
+$("#btn-gps").addEventListener('click',()=>{ if(!navigator.geolocation){ toast("GPS not available"); return; } navigator.geolocation.getCurrentPosition(pos=>{ state.lat=Number(pos.coords.latitude.toFixed(5)); state.lon=Number(pos.coords.longitude.toFixed(5)); $("#in-lat").value=state.lat; $("#in-lon").value=state.lon; ls('lat',state.lat); ls('lon',state.lon); showBadge($("#loc-badge"),"GPS set"); },()=>toast("GPS failed")); });
+$("#btn-loc-save").addEventListener('click',()=>{ const name=($("#in-locname").value||"").trim(); if(!name){ toast("Name the location first"); return; } state.locations[name]={lat:Number($("#in-lat").value||state.lat), lon:Number($("#in-lon").value||state.lon), windowH:Number($("#in-window").value||state.windowH)}; ls('locations',state.locations); refreshLocationDropdown(); $("#sel-locations").value=name; showBadge($("#loc-badge"),"Location saved"); });
+$("#btn-loc-load").addEventListener('click',()=>{ const name=$("#sel-locations").value; if(!name||!state.locations[name]){ toast("Select a saved location"); return; } const loc=state.locations[name]; state.lat=loc.lat; state.lon=loc.lon; state.windowH=loc.windowH; $("#in-lat").value=state.lat; $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); showBadge($("#loc-badge"),"Location loaded"); });
 
-/* Profiles (whole snapshot) */
+/* Profiles (deep snapshot) */
 function refreshProfileDropdown(){ const sel=$("#sel-profiles"); sel.innerHTML='<option value="">(none)</option>'; Object.keys(state.profiles).sort().forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }); }
 $("#btn-prof-save").addEventListener('click',()=>{ const name=($("#in-profile").value||"").trim(); if(!name){ toast("Name the profile first"); return; }
-  const snap={ rig:state.rig, thresholds:state.thresholds, lat:state.lat, lon:state.lon, windowH:state.windowH };
+  const snap=JSON.parse(JSON.stringify({ rig:state.rig, thresholds:state.thresholds, lat:state.lat, lon:state.lon, windowH:state.windowH }));
   state.profiles[name]=snap; ls('profiles',state.profiles); refreshProfileDropdown(); $("#sel-profiles").value=name; toast("Profile saved"); });
 $("#btn-prof-load").addEventListener('click',()=>{ const name=$("#sel-profiles").value; if(!name||!state.profiles[name]){ toast("Select a profile"); return; }
-  const s=state.profiles[name]; state.rig=s.rig; state.thresholds=s.thresholds; state.lat=s.lat; state.lon=s.lon; state.windowH=s.windowH;
+  const s=JSON.parse(JSON.stringify(state.profiles[name]));  // deep copy back
+  state.rig=s.rig; state.thresholds=s.thresholds; state.lat=s.lat; state.lon=s.lon; state.windowH=s.windowH;
   ls('rig',state.rig); ls('gng',state.thresholds); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH);
-  syncEditorFromRig(); renderRigSummary(); loadBasics(); renderCatalog(); decideGoNoGo(); toast("Profile loaded"); $("#scope-loaded").style.display=""; });
+  // reflect in UI
+  syncEditorFromRig(); renderRigSummary(); loadBasics(); renderCatalog(); decideGoNoGo(); showBadge($("#scope-badge"),"Profile loaded"); showBadge($("#loc-badge"),"Location loaded");
+});
 $("#btn-prof-del").addEventListener('click',()=>{ const name=$("#sel-profiles").value; if(!name||!state.profiles[name]){ toast("Select a profile"); return; } delete state.profiles[name]; ls('profiles',state.profiles); refreshProfileDropdown(); toast("Profile deleted"); });
 
 /* Calc buttons */
 async function fullRecalc(){ await fetchWeather(); decideGoNoGo(); renderTop5(computeTop5()); toast("Updated"); }
-$("#btn-calc").addEventListener('click', async ()=>{ state.lat=Number($("#in-lat").value||state.lat); state.lon=Number($("#in-lon").value||state.lon); state.windowH=Number($("#in-window").value||state.windowH); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); toast("Calculating…"); await fullRecalc(); });
-$("#btn-rig-calc").addEventListener('click', async ()=>{ toast("Rig updated. Recalculating…"); await fullRecalc(); });
+$("#btn-calc").addEventListener('click', async ()=>{ state.lat=Number($("#in-lat").value||state.lat); state.lon=Number($("#in-lon").value||state.lon); state.windowH=Number($("#in-window").value||state.windowH); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); await fullRecalc(); });
+$("#btn-rig-calc").addEventListener('click', async ()=>{ await fullRecalc(); });
 
 /* Boot */
 document.addEventListener('DOMContentLoaded',()=>{
