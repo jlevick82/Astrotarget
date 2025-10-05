@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Go/No-Go v28.7</title>
+<title>Go/No-Go v28.8</title>
 <style>
   :root{
     --bg:#0f1b22; --panel:#111c23; --panel-2:#0c151b;
@@ -74,14 +74,14 @@
   .toast{pointer-events:auto;background:#0f1a20;border:1px solid var(--ring);box-shadow:var(--shadow);color:var(--text);border-radius:12px;padding:10px 12px;min-width:240px;text-align:center}
   .compact .card-body{padding:10px}
   .compact .kv{padding:10px}
-  /* Tight action rows */
   .action-row{display:flex;gap:6px;flex-wrap:wrap}
+  .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-left:8px}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header class="app">
-      <div class="title">Go/No-Go</div><div class="ver">v28.7</div>
+      <div class="title">Go/No-Go</div><div class="ver">v28.8</div>
     </header>
 
     <div class="toolbar">
@@ -166,7 +166,7 @@
     <!-- 4) RIG -->
     <section id="card-rig" class="card">
       <div class="card-header">
-        <div class="card-title">Rig (Scope + Camera)</div>
+        <div class="card-title">Rig (Scope + Camera) <span id="rig-ready-dot" class="status-dot" style="display:none"></span></div>
         <button class="chev" data-target="card-rig" aria-expanded="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
@@ -241,6 +241,10 @@
               <span id="hook-bias" class="toggle active">Bias Top-5 to FOV</span>
               <span id="hook-fov" class="toggle active">FOV overlay on thumbs</span>
             </div>
+            <div class="action-row">
+              <button id="btn-rig-calc" class="btn small">Recalculate</button>
+              <span id="scope-loaded" class="badge" style="display:none">Scope loaded</span>
+            </div>
           </div>
         </div>
       </div>
@@ -312,11 +316,11 @@ const state = {
   rig: ls('rig') ?? {initialized:false, reducer:1, hooks:{fov:true,bias:true}},
   profiles: ls('profiles') ?? {},
   catalog: [
-    {id:"M31", type:"GX", ra:"0.71h", dec:"41.3°", img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo11.jpg"},
-    {id:"M33", type:"GX", ra:"1.55h", dec:"30.7°", img:"https://upload.wikimedia.org/wikipedia/commons/9/94/Triangulum_Galaxy_Messier_33_from_the_Mount_Lemmon_SkyCenter_Schmidt-Camera.jpg"},
-    {id:"M27", type:"PN", ra:"19.89h", dec:"22.7°", img:"https://upload.wikimedia.org/wikipedia/commons/1/16/M27_Dumbbell_Nebula.jpg"},
-    {id:"M57", type:"PN", ra:"18.89h", dec:"33.0°", img:"https://upload.wikimedia.org/wikipedia/commons/8/8e/M57_The_Ring_Nebula.JPG"},
-    {id:"M13", type:"GC", ra:"16.70h", dec:"36.5°", img:"https://upload.wikimedia.org/wikipedia/commons/5/57/M13_-_The_Great_Globular_Cluster_in_Hercules.jpg"}
+    {id:"M31", name:"Andromeda Galaxy", type:"GX", ra:"0.71h", dec:"41.3°", img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo11.jpg"},
+    {id:"M33", name:"Triangulum Galaxy", type:"GX", ra:"1.55h", dec:"30.7°", img:"https://upload.wikimedia.org/wikipedia/commons/9/94/Triangulum_Galaxy_Messier_33_from_the_Mount_Lemmon_SkyCenter_Schmidt-Camera.jpg"},
+    {id:"M27", name:"Dumbbell Nebula", type:"PN", ra:"19.89h", dec:"22.7°", img:"https://upload.wikimedia.org/wikipedia/commons/1/16/M27_Dumbbell_Nebula.jpg"},
+    {id:"M57", name:"Ring Nebula", type:"PN", ra:"18.89h", dec:"33.0°", img:"https://upload.wikimedia.org/wikipedia/commons/8/8e/M57_The_Ring_Nebula.JPG"},
+    {id:"M13", name:"Hercules Globular", type:"GC", ra:"16.70h", dec:"36.5°", img:"https://upload.wikimedia.org/wikipedia/commons/5/57/M13_-_The_Great_Globular_Cluster_in_Hercules.jpg"}
   ],
   wx:{clouds:null,vis:null,hum:null,aod:0.12,pm25:2.0,dT:0.7,astroDark:true,sunAlt:-45,moonPct:7,moonAlt:-29,updated:null,transpText:"—"}
 };
@@ -333,38 +337,64 @@ function computeRig(r){ if(!r.fl||!r.dia||!r.reducer||!r.cam||!r.cam.sx||!r.cam.
 function renderRigSummary(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null;
   $("#rig-efffl").textContent=c?`Eff. FL ${c.effFL} mm (${r.reducer}×)`:"Eff. FL — mm";
   $("#rig-fov").textContent=c?`FOV ${c.fovX.toFixed(2)} × ${c.fovY.toFixed(2)}`:"FOV — × —";
-  $("#rig-scale").textContent=c?`Scale ${c.scale.toFixed(2)} \"/px`:"Scale — \"/px"; }
+  $("#rig-scale").textContent=c?`Scale ${c.scale.toFixed(2)} \"/px`:"Scale — \"/px";
+  $("#rig-ready-dot").style.display=r?"" :"none";
+}
 
 /* Editor sync & events */
+function chooseScopeOptionFromValues(fl,dia){
+  const sel=$("#sel-scope"); let matched=false;
+  [...sel.options].forEach(o=>{
+    if(!o.value || o.value==="custom") return;
+    const [,ofl,odia]=o.value.split("|").map(x=>x.trim());
+    if(Number(ofl)==fl && Number(odia)==dia){ sel.value=o.value; matched=true; }
+  });
+  if(!matched){ sel.value="custom"; $("#scope-custom").style.display=""; $("#in-fl").value=fl||""; $("#in-dia").value=dia||""; }
+  else { $("#scope-custom").style.display="none"; }
+}
+
+function chooseCamOptionFromValues(sx,sy,px){
+  const sel=$("#sel-cam"); let matched=false;
+  [...sel.options].forEach(o=>{
+    if(!o.value || o.value==="custom") return;
+    const [,osx,osy,opx]=o.value.split("|").map(x=>x.trim());
+    if(Number(osx)==sx && Number(osy)==sy && Number(opx)==px){ sel.value=o.value; matched=true; }
+  });
+  if(!matched){ sel.value="custom"; $("#cam-custom").style.display=""; $("#in-sx").value=sx||""; $("#in-sy").value=sy||""; $("#in-px").value=px||""; }
+  else { $("#cam-custom").style.display="none"; }
+}
+
 function syncEditorFromRig(){
   if(!state.rig.initialized){
     $("#sel-scope").value=""; $("#sel-cam").value="";
     $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none";
     $("#rig-efffl-editor").textContent="— mm";
     $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active',t.dataset.mul==="1"));
+    $("#rig-ready-dot").style.display="none";
     return;
   }
-  $("#scope-custom").style.display="none"; $("#cam-custom").style.display="none";
+  chooseScopeOptionFromValues(state.rig.fl,state.rig.dia);
+  chooseCamOptionFromValues(state.rig.cam?.sx,state.rig.cam?.sy,state.rig.cam?.px);
   $$("#seg-reducer .toggle").forEach(t=>t.classList.toggle('active', Number(t.dataset.mul)===state.rig.reducer));
-  $("#in-sx").value=state.rig.cam?.sx??""; $("#in-sy").value=state.rig.cam?.sy??""; $("#in-px").value=state.rig.cam?.px??"";
   const c=computeRig(state.rig); $("#rig-efffl-editor").textContent=c?`${c.effFL} mm`:"— mm";
+  $("#rig-ready-dot").style.display="";
 }
 function touchRig(){ renderRigSummary(); renderCatalog(); saveRig(); }
 
 $("#sel-scope").addEventListener('change',e=>{ const v=e.target.value;
   if(v==="custom"){ $("#scope-custom").style.display=""; }
-  else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; }
+  else{ const [,fl,dia]=v.split("|"); $("#scope-custom").style.display="none"; state.rig.fl=Number(fl); state.rig.dia=Number(dia); state.rig.initialized=true; $("#scope-loaded").style.display=""; toast("Scope loaded"); }
   $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
-$("#in-fl").addEventListener('input',()=>{ state.rig.fl=Number($("#in-fl").value||0); state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
-$("#in-dia").addEventListener('input',()=>{ state.rig.dia=Number($("#in-dia").value||0); state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+$("#in-fl").addEventListener('input',()=>{ state.rig.fl=Number($("#in-fl").value||0); state.rig.initialized=true; $("#scope-loaded").style.display=""; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+$("#in-dia").addEventListener('input',()=>{ state.rig.dia=Number($("#in-dia").value||0); state.rig.initialized=true; $("#scope-loaded").style.display=""; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
 $("#seg-reducer").addEventListener('click',e=>{ const t=e.target.closest('.toggle'); if(!t) return; $$("#seg-reducer .toggle").forEach(el=>el.classList.remove('active')); t.classList.add('active'); state.rig.reducer=Number(t.dataset.mul); state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
 $("#sel-cam").addEventListener('change',e=>{ const v=e.target.value;
-  if(v==="custom"){ $("#cam-custom").style.display=""; state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; }
-  else{ const [,sx,sy,px]=v.split("|"); $("#cam-custom").style.display="none"; state.rig.cam={sx:Number(sx),sy:Number(sy),px:Number(px)}; }
-  state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
+  if(v==="custom"){ $("#cam-custom").style.display=""; state.rig.initialized=true; }
+  else{ const [,sx,sy,px]=v.split("|"); $("#cam-custom").style.display="none"; state.rig.cam={sx:Number(sx),sy:Number(sy),px:Number(px)}; state.rig.initialized=true; toast("Camera loaded"); }
+  $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); });
 
 ["#in-sx","#in-sy","#in-px"].forEach(s=>$(s).addEventListener('input',()=>{ state.rig.cam={sx:Number($("#in-sx").value||0), sy:Number($("#in-sy").value||0), px:Number($("#in-px").value||0)}; state.rig.initialized=true; $("#rig-efffl-editor").textContent=computeRig(state.rig)?`${computeRig(state.rig).effFL} mm`:"— mm"; touchRig(); }));
 
@@ -376,7 +406,10 @@ function messierWikiLink(id){ return `https://en.wikipedia.org/wiki/Messier_${id
 function renderCatalog(){
   const body=$("#cat-body"); if(!body) return; body.innerHTML="";
   const q=($("#search")?.value||"").trim().toLowerCase();
-  const items=state.catalog.filter(x=>!q || x.id.toLowerCase().includes(q) || x.type.toLowerCase().includes(q));
+  const items=state.catalog.filter(x=>{
+    const n=(x.name||"").toLowerCase();
+    return !q || x.id.toLowerCase().includes(q) || x.type.toLowerCase().includes(q) || n.includes(q);
+  });
   items.forEach(m=>{
     const tr=document.createElement('tr');
     const img=document.createElement('img');
@@ -386,7 +419,7 @@ function renderCatalog(){
     thumb.className=`thumb ${state.rig?.hooks?.fov?'fov':''}`;
     thumb.appendChild(img);
     const tdImg=document.createElement('td'); tdImg.appendChild(thumb);
-    tr.innerHTML=`<td><a href="${messierWikiLink(m.id)}" target="_blank">${m.id}</a></td><td>${m.type}</td><td>${m.ra}</td><td>${m.dec}</td>`;
+    tr.innerHTML=`<td><a href="${messierWikiLink(m.id)}" target="_blank">${m.id} — ${m.name}</a></td><td>${m.type}</td><td>${m.ra}</td><td>${m.dec}</td>`;
     tr.appendChild(tdImg);
     body.appendChild(tr);
   });
@@ -426,7 +459,7 @@ async function fetchWeather(){
 function computeTop5(){ const r=state.rig.initialized?state.rig:null; const c=r?computeRig(r):null; const diag=c?Math.hypot(c.fovX,c.fovY):null;
   const bias=r?.hooks?.bias?(m=>{ const want=(m.type==="GX"?2.0:m.type==="GC"?1.0:1.5); return diag?Math.max(0,1.5-Math.abs(diag-want)):1; }):(()=>1);
   return state.catalog.map(m=>({m,score:Math.random()*0.8+bias(m)})).sort((a,b)=>b.score-a.score).slice(0,5).map(x=>x.m); }
-function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=m.id; li.appendChild(a); ol.appendChild(li); }); setOpen('card-top5',true); }
+function renderTop5(list){ const ol=$("#top5-list"); ol.innerHTML=""; list.forEach(m=>{ const li=document.createElement('li'); const a=document.createElement('a'); a.href=messierWikiLink(m.id); a.target="_blank"; a.textContent=`${m.id}`; li.appendChild(a); ol.appendChild(li); }); setOpen('card-top5',true); }
 
 /* Quick setup + Locations */
 function loadBasics(){ if(state.lat!=null) $("#in-lat").value=state.lat; if(state.lon!=null) $("#in-lon").value=state.lon; $("#in-window").value=state.windowH; refreshLocationDropdown(); refreshProfileDropdown(); }
@@ -444,11 +477,13 @@ $("#btn-prof-save").addEventListener('click',()=>{ const name=($("#in-profile").
 $("#btn-prof-load").addEventListener('click',()=>{ const name=$("#sel-profiles").value; if(!name||!state.profiles[name]){ toast("Select a profile"); return; }
   const s=state.profiles[name]; state.rig=s.rig; state.thresholds=s.thresholds; state.lat=s.lat; state.lon=s.lon; state.windowH=s.windowH;
   ls('rig',state.rig); ls('gng',state.thresholds); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH);
-  syncEditorFromRig(); renderRigSummary(); loadBasics(); renderCatalog(); decideGoNoGo(); toast("Profile loaded"); });
+  syncEditorFromRig(); renderRigSummary(); loadBasics(); renderCatalog(); decideGoNoGo(); toast("Profile loaded"); $("#scope-loaded").style.display=""; });
 $("#btn-prof-del").addEventListener('click',()=>{ const name=$("#sel-profiles").value; if(!name||!state.profiles[name]){ toast("Select a profile"); return; } delete state.profiles[name]; ls('profiles',state.profiles); refreshProfileDropdown(); toast("Profile deleted"); });
 
-/* Calc */
-$("#btn-calc").addEventListener('click', async ()=>{ state.lat=Number($("#in-lat").value||state.lat); state.lon=Number($("#in-lon").value||state.lon); state.windowH=Number($("#in-window").value||state.windowH); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); toast("Calculating…"); await fetchWeather(); decideGoNoGo(); renderTop5(computeTop5()); toast("Updated"); });
+/* Calc buttons */
+async function fullRecalc(){ await fetchWeather(); decideGoNoGo(); renderTop5(computeTop5()); toast("Updated"); }
+$("#btn-calc").addEventListener('click', async ()=>{ state.lat=Number($("#in-lat").value||state.lat); state.lon=Number($("#in-lon").value||state.lon); state.windowH=Number($("#in-window").value||state.windowH); ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH); toast("Calculating…"); await fullRecalc(); });
+$("#btn-rig-calc").addEventListener('click', async ()=>{ toast("Rig updated. Recalculating…"); await fullRecalc(); });
 
 /* Boot */
 document.addEventListener('DOMContentLoaded',()=>{
