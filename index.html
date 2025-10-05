@@ -1,37 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Go/No-Go v28.9</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Go/No-Go v29.0</title>
 <style>
   :root{
-    --bg:#0c181e;--card:#0f2128;--ink:#dbe3e7;--ink-dim:#b7c2c9;
-    --mut:#2a3a45;--mut2:#18313a;--pill:#14242c;--good:#1f7a3f;--warn:#8a2d2d;
-    --accent:#2a8bbd;
+    --bg:#0c1419;--card:#0f1e25;--ink:#e7f1f6;--ink-dim:#b8c7cf;
+    --mut:#1e313b;--mut2:#16303a;--pill:#13242c;--accent:#2aa0cf;
+    --good:#0f6a3a;--good-bg:#0b2a1b;
   }
-  html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial;}
-  h1{font-size:2.2rem;margin:12px 12px 4px}
-  h1 small{opacity:.6;font-weight:700}
-  .toolbar{padding:0 12px 8px}
-  .btn{background:#1c2c34;border:1px solid var(--mut);color:var(--ink);border-radius:999px;padding:.45rem .9rem;margin:.25rem .35rem 0 0}
-  .btn:active{transform:translateY(1px)}
-  .card{background:var(--card);border-radius:14px;margin:12px;padding:14px;box-shadow:0 0 0 1px #0005}
-  .card h2{margin:0 0 10px}
+  body.night{
+    --bg:#050505;--card:#0a0a0a;--ink:#ffd9d9;--ink-dim:#ffbebe;
+    --mut:#262626;--mut2:#1a1a1a;--pill:#121212;--accent:#ff7d7d;
+    --good:#38c172;--good-bg:#0f271a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+  h1{font-size:2.1rem;margin:14px 12px 6px}
+  h1 small{opacity:.65}
+  .toolbar{padding:0 12px 10px}
+  .chip{display:inline-block;background:var(--pill);border:1px solid var(--mut);border-radius:999px;padding:.45rem .85rem;margin:.25rem .4rem 0 0}
+  details{background:var(--card);border-radius:14px;margin:12px;padding:0;box-shadow:0 0 0 1px #0005}
+  summary{list-style:none;cursor:pointer;padding:14px 14px 10px;border-radius:14px;color:var(--ink);font-weight:800}
+  summary::-webkit-details-marker{display:none}
+  .content{padding:0 14px 14px}
   .grid{display:grid;gap:.65rem}
   .cols2{grid-template-columns:repeat(2,1fr)}
   .cols3{grid-template-columns:repeat(3,1fr)}
-  @media (max-width:520px){.cols2{grid-template-columns:1fr}}
-  @media (max-width:720px){.cols3{grid-template-columns:1fr}}
-  .pill{background:var(--pill);border:1px solid var(--mut);border-radius:12px;padding:.55rem .75rem}
+  @media (max-width:680px){.cols2{grid-template-columns:1fr}.cols3{grid-template-columns:1fr}}
+  .pill{background:var(--pill);border:1px solid var(--mut);border-radius:12px;padding:.55rem .7rem}
   .mut{color:var(--ink-dim)}
   input,select{width:100%;background:var(--pill);border:1px solid var(--mut);border-radius:10px;color:var(--ink);padding:.55rem .6rem}
-  .inline-btns{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
-  .seg{display:flex;gap:.5rem;flex-wrap:wrap}
-  .seg button{background:transparent;border:1px solid var(--mut);border-radius:12px;color:var(--ink);padding:.5rem .8rem}
+  .seg{display:flex;flex-wrap:wrap;gap:.5rem}
+  .seg button{background:transparent;border:1px solid var(--mut);border-radius:12px;color:var(--ink);padding:.45rem .8rem}
   .seg button.active{outline:2px solid var(--accent);background:#123040}
-  .good{background:#0f2c14;border-color:#1a5d34}
-  .badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-weight:600;background:#134d2a;margin-left:.35rem}
+  .row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}
+  .btn{background:#1b2b33;border:1px solid var(--mut);color:var(--ink);border-radius:999px;padding:.45rem .85rem}
+  .btn:active{transform:translateY(1px)}
+  .badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-weight:700;background:var(--good-bg);color:#c6ffd9;border:1px solid var(--good);margin-left:.4rem}
   table{width:100%;border-collapse:collapse;margin-top:.6rem}
   th,td{padding:.55rem;border-bottom:1px solid #0a151a;text-align:left}
   th{color:var(--ink-dim);font-weight:600}
@@ -40,18 +47,17 @@
 </style>
 </head>
 <body>
-
-<h1>Go/No-Go <small>v28.9</small></h1>
+<h1>Go/No-Go <small>v29.0</small></h1>
 <div class="toolbar">
-  <button class="btn" id="btnCompact">Compact Off</button>
-  <button class="btn" id="btnNight">Night Mode</button>
+  <button class="chip" id="chipCompact">Compact Off</button>
+  <button class="chip" id="chipNight">Night Mode Off</button>
 </div>
 
 <!-- STATUS -->
-<section class="card" id="card-status">
-  <h2>Status</h2>
-  <div class="grid cols2">
-    <div class="pill"><div class="mut">Decision</div><div id="st-decision" style="font-weight:700">GO</div></div>
+<details open id="secStatus">
+  <summary>Status</summary>
+  <div class="content grid cols2">
+    <div class="pill"><div class="mut">Decision</div><div id="st-decision" style="font-weight:800">GO</div></div>
     <div class="pill"><div class="mut">Clouds</div><div id="st-clouds">~0%</div></div>
     <div class="pill"><div class="mut">Visibility</div><div id="st-vis">15 km</div></div>
     <div class="pill"><div class="mut">Astro</div><div id="st-astro">Astro dark</div></div>
@@ -60,161 +66,142 @@
     <div class="pill"><div class="mut">Moon</div><div id="st-moon">7%</div></div>
     <div class="pill"><div class="mut">Transparency</div><div id="st-trans">Okay</div></div>
   </div>
-</section>
+</details>
 
 <!-- CONDITIONS -->
-<section class="card" id="card-cond">
-  <h2>Conditions</h2>
-  <div class="grid cols2">
+<details open id="secCond">
+  <summary>Conditions</summary>
+  <div class="content grid cols2">
     <div class="pill"><div class="mut">Moon illum</div><div id="cd-moon">7%</div></div>
     <div class="pill"><div class="mut">Altitude</div><div id="cd-alt">-29°</div></div>
     <div class="pill"><div class="mut">Clouds (max window)</div><div id="cd-clouds">0%</div></div>
     <div class="pill"><div class="mut">Humidity</div><div id="cd-hum">74%</div></div>
   </div>
-</section>
+</details>
 
-<!-- QUICK SETUP (LOCATION) -->
-<section class="card" id="card-quick">
-  <h2>Quick setup</h2>
-  <div class="grid cols2">
-    <div><label class="mut">Latitude (°)</label><input id="lat" value="37.16556"></div>
-    <div><label class="mut">Longitude (°)</label><input id="lon" value="-76.5684"></div>
-    <div><label class="mut">Hours (window)</label><input id="hours" value="3"></div>
-    <div><label class="mut">Location name</label><input id="locname" placeholder="e.g., Backyard"></div>
+<!-- QUICK SETUP -->
+<details open id="secQuick">
+  <summary>Quick setup</summary>
+  <div class="content">
+    <div class="grid cols2">
+      <div><label class="mut">Latitude (°)</label><input id="lat" value="37.16556"></div>
+      <div><label class="mut">Longitude (°)</label><input id="lon" value="-76.5684"></div>
+      <div><label class="mut">Hours (window)</label><input id="hours" value="3"></div>
+      <div><label class="mut">Location name</label><input id="locname" placeholder="e.g., Backyard"></div>
+    </div>
+    <div style="margin-top:.6rem">
+      <label class="mut">Saved locations</label>
+      <select id="locSaved"><option value="">(none)</option></select>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnGps">Use GPS</button>
+      <button class="btn" id="btnLocSave">Save</button>
+      <button class="btn" id="btnLocLoad">Load</button>
+      <button class="btn" id="btnLocDelete">Delete</button>
+      <button class="btn" id="btnCalc">Calculate</button>
+      <span id="locBadge" class="badge" style="display:none">Loaded</span>
+    </div>
   </div>
-  <div style="margin-top:.5rem">
-    <label class="mut">Saved locations</label>
-    <select id="locSaved"><option value="">(none)</option></select>
-  </div>
-  <div class="inline-btns">
-    <button class="btn" id="btnGps">Use GPS</button>
-    <button class="btn" id="btnLocSave">Save</button>
-    <button class="btn" id="btnLocLoad">Load</button>
-    <button class="btn" id="btnLocDelete">Delete</button>
-    <button class="btn" id="btnCalc">Calculate</button>
-    <span id="locBadge" class="badge" style="display:none">Loaded</span>
-  </div>
-</section>
+</details>
 
 <!-- RIG -->
-<section class="card" id="card-rig">
-  <h2>Rig (Scope + Camera)</h2>
-
-  <!-- Summary row -->
-  <div class="grid cols2" style="margin-bottom:.6rem">
-    <div class="pill"><div class="mut">Eff. FL</div><div id="sum-fl">448 mm (0.8×)</div></div>
-    <div class="pill"><div class="mut">FOV</div><div id="sum-fov">1.45 × 1.45</div></div>
-    <div class="pill"><div class="mut">Scale</div><div id="sum-scale">1.73 "/px</div></div>
-    <div class="pill"><div class="mut">Scope</div><div id="sum-scope">SV503 (560×80)</div></div>
-  </div>
-
-  <!-- Presets -->
-  <div class="grid cols2" style="margin:.4rem 0 1rem">
-    <div>
-      <label class="mut">Profile name</label>
-      <input id="rigName" placeholder="e.g., SV503_533_0.8x_Backyard" />
+<details open id="secRig">
+  <summary>Rig (Scope + Camera)</summary>
+  <div class="content">
+    <div class="grid cols2" style="margin-bottom:.6rem">
+      <div class="pill"><div class="mut">Eff. FL</div><div id="sum-fl">448 mm (0.8×)</div></div>
+      <div class="pill"><div class="mut">FOV</div><div id="sum-fov">1.45 × 1.45</div></div>
+      <div class="pill"><div class="mut">Scale</div><div id="sum-scale">1.73 "/px</div></div>
+      <div class="pill"><div class="mut">Scope</div><div id="sum-scope">SV503 (560×80)</div></div>
     </div>
-    <div>
-      <label class="mut">Saved profiles</label>
-      <select id="rigSaved"><option value="">(none)</option></select>
-    </div>
-  </div>
-  <div class="inline-btns">
-    <button class="btn" id="rigSave">Save Profile</button>
-    <button class="btn" id="rigLoad">Load</button>
-    <button class="btn" id="rigDelete">Delete</button>
-    <span id="rigBadge" class="badge" style="display:none">Profile loaded</span>
-  </div>
 
-  <!-- Step 1 -->
-  <div class="pill" style="margin-top:1rem">
-    <div class="mut" style="font-weight:700">Step 1 — Select Scope</div>
-    <select id="scopeSel" style="margin-top:.45rem"></select>
-    <div class="grid cols2" style="margin-top:.5rem">
-      <div><label class="mut">Focal length (mm)</label><input id="scopeFl" placeholder="560"></div>
-      <div><label class="mut">Diameter (mm)</label><input id="scopeDia" placeholder="80"></div>
+    <div class="grid cols2" style="margin:.4rem 0 1rem">
+      <div><label class="mut">Profile name</label><input id="rigName" placeholder="e.g., SV503_533_0.8x_Backyard"/></div>
+      <div><label class="mut">Saved profiles</label><select id="rigSaved"><option value="">(none)</option></select></div>
     </div>
-  </div>
-
-  <!-- Step 2 -->
-  <div class="pill" style="margin-top:.8rem">
-    <div class="mut" style="font-weight:700">Step 2 — Reducer / Barlow</div>
-    <div class="seg" style="margin-top:.45rem">
-      <button data-mf="0.63">0.63×</button>
-      <button data-mf="0.7">0.7×</button>
-      <button data-mf="0.8" class="active">0.8×</button>
-      <button data-mf="1">1×</button>
-      <button data-mf="2">2×</button>
+    <div class="row">
+      <button class="btn" id="rigSave">Save Profile</button>
+      <button class="btn" id="rigLoad">Load</button>
+      <button class="btn" id="rigDelete">Delete</button>
+      <span id="rigBadge" class="badge" style="display:none">Profile loaded</span>
     </div>
-    <div style="font-size:1.6rem;font-weight:800;margin-top:.4rem"><span id="effFl">448</span> mm</div>
-    <div class="inline-btns"><button class="btn" id="btnRigCalc">Recalculate</button></div>
-  </div>
 
-  <!-- Step 3 -->
-  <div class="pill" style="margin-top:.8rem">
-    <div class="mut" style="font-weight:700">Step 3 — Select Camera</div>
-    <select id="camSel" style="margin-top:.45rem"></select>
-    <div class="grid cols3" style="margin-top:.5rem">
-      <div><label class="mut">Sensor X (mm)</label><input id="sensX" placeholder="11.31"></div>
-      <div><label class="mut">Sensor Y (mm)</label><input id="sensY" placeholder="11.31"></div>
-      <div><label class="mut">Pixel (µm)</label><input id="px" placeholder="3.76"></div>
+    <div class="pill" style="margin-top:1rem">
+      <div class="mut" style="font-weight:700">Step 1 — Select Scope</div>
+      <select id="scopeSel" style="margin-top:.45rem"></select>
+      <div class="grid cols2" style="margin-top:.5rem">
+        <div><label class="mut">Focal length (mm)</label><input id="scopeFl" placeholder="560"></div>
+        <div><label class="mut">Diameter (mm)</label><input id="scopeDia" placeholder="80"></div>
+      </div>
+    </div>
+
+    <div class="pill" style="margin-top:.8rem">
+      <div class="mut" style="font-weight:700">Step 2 — Reducer / Barlow</div>
+      <div class="seg" style="margin-top:.45rem">
+        <button data-mf="0.63">0.63×</button><button data-mf="0.7">0.7×</button>
+        <button data-mf="0.8" class="active">0.8×</button><button data-mf="1">1×</button><button data-mf="2">2×</button>
+      </div>
+      <div style="font-size:1.6rem;font-weight:800;margin-top:.4rem"><span id="effFl">448</span> mm</div>
+      <div class="row"><button class="btn" id="btnRigCalc">Recalculate</button></div>
+    </div>
+
+    <div class="pill" style="margin-top:.8rem">
+      <div class="mut" style="font-weight:700">Step 3 — Select Camera</div>
+      <select id="camSel" style="margin-top:.45rem"></select>
+      <div class="grid cols3" style="margin-top:.5rem">
+        <div><label class="mut">Sensor X (mm)</label><input id="sensX" placeholder="11.31"></div>
+        <div><label class="mut">Sensor Y (mm)</label><input id="sensY" placeholder="11.31"></div>
+        <div><label class="mut">Pixel (µm)</label><input id="px" placeholder="3.76"></div>
+      </div>
+    </div>
+
+    <div class="pill" style="margin-top:.8rem">
+      <div class="mut" style="font-weight:700">Step 4 — Options</div>
+      <div class="seg" style="margin-top:.45rem">
+        <button id="optBias">Bias Top-5 to FOV</button>
+        <button id="optFov">FOV overlay on thumbs</button>
+      </div>
     </div>
   </div>
-
-  <!-- Step 4 -->
-  <div class="pill" style="margin-top:.8rem">
-    <div class="mut" style="font-weight:700">Step 4 — Options</div>
-    <div class="seg" style="margin-top:.45rem">
-      <button id="optBias" class="">Bias Top-5 to FOV</button>
-      <button id="optFov" class="">FOV overlay on thumbs</button>
-    </div>
-  </div>
-</section>
+</details>
 
 <!-- TOP 5 -->
-<section class="card" id="card-top5">
-  <h2>Top 5 Recommendations</h2>
-  <ol id="top5">
-    <!-- filled by JS -->
-  </ol>
-</section>
+<details id="secTop5" open>
+  <summary>Top 5 Recommendations</summary>
+  <div class="content"><ol id="top5"></ol></div>
+</details>
 
 <!-- CATALOG -->
-<section class="card" id="card-cat">
-  <h2>Catalog</h2>
-  <input id="catSearch" placeholder="e.g., M31, galaxy, nebula …" />
-  <button class="btn" id="catClear" style="margin-top:.4rem">Clear</button>
-  <table>
-    <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
-    <tbody id="catBody"></tbody>
-  </table>
-</section>
+<details id="secCat" open>
+  <summary>Catalog</summary>
+  <div class="content">
+    <input id="catSearch" placeholder="e.g., M31, galaxy, nebula …"/>
+    <button class="btn" id="catClear" style="margin-top:.4rem">Clear</button>
+    <table>
+      <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
+      <tbody id="catBody"></tbody>
+    </table>
+  </div>
+</details>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ---------- helpers ---------- */
-const $=s=>document.querySelector(s);
-const $$=s=>[...document.querySelectorAll(s)];
-const F=Number.parseFloat;
+/* ===== Helpers ===== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const F=n=>Number.parseFloat(n);
 const to2=n=>Number(n).toFixed(2);
-const toast=msg=>{const t=$("#toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",1800);};
-const LS={
-  get:(k,d=null)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
-  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-  del:k=>localStorage.removeItem(k)
-};
+const toast=msg=>{const t=$("#toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",1600);};
+const LS={get:(k,d=null)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{ return d}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 
-/* ---------- demo data ---------- */
-const SCOPES=[
-  {id:"SV503_560_80",label:"SVBONY SV503 (560 × 80)", fl:560, dia:80},
-  {id:"C8_2032_203",label:"Celestron C8 (2032 × 203)", fl:2032, dia:203},
-  {id:"ED72_420_72",label:"SkyWatcher Evostar 72ED (420 × 72)", fl:420, dia:72}
-];
-const CAMS=[
-  {id:"ASI533",label:"ZWO ASI533MC (11.31×11.31 / 3.76µm)", x:11.31, y:11.31, px:3.76},
-  {id:"A7III",label:"Sony A7 III (35.9×24.0 / 5.94µm)", x:35.9, y:24.0, px:5.94}
-];
+/* ===== Data ===== */
+const WIKI={
+  M31:"https://en.wikipedia.org/wiki/Andromeda_Galaxy",
+  M33:"https://en.wikipedia.org/wiki/Triangulum_Galaxy",
+  M27:"https://en.wikipedia.org/wiki/Dumbbell_Nebula",
+  M57:"https://en.wikipedia.org/wiki/Ring_Nebula",
+  M13:"https://en.wikipedia.org/wiki/Messier_13"
+};
 const CATALOG=[
   {id:"M31", name:"M31 – Andromeda Galaxy", type:"GX", ra:"0.71h", dec:"41.3°"},
   {id:"M33", name:"M33 – Triangulum Galaxy", type:"GX", ra:"1.55h", dec:"30.7°"},
@@ -222,8 +209,17 @@ const CATALOG=[
   {id:"M57", name:"M57 – Ring Nebula", type:"PN", ra:"18.89h", dec:"33.0°"},
   {id:"M13", name:"M13 – Hercules Globular", type:"GC", ra:"16.70h", dec:"36.5°"}
 ];
+const SCOPES=[
+  {id:"SV503_560_80",label:"SVBONY SV503 (560 × 80)",fl:560,dia:80},
+  {id:"C8_2032_203",label:"Celestron C8 (2032 × 203)",fl:2032,dia:203},
+  {id:"ED72_420_72",label:"SkyWatcher Evostar 72ED (420 × 72)",fl:420,dia:72}
+];
+const CAMS=[
+  {id:"ASI533",label:"ZWO ASI533MC (11.31×11.31 / 3.76µm)",x:11.31,y:11.31,px:3.76},
+  {id:"A7III",label:"Sony A7 III (35.9×24.0 / 5.94µm)",x:35.9,y:24.0,px:5.94}
+];
 
-/* ---------- state ---------- */
+/* ===== State ===== */
 const state={
   reducer:0.8, scope:SCOPES[0], cam:CAMS[0],
   options:{bias:false,fov:false},
@@ -231,160 +227,97 @@ const state={
   rigProfiles:LS.get("rigProfiles",{})
 };
 
-/* ---------- init dropdowns ---------- */
-function fillSel(sel,data,fmtKey="label"){
-  sel.innerHTML=data.map(o=>`<option value="${o.id}">${o[fmtKey]}</option>`).join("");
-}
-fillSel($("#scopeSel"),SCOPES);
-fillSel($("#camSel"),CAMS);
-function fillSaved(sel,store){
-  const keys=Object.keys(store);
-  sel.innerHTML=`<option value="">(none)</option>`+keys.map(k=>`<option value="${k}">${k}</option>`).join("");
-}
-fillSaved($("#locSaved"),state.locations);
-fillSaved($("#rigSaved"),state.rigProfiles);
+/* ===== UI Fillers ===== */
+function fillSel(sel,data){ sel.innerHTML=data.map(o=>`<option value="${o.id}">${o.label}</option>`).join(""); }
+function fillSaved(sel,obj){ const ks=Object.keys(obj); sel.innerHTML=`<option value="">(none)</option>`+ks.map(k=>`<option value="${k}">${k}</option>`).join(""); }
+function applyScope(s){ $("#scopeSel").value=s.id; $("#scopeFl").value=s.fl; $("#scopeDia").value=s.dia; $("#sum-scope").textContent=`${s.label.split(" (")[0]} (${s.fl}×${s.dia})`; }
+function applyCam(c){ $("#camSel").value=c.id; $("#sensX").value=c.x; $("#sensY").value=c.y; $("#px").value=c.px; }
 
-/* ---------- apply selected scope/cam to inputs ---------- */
-function applyScope(s){
-  $("#scopeSel").value=s.id;
-  $("#scopeFl").value=s.fl;
-  $("#scopeDia").value=s.dia;
-  $("#sum-scope").textContent=`${s.label.split(" (")[0]} (${s.fl}×${s.dia})`;
-}
-function applyCam(c){
-  $("#camSel").value=c.id;
-  $("#sensX").value=c.x;
-  $("#sensY").value=c.y;
-  $("#px").value=c.px;
-}
+fillSel($("#scopeSel"),SCOPES); fillSel($("#camSel"),CAMS);
+fillSaved($("#locSaved"),state.locations); fillSaved($("#rigSaved"),state.rigProfiles);
 
-/* ---------- calc rig ---------- */
+/* ===== Calculations ===== */
 function calcRig(){
-  const fl=F($("#scopeFl").value)||0;
-  const r=state.reducer||1;
-  const eff=fl*r;
+  const fl=F($("#scopeFl").value)||0, r=state.reducer||1, eff=fl*r;
   $("#effFl").textContent=Math.round(eff);
   $("#sum-fl").textContent=`${Math.round(eff)} mm (${r}×)`;
-
   const sx=F($("#sensX").value)||0, sy=F($("#sensY").value)||0, px=F($("#px").value)||0;
-  const fovX= (sx/eff)*(180/Math.PI); // deg
-  const fovY= (sy/eff)*(180/Math.PI);
-  $("#sum-fov").textContent=`${to2(fovX)} × ${to2(fovY)}`;
-  const scale=206.265*px/eff; // "/px
-  $("#sum-scale").textContent=`${to2(scale)} "/px`;
+  const fovX=(sx/eff)*(180/Math.PI), fovY=(sy/eff)*(180/Math.PI); $("#sum-fov").textContent=`${to2(fovX)} × ${to2(fovY)}`;
+  const scale=206.265*px/eff; $("#sum-scale").textContent=`${to2(scale)} "/px`;
 }
+state.scope=SCOPES[0]; applyScope(state.scope);
+state.cam=CAMS[0]; applyCam(state.cam);
 calcRig();
 
 /* reducer buttons */
-$$('#card-rig [data-mf]').forEach(btn=>{
-  btn.onclick=()=>{
-    $$('#card-rig [data-mf]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    state.reducer=F(btn.dataset.mf);
-    calcRig();
-  };
-});
+$$('[data-mf]').forEach(b=>b.onclick=()=>{ $$('[data-mf]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.reducer=F(b.dataset.mf); calcRig(); });
 $("#btnRigCalc").onclick=calcRig;
 
-/* change handlers */
-$("#scopeSel").onchange=e=>{
-  const s=SCOPES.find(x=>x.id===e.target.value); if(!s) return;
-  state.scope=s; applyScope(s); calcRig();
-};
+/* scope/cam handlers */
+$("#scopeSel").onchange=e=>{ const s=SCOPES.find(x=>x.id===e.target.value); if(!s) return; state.scope=s; applyScope(s); calcRig(); };
 $("#scopeFl").oninput=calcRig; $("#scopeDia").oninput=calcRig;
-$("#camSel").onchange=e=>{
-  const c=CAMS.find(x=>x.id===e.target.value); if(!c) return;
-  state.cam=c; applyCam(c); calcRig();
-};
+$("#camSel").onchange=e=>{ const c=CAMS.find(x=>x.id===e.target.value); if(!c) return; state.cam=c; applyCam(c); calcRig(); };
 $("#sensX").oninput=calcRig; $("#sensY").oninput=calcRig; $("#px").oninput=calcRig;
 
-/* options */
-$("#optBias").onclick=()=>{state.options.bias=!state.options.bias; $("#optBias").classList.toggle('active',state.options.bias);};
-$("#optFov").onclick=()=>{state.options.fov=!state.options.fov; $("#optFov").classList.toggle('active',state.options.fov);};
+/* options buttons (visual only for now) */
+$("#optBias").onclick=()=>{ state.options.bias=!state.options.bias; $("#optBias").classList.toggle("active",state.options.bias); };
+$("#optFov").onclick=()=>{ state.options.fov=!state.options.fov; $("#optFov").classList.toggle("active",state.options.fov); };
 
-/* ---------- rig profiles ---------- */
-function rebuildRigSaved(){ fillSaved($("#rigSaved"),state.rigProfiles); }
+/* ===== Rig Profiles ===== */
+function refreshRigSaved(){ fillSaved($("#rigSaved"),state.rigProfiles); }
 $("#rigSave").onclick=()=>{
-  const name=$("#rigName").value.trim();
-  if(!name){toast("Enter a profile name");return;}
+  const name=$("#rigName").value.trim(); if(!name){toast("Enter a profile name");return;}
   state.rigProfiles[name]={
-    scope:{id:$("#scopeSel").value, fl:F($("#scopeFl").value), dia:F($("#scopeDia").value)},
+    scope:{id:$("#scopeSel").value,fl:F($("#scopeFl").value),dia:F($("#scopeDia").value)},
     reducer:state.reducer,
-    cam:{id:$("#camSel").value, x:F($("#sensX").value), y:F($("#sensY").value), px:F($("#px").value)},
+    cam:{id:$("#camSel").value,x:F($("#sensX").value),y:F($("#sensY").value),px:F($("#px").value)},
     options:state.options
   };
-  LS.set("rigProfiles",state.rigProfiles); rebuildRigSaved(); toast("Profile saved");
+  LS.set("rigProfiles",state.rigProfiles); refreshRigSaved(); toast("Profile saved");
 };
 $("#rigLoad").onclick=()=>{
-  const name=$("#rigSaved").value; if(!name || !state.rigProfiles[name]){toast("Select a saved profile");return;}
+  const name=$("#rigSaved").value; if(!name||!state.rigProfiles[name]){toast("Select a saved profile");return;}
   const p=state.rigProfiles[name];
-  /* scope */
-  const s=SCOPES.find(x=>x.id===p.scope.id) || {id:p.scope.id,label:p.scope.id,fl:p.scope.fl,dia:p.scope.dia};
+  const s=SCOPES.find(x=>x.id===p.scope.id)||{id:p.scope.id,label:p.scope.id,fl:p.scope.fl,dia:p.scope.dia};
   state.scope=s; applyScope({...s,fl:p.scope.fl,dia:p.scope.dia});
-  /* reducer */
-  state.reducer=p.reducer||1;
-  $$('#card-rig [data-mf]').forEach(b=>b.classList.toggle('active',F(b.dataset.mf)===state.reducer));
-  /* cam */
-  const c=CAMS.find(x=>x.id===p.cam.id) || {id:p.cam.id,label:p.cam.id,x:p.cam.x,y:p.cam.y,px:p.cam.px};
+  state.reducer=p.reducer||1; $$('[data-mf]').forEach(x=>x.classList.toggle('active',F(x.dataset.mf)===state.reducer));
+  const c=CAMS.find(x=>x.id===p.cam.id)||{id:p.cam.id,label:p.cam.id,x:p.cam.x,y:p.cam.y,px:p.cam.px};
   state.cam=c; applyCam({...c,x:p.cam.x,y:p.cam.y,px:p.cam.px});
-  /* options */
   state.options=p.options||{bias:false,fov:false};
-  $("#optBias").classList.toggle('active',state.options.bias);
-  $("#optFov").classList.toggle('active',state.options.fov);
-  calcRig();
-  showBadge($("#rigBadge"),"Profile loaded");
+  $("#optBias").classList.toggle("active",state.options.bias);
+  $("#optFov").classList.toggle("active",state.options.fov);
+  calcRig(); badge($("#rigBadge"),"Profile loaded");
 };
-$("#rigDelete").onclick=()=>{
-  const name=$("#rigSaved").value; if(!name||!state.rigProfiles[name]){toast("Select a profile");return;}
-  delete state.rigProfiles[name]; LS.set("rigProfiles",state.rigProfiles); rebuildRigSaved(); toast("Profile deleted");
-};
-function showBadge(el,txt){el.textContent=txt; el.style.display='inline-block'; setTimeout(()=>el.style.display='none',2200);}
+$("#rigDelete").onclick=()=>{ const name=$("#rigSaved").value; if(!name||!state.rigProfiles[name]){toast("Select a profile");return;} delete state.rigProfiles[name]; LS.set("rigProfiles",state.rigProfiles); refreshRigSaved(); toast("Profile deleted"); };
 
-/* ---------- locations ---------- */
-function rebuildLocSaved(){ fillSaved($("#locSaved"),state.locations); }
-$("#btnLocSave").onclick=()=>{
-  const name=$("#locname").value.trim(); if(!name){toast("Enter location name");return;}
-  state.locations[name]={lat:$("#lat").value,lon:$("#lon").value,hrs:$("#hours").value};
-  LS.set("locations",state.locations); rebuildLocSaved(); toast("Location saved");
-};
-$("#btnLocLoad").onclick=()=>{
-  const name=$("#locSaved").value; if(!name||!state.locations[name]){toast("Select a saved location");return;}
-  const l=state.locations[name];
-  $("#lat").value=l.lat; $("#lon").value=l.lon; $("#hours").value=l.hrs; $("#locname").value=name;
-  showBadge($("#locBadge"),"Location loaded");
-};
-$("#btnLocDelete").onclick=()=>{
-  const name=$("#locSaved").value; if(!name||!state.locations[name]){toast("Select a saved location");return;}
-  delete state.locations[name]; LS.set("locations",state.locations); rebuildLocSaved(); toast("Location deleted");
-};
-$("#btnGps").onclick=()=>toast("GPS not wired in this demo");
-$("#btnCalc").onclick=()=>toast("Recalculated with current inputs");
+/* ===== Locations ===== */
+function refreshLocSaved(){ fillSaved($("#locSaved"),state.locations); }
+$("#btnLocSave").onclick=()=>{ const name=$("#locname").value.trim(); if(!name){toast("Enter location name");return;} state.locations[name]={lat:$("#lat").value,lon:$("#lon").value,hrs:$("#hours").value}; LS.set("locations",state.locations); refreshLocSaved(); toast("Location saved"); };
+$("#btnLocLoad").onclick=()=>{ const name=$("#locSaved").value; if(!name||!state.locations[name]){toast("Select a saved location");return;} const l=state.locations[name]; $("#lat").value=l.lat; $("#lon").value=l.lon; $("#hours").value=l.hrs; $("#locname").value=name; badge($("#locBadge"),"Location loaded"); };
+$("#btnLocDelete").onclick=()=>{ const name=$("#locSaved").value; if(!name||!state.locations[name]){toast("Select a saved location");return;} delete state.locations[name]; LS.set("locations",state.locations); refreshLocSaved(); toast("Location deleted"); };
+$("#btnGps").onclick=()=>toast("GPS not wired in demo");
+$("#btnCalc").onclick=()=>{ $("#st-time").textContent=new Date().toLocaleTimeString(); toast("Recalculated"); };
 
-/* ---------- top 5 + catalog ---------- */
+/* ===== Top-5 & Catalog ===== */
 function paintTop5(){
-  const list = CATALOG.slice(0,5)
-    .map(o=>`<li><a href="#">${o.name}</a></li>`).join("");
-  $("#top5").innerHTML=list;
+  $("#top5").innerHTML=CATALOG.slice(0,5).map(o=>`<li><a href="${WIKI[o.id]||'#'}" target="_blank" rel="noopener">${o.name}</a></li>`).join("");
 }
-function paintCatalog(filter=""){
-  const q=filter.trim().toLowerCase();
-  const rows=CATALOG.filter(o=>!q || o.name.toLowerCase().includes(q) || o.type.toLowerCase().includes(q))
-    .map(o=>`<tr><td>${o.name}</td><td>${o.type}</td><td>${o.ra}</td><td>${o.dec}</td><td>[img]</td></tr>`).join("");
+function paintCatalog(q=""){
+  const f=q.trim().toLowerCase();
+  const rows=CATALOG.filter(o=>!f||o.name.toLowerCase().includes(f)||o.type.toLowerCase().includes(f))
+    .map(o=>`<tr><td><a href="${WIKI[o.id]||'#'}" target="_blank" rel="noopener">${o.name}</a></td><td>${o.type}</td><td>${o.ra}</td><td>${o.dec}</td><td>[img]</td></tr>`).join("");
   $("#catBody").innerHTML=rows||`<tr><td colspan="5" class="mut">No matches</td></tr>`;
 }
 paintTop5(); paintCatalog();
-$("#catSearch").oninput=e=>paintCatalog(e.target.value); $("#catClear").onclick=()=>{ $("#catSearch").value=""; paintCatalog(""); };
+$("#catSearch").oninput=e=>paintCatalog(e.target.value);
+$("#catClear").onclick=()=>{ $("#catSearch").value=""; paintCatalog(""); };
 
-/* ---------- initial select defaults ---------- */
-state.scope=SCOPES[0]; applyScope(state.scope);
-state.cam=CAMS[0]; applyCam(state.cam);
-rebuildLocSaved(); rebuildRigSaved();
+/* ===== Night / Compact ===== */
+$("#chipNight").onclick=()=>{ document.body.classList.toggle("night"); $("#chipNight").textContent=document.body.classList.contains("night")?"Night Mode On":"Night Mode Off"; };
+$("#chipCompact").onclick=()=>{ const tight = $("#chipCompact").textContent.includes("Off"); document.querySelectorAll(".pill").forEach(p=>p.style.padding=tight?".35rem .55rem":".55rem .7rem"); $("#chipCompact").textContent=tight?"Compact On":"Compact Off"; };
 
-/* ---------- night/compact (local only) ---------- */
-let night=false, compact=false;
-$("#btnNight").onclick=()=>{ night=!night; document.body.style.filter=night?"invert(0.02) hue-rotate(0deg)":"none"; $("#btnNight").textContent=night?"Night Mode On":"Night Mode"; };
-$("#btnCompact").onclick=()=>{ compact=!compact; document.querySelectorAll('.pill').forEach(p=>p.style.padding=compact?".35rem .55rem":".55rem .75rem"); $("#btnCompact").textContent=compact?"Compact On":"Compact Off"; };
-
+/* ===== Utils ===== */
+function badge(el,txt){ el.textContent=txt; el.style.display="inline-block"; setTimeout(()=>el.style.display="none",2200); }
 </script>
 </body>
 </html>
