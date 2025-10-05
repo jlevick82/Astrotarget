@@ -2,546 +2,631 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-<title>Go/No-Go</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Go/No-Go v28.3+</title>
 <style>
   :root{
-    --bg:#0b1a22;--bg2:#0f2430;--card:#0e2a36;--ink:#e8f0f4;--muted:#a9c0cb;
-    --ok:#10b981;--warn:#f59e0b;--bad:#ef4444;--chip:#123544;--chip2:#132e3a;
-    --accent:#69a7ff;--ring:#2a5363;--shadow:rgba(0,0,0,.25);
+    --bg: #0f1b22;
+    --panel: #111c23;
+    --panel-2: #0c151b;
+    --text: #dbe7ef;
+    --muted: #9fb3c1;
+    --accent: #8bd3ff;
+    --ok: #3ddc84;
+    --warn: #ffcf5a;
+    --bad: #ff6b6b;
+    --chip: #13222b;
+    --ring: rgba(255,255,255,.08);
+    --shadow: 0 12px 40px rgba(0,0,0,.35);
+    --radius: 18px;
   }
-  .night:root{ /* softer contrast for night */
-    --bg:#0a0b0d;--bg2:#0e0f11;--card:#121317;--ink:#ffd9df;--muted:#e3b7bf;
-    --chip:#1b1c22;--chip2:#17181f;--ring:#2b2d35;--accent:#8bb4ff;
+  body{margin:0;background:radial-gradient(1200px 700px at 50% -200px,#123,#0a1217) fixed,var(--bg);color:var(--text);font:16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+  *{box-sizing:border-box}
+  a{color:#9fd1ff;text-decoration:underline}
+  .wrap{max-width:980px;margin:24px auto;padding:0 16px 80px}
+  header.app{display:flex;align-items:end;gap:16px;margin:8px 0 18px}
+  .title{font-weight:900;letter-spacing:.5px;font-size:44px}
+  .ver{opacity:.65;font-weight:700;font-size:34px}
+  .toolbar{display:flex;gap:12px;margin:8px 0 6px;flex-wrap:wrap}
+  .btn{
+    appearance:none;border:0;outline:0;padding:12px 16px;border-radius:999px;
+    background:linear-gradient(#1a2a34,#141f26);color:var(--text);box-shadow:var(--shadow);
   }
-  html,body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.4 system-ui,Segoe UI,Roboto,Inter,Arial}
-  .wrap{max-width:980px;margin:0 auto;padding:18px}
-  h1{font-size:44px;letter-spacing:.5px;margin:8px 0 10px}
-  .version{opacity:.6;font-weight:700;margin-left:10px}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{background:var(--chip);border:1px solid var(--ring);color:var(--ink);padding:10px 16px;border-radius:999px;cursor:pointer}
   .btn:active{transform:translateY(1px)}
-  .card{background:var(--card);border:1px solid var(--ring);border-radius:18px;padding:16px;box-shadow:0 6px 20px var(--shadow);margin:14px 0}
-  .card.hdr{display:flex;align-items:center;justify-content:space-between}
-  .title{font-weight:800;font-size:28px}
-  .chev{width:42px;height:42px;border-radius:12px;background:var(--chip2);display:grid;place-items:center;border:1px solid var(--ring);cursor:pointer}
-  .collapse{display:none}
-  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .chip{background:var(--chip);border:1px solid var(--ring);padding:10px 14px;border-radius:999px;white-space:nowrap}
-  .chip.ok{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.35);color:var(--ink)}
-  .chip.bad{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media (max-width:720px){.grid2{grid-template-columns:1fr}}
-  .tile{background:var(--bg2);border-radius:16px;padding:16px;border:1px solid var(--ring)}
-  .tile h4{margin:0 0 6px;font-weight:700;color:var(--muted)}
-  .big{font-size:34px;font-weight:900}
-  .table{width:100%;border-collapse:separate;border-spacing:0}
-  .thead th{font-weight:700;color:var(--muted);text-align:left;padding:14px}
-  .tbody td{padding:14px;border-top:1px solid var(--ring)}
-  .thumb{width:72px;height:72px;border-radius:12px;background:var(--chip2);border:1px solid var(--ring);object-fit:cover}
-  a{color:#9cc9ff}
-  input[type="text"], input[type="number"]{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--ring);background:var(--bg2);color:var(--ink)}
-  .sl{accent-color:var(--accent);width:100%}
-  .right{margin-left:auto}
-  .muted{color:var(--muted)}
+  .btn.small{padding:8px 12px;font-size:14px}
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;
+    background:linear-gradient(180deg,#12202a,#0f1920);border:1px solid var(--ring);color:var(--text);white-space:nowrap
+  }
+  .chip.ok{background:#0e2216;border-color:#215b36}
+  .chip.bad{background:#2a1414;border-color:#6b2a2a}
+  .chip.warn{background:#2b230f;border-color:#6b5520}
+  /* cards */
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--ring);
+        border-radius:var(--radius);box-shadow:var(--shadow);margin:14px 0;overflow:hidden}
+  .card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px}
+  .card-title{font-size:28px;font-weight:800;letter-spacing:.3px}
+  .chev{width:42px;height:42px;border-radius:12px;background:linear-gradient(#18242c,#121b22);border:1px solid var(--ring);
+        display:grid;place-items:center;color:var(--muted);cursor:pointer;user-select:none}
+  .chev svg{transition:transform .25s ease}
+  .chev[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .card-body{padding:16px 18px 22px}
+  .grid{display:grid;gap:14px}
+  .grid.cols2{grid-template-columns:repeat(2,1fr)}
+  .grid.cols3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:820px){.grid.cols2,.grid.cols3{grid-template-columns:1fr}}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:#0f1a20;border:1px solid var(--ring);border-radius:999px}
+  .kv{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;border:1px solid var(--ring);background:#0f1a20}
+  .kv h4{margin:0 0 6px 0;font-weight:700;letter-spacing:.2px;color:var(--muted)}
+  .kv .big{font-size:34px;font-weight:900}
+  /* table */
+  table{width:100%;border-collapse:separate;border-spacing:0 10px}
+  thead th{font-weight:700;color:var(--muted);text-align:left;padding:6px 10px}
+  tbody td{padding:16px 10px;background:#0f1a20;border-top:1px solid var(--ring);border-bottom:1px solid var(--ring)}
+  tbody tr td:first-child{border-left:1px solid var(--ring);border-top-left-radius:12px;border-bottom-left-radius:12px}
+  tbody tr td:last-child{border-right:1px solid var(--ring);border-top-right-radius:12px;border-bottom-right-radius:12px}
+  .thumb{width:72px;height:72px;border-radius:14px;background:#0a141a;border:1px solid var(--ring);display:grid;place-items:center;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.95}
+  .thumb.fov::after{
+    content:"";position:absolute;inset:18% 18% 18% 18%;border:2px dashed rgba(255,255,255,.6);border-radius:6px;pointer-events:none}
+  .row-actions{display:flex;gap:8px;align-items:center}
+  /* compact mode */
+  .compact .card-body{padding:10px 12px}
+  .compact .card-title{font-size:22px}
+  .compact .kv .big{font-size:26px}
   /* toast */
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0c0e12;color:#eaf2f7;border:1px solid #405264;padding:12px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.25s}
-  .toast.show{opacity:1;pointer-events:auto}
-  /* compact mode spacing */
-  .compact .card{padding:12px;border-radius:14px}
-  .compact .title{font-size:24px}
-  .compact .chip{padding:8px 12px}
+  .toast-wrap{position:fixed;left:0;right:0;bottom:20px;display:grid;place-items:center;pointer-events:none;z-index:9999}
+  .toast{
+    pointer-events:auto; background:#0f1a20;border:1px solid var(--ring);box-shadow:var(--shadow);
+    color:var(--text);border-radius:14px;padding:12px 14px;min-width:260px;text-align:center
+  }
+  /* badges */
+  .badge{padding:6px 10px;border-radius:999px;border:1px solid var(--ring);background:#0e171c;white-space:nowrap}
+  .badge.ok{background:#0e2216;border-color:#1b4d2f}
+  .badge.bad{background:#2a1414;border-color:#6b2a2a}
+  /* inputs */
+  input[type="text"], input[type="number"]{
+    width:100%;padding:12px 14px;border-radius:12px;color:var(--text);background:#0f1a20;border:1px solid var(--ring);
+  }
+  .seg{display:flex;gap:10px;flex-wrap:wrap}
+  .seg .toggle{
+    padding:10px 14px;border-radius:14px;border:1px solid var(--ring);background:#0f1a20;cursor:pointer;user-select:none
+  }
+  .seg .toggle.active{outline:2px solid var(--accent);box-shadow:0 0 0 6px rgba(139,211,255,.08) inset}
+  .right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .muted{color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Go/No-Go <span class="version">v28.3</span></h1>
-  <div class="row">
-    <button id="compactBtn" class="btn">Compact Off</button>
-    <button id="themeBtn" class="btn">Normal Mode</button>
+  <div class="wrap">
+    <header class="app">
+      <div class="title">Go/No-Go</div>
+      <div class="ver">v28.3+</div>
+    </header>
+
+    <div class="toolbar">
+      <button id="btn-compact" class="btn">Compact On</button>
+      <button id="btn-night" class="btn">Night Mode</button>
+    </div>
+
+    <!-- 1) STATUS -->
+    <section id="card-status" class="card">
+      <div class="card-header">
+        <div class="card-title">Status</div>
+        <button class="chev" data-target="card-status" aria-expanded="true" title="Collapse/Expand">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="grid cols3">
+          <div class="kv">
+            <h4>Decision</h4>
+            <div id="status-decision" class="chip ok">GO</div>
+          </div>
+          <div class="kv">
+            <h4>Clouds</h4>
+            <div id="status-clouds" class="pill">~—%</div>
+          </div>
+          <div class="kv">
+            <h4>Visibility</h4>
+            <div id="status-vis" class="pill">Vis — km</div>
+          </div>
+        </div>
+        <div class="grid cols3" style="margin-top:8px">
+          <div class="pill" id="status-astro">Astro dark</div>
+          <div class="pill" id="status-updated">Updated —:—</div>
+          <div class="pill" id="status-sun">Sun alt —°</div>
+          <div class="pill" id="status-moon">Moon —%</div>
+          <div class="pill" id="status-transp">Transparency —</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) CONDITIONS -->
+    <section id="card-conditions" class="card">
+      <div class="card-header">
+        <div class="card-title">Conditions</div>
+        <button class="chev" data-target="card-conditions" aria-expanded="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="grid cols2">
+          <div class="kv"><h4>Moon illum</h4><div class="big" id="cond-moon">—%</div><div class="muted" id="cond-moon-alt">Alt —°</div></div>
+          <div class="kv"><h4>Clouds (window max)</h4><div class="big" id="cond-clouds">—%</div><div class="muted">From Open-Meteo (window max)</div></div>
+          <div class="kv"><h4>Humidity</h4><div class="big" id="cond-hum">—%</div></div>
+          <div class="kv"><h4>Transparency</h4><div class="big" id="cond-transp">—</div><div class="muted" id="cond-transp-detail"></div></div>
+        </div>
+        <div class="right" style="margin-top:10px">
+          <span class="badge" id="cond-updated">Updated —:— —</span>
+          <span class="badge" id="cond-sun">Sun alt —°</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3) QUICK SETUP -->
+    <section id="card-quicksetup" class="card">
+      <div class="card-header">
+        <div class="card-title">Quick setup</div>
+        <button class="chev" data-target="card-quicksetup" aria-expanded="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="grid cols3">
+          <div class="kv">
+            <h4>Latitude (°)</h4>
+            <input id="in-lat" type="text" inputmode="decimal" placeholder="e.g. 37.16">
+          </div>
+          <div class="kv">
+            <h4>Longitude (°)</h4>
+            <input id="in-lon" type="text" inputmode="decimal" placeholder="e.g. -76.56">
+          </div>
+          <div class="kv">
+            <h4>Hours (window)</h4>
+            <input id="in-window" type="number" min="1" max="12" value="3">
+          </div>
+        </div>
+        <div class="right" style="margin-top:12px">
+          <button id="btn-gps" class="btn small">Use GPS</button>
+          <button id="btn-calc" class="btn small">Calculate Now</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4) RIG -->
+    <section id="card-rig" class="card">
+      <div class="card-header">
+        <div class="card-title">Rig (Scope + Camera)</div>
+        <button class="chev" data-target="card-rig" aria-expanded="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="right" style="flex-wrap:wrap;margin-bottom:10px">
+          <span id="rig-efffl" class="badge">Eff. FL — mm</span>
+          <span id="rig-fov" class="badge">FOV — × —</span>
+          <span id="rig-scale" class="badge">Scale — "/px</span>
+          <span id="rig-scope" class="badge">— × — mm (f/—)</span>
+          <span id="rig-reducer" class="badge">Reducer —</span>
+          <button id="btn-edit-rig" class="btn small">Edit rig</button>
+        </div>
+
+        <!-- editor (collapsible inside card) -->
+        <div id="rig-editor" style="display:none;margin-top:8px">
+          <div class="grid cols2">
+            <div class="kv">
+              <h4>Scope</h4>
+              <select id="sel-scope" class="btn" style="width:100%">
+                <option value="SVBONY SV503|560|80">SVBONY SV503 (560 × 80)</option>
+                <option value="William Z61|360|61">William Z61 (360 × 61)</option>
+                <option value="Celestron C8|2032|203">Celestron C8 (2032 × 203)</option>
+              </select>
+              <div class="grid cols2" style="margin-top:10px">
+                <input id="in-fl" type="number" placeholder="Focal length (mm)" />
+                <input id="in-dia" type="number" placeholder="Diameter (mm)" />
+              </div>
+            </div>
+            <div class="kv">
+              <h4>Reducer / Barlow</h4>
+              <div class="seg" id="seg-reducer">
+                <span class="toggle" data-mul="0.63">0.63×</span>
+                <span class="toggle" data-mul="0.7">0.7×</span>
+                <span class="toggle active" data-mul="0.8">0.8×</span>
+                <span class="toggle" data-mul="1">1×</span>
+                <span class="toggle" data-mul="2">2×</span>
+              </div>
+              <div class="kv" style="margin-top:10px"><h4>Eff. FL</h4><div id="rig-efffl-editor" class="big">— mm</div></div>
+            </div>
+            <div class="kv">
+              <h4>Camera</h4>
+              <select id="sel-cam" class="btn" style="width:100%">
+                <option value="ZWO ASI533MC|11.31|11.31|3.76">ZWO ASI533MC (11.31×11.31 / 3.76µm)</option>
+                <option value="ZWO ASI294MC|19.1|13.0|4.63">ZWO ASI294MC (19.1×13.0 / 4.63µm)</option>
+                <option value="Sony A7 III|35.9|24.0|5.94">Sony A7 III (35.9×24.0 / 5.94µm)</option>
+              </select>
+              <div class="grid cols3" style="margin-top:10px">
+                <input id="in-sx" type="number" step="0.01" placeholder="Sensor X (mm)">
+                <input id="in-sy" type="number" step="0.01" placeholder="Sensor Y (mm)">
+                <input id="in-px" type="number" step="0.01" placeholder="Pixel (µm)">
+              </div>
+            </div>
+            <div class="kv">
+              <h4>Hooks</h4>
+              <label class="seg"><span class="toggle active" id="hook-bias">Bias Top-5 to FOV</span></label>
+              <label class="seg" style="margin-top:8px"><span class="toggle active" id="hook-fov">FOV overlay on thumbs</span></label>
+              <div class="muted" style="margin-top:10px">Preset: <code id="rig-preset-name">SV503_533_0.8x</code></div>
+              <div class="right" style="margin-top:10px">
+                <button id="btn-save-rig" class="btn small">Save</button>
+                <button id="btn-del-rig" class="btn small">Delete</button>
+                <button id="btn-close-rig" class="btn small">Close editor</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5) TOP 5 -->
+    <section id="card-top5" class="card">
+      <div class="card-header">
+        <div class="card-title">Top 5 Recommendations</div>
+        <button class="chev" data-target="card-top5" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <ol id="top5-list" style="padding-left:18px;margin:0;display:grid;gap:10px"></ol>
+      </div>
+    </section>
+
+    <!-- 6) CATALOG (starts closed) -->
+    <section id="card-catalog" class="card collapsed">
+      <div class="card-header">
+        <div class="card-title">Catalog</div>
+        <button class="chev" data-target="card-catalog" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="grid cols2">
+          <div class="kv"><h4>Search catalog (name/type)</h4><input id="search" type="text" placeholder="e.g., M31, galaxy, nebula…"></div>
+          <div class="kv"><h4>&nbsp;</h4><button id="btn-clear-search" class="btn small">Clear</button></div>
+        </div>
+        <div style="overflow:auto">
+          <table id="tbl-catalog">
+            <thead><tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr></thead>
+            <tbody id="cat-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7) GO/NO-GO SETTINGS (starts closed) -->
+    <section id="card-gng-settings" class="card collapsed">
+      <div class="card-header">
+        <div class="card-title">Go/No-Go Settings</div>
+        <button class="chev" data-target="card-gng-settings" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="grid cols3">
+          <div class="kv"><h4>Clouds threshold (max in window)</h4><input id="th-clouds" type="number" value="35" min="0" max="100"><div class="muted">GO if ≤ this %</div></div>
+          <div class="kv"><h4>Humidity threshold</h4><input id="th-hum" type="number" value="90" min="0" max="100"><div class="muted">Warn if ≥ this %</div></div>
+          <div class="kv"><h4>Visibility threshold (km)</h4><input id="th-vis" type="number" value="10" min="1" max="50"><div class="muted">Warn if &lt; this</div></div>
+        </div>
+        <div class="right" style="margin-top:10px">
+          <button id="btn-save-gng" class="btn small">Save</button>
+          <span class="muted">Applies on next calculation</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toasts -->
+    <div class="toast-wrap" id="toast-wrap" style="display:none">
+      <div class="toast" id="toast"></div>
+    </div>
   </div>
 
-  <!-- Status -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Status</div>
-      <div class="chev" data-target="#statusBody">⌄</div>
-    </div>
-    <div id="statusBody">
-      <div class="chips" id="statusChips">
-        <!-- filled by JS -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Go/No-Go Settings -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Go/No-Go Settings</div>
-      <div class="chev" data-target="#settingsBody">⌄</div>
-    </div>
-    <div id="settingsBody">
-      <div class="grid2">
-        <div class="tile">
-          <h4>Cloud weight</h4>
-          <input id="setCloudW" type="range" min="0" max="100" value="60" class="sl">
-          <div class="muted">How strongly clouds affect the decision.</div>
-        </div>
-        <div class="tile">
-          <h4>Min visibility (km)</h4>
-          <input id="setVisMin" type="range" min="5" max="50" value="12" class="sl">
-          <div class="muted">Below this → automatic NO-GO.</div>
-        </div>
-        <div class="tile">
-          <h4>Moon tolerance (%)</h4>
-          <input id="setMoonTol" type="range" min="0" max="100" value="35" class="sl">
-          <div class="muted">Max moon illum allowed when the Moon is above horizon.</div>
-        </div>
-        <div class="tile">
-          <h4>Refresh every (min)</h4>
-          <input id="setRefresh" type="range" min="5" max="60" value="10" class="sl">
-          <div class="muted">Auto update cadence.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Conditions -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Conditions</div>
-      <div class="chev" data-target="#condBody">⌄</div>
-    </div>
-    <div id="condBody">
-      <div class="grid2">
-        <div class="tile"><h4>Moon illum</h4><div class="big" id="moonPct">—</div><div class="muted" id="moonAlt">—</div></div>
-        <div class="tile"><h4>Clouds (window max)</h4><div class="big" id="clouds">—</div><div class="muted">From Open-Meteo (window max)</div></div>
-        <div class="tile"><h4>Humidity</h4><div class="big" id="rh">—</div></div>
-        <div class="tile"><h4>Transparency</h4><div class="big" id="transp">—</div><div class="muted" id="transpInfo">—</div></div>
-      </div>
-      <div class="chips" style="margin-top:12px">
-        <div class="chip" id="updated">Updated —</div>
-        <div class="chip" id="sunAlt">Sun alt —</div>
-        <div class="chip" id="astro">—</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Quick setup -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Quick setup</div>
-      <div class="chev" data-target="#qsBody">⌄</div>
-    </div>
-    <div id="qsBody">
-      <div class="grid2">
-        <div class="tile"><h4>Latitude (°)</h4><input id="lat" type="number" step="0.00001"></div>
-        <div class="tile"><h4>Longitude (°)</h4><input id="lon" type="number" step="0.00001"></div>
-      </div>
-      <div class="chips" style="margin-top:12px">
-        <button id="gpsBtn" class="btn">Use GPS</button>
-        <button id="calcBtn" class="btn">Calculate Now</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Top 5 (example static for now, sorted later by rules) -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Top 5 Recommendations</div>
-      <div class="chev" data-target="#topBody">⌄</div>
-    </div>
-    <div id="topBody">
-      <ol id="topList" style="padding-left:22px;margin:10px 0 0"></ol>
-    </div>
-  </section>
-
-  <!-- Catalog (with built-in search) -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Catalog</div>
-      <div class="chev" data-target="#catBody">⌄</div>
-    </div>
-    <div id="catBody">
-      <div class="row" style="margin:6px 0 10px">
-        <input id="search" type="text" placeholder="Search catalog (name/type)" />
-        <button id="clearSearch" class="btn">Clear</button>
-      </div>
-      <div class="tile">
-        <table class="table">
-          <thead class="thead">
-            <tr><th>Name</th><th>Type</th><th>RA</th><th>Dec</th><th>Image</th></tr>
-          </thead>
-          <tbody id="catRows" class="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- Rig -->
-  <section class="card">
-    <div class="card hdr">
-      <div class="title">Rig (Scope + Camera)</div>
-      <div class="chev" data-target="#rigBody">⌄</div>
-    </div>
-    <div id="rigBody">
-      <div class="chips" id="rigSummary"></div>
-      <div class="chips" style="margin-top:10px">
-        <button id="editRigBtn" class="btn">Edit rig</button>
-      </div>
-      <div id="rigEditor" class="collapse" style="margin-top:10px">
-        <div class="grid2">
-          <div class="tile">
-            <h4>Scope (FL × Dia)</h4>
-            <div class="row">
-              <input id="scopeFL" type="number" placeholder="Focal length (mm)" />
-              <input id="scopeDia" type="number" placeholder="Diameter (mm)" />
-            </div>
-          </div>
-          <div class="tile">
-            <h4>Reducer / Barlow</h4>
-            <div class="row">
-              <button class="btn redBtn" data-red="0.63">0.63×</button>
-              <button class="btn redBtn" data-red="0.7">0.7×</button>
-              <button class="btn redBtn" data-red="0.8">0.8×</button>
-              <button class="btn redBtn" data-red="1">1×</button>
-              <button class="btn redBtn" data-red="2">2×</button>
-            </div>
-          </div>
-          <div class="tile">
-            <h4>Camera sensor (mm)</h4>
-            <div class="row">
-              <input id="camW" type="number" step="0.01" placeholder="Width" />
-              <input id="camH" type="number" step="0.01" placeholder="Height" />
-              <input id="pix" type="number" step="0.01" placeholder="Pixel size (µm)" />
-            </div>
-          </div>
-          <div class="tile">
-            <h4>Preset</h4>
-            <input id="presetName" type="text" placeholder="SV503_533_0.8x" />
-            <div class="chips" style="margin-top:10px">
-              <button id="savePreset" class="btn">Save</button>
-              <button id="delPreset" class="btn">Delete</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</div>
-
-<div id="toast" class="toast">—</div>
-
 <script>
-/* ---------- helpers ---------- */
-const $=q=>document.querySelector(q);
-const $$=q=>[...document.querySelectorAll(q)];
-const toast=(msg)=>{const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
-const fmtPct=x=> (x==null?"—":Math.round(x)+"%");
-const nowStr=()=> new Date().toLocaleTimeString();
-const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+/* ========= UTIL ========= */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => [...document.querySelectorAll(sel)];
+const ls = (k,v) => (v===undefined? JSON.parse(localStorage.getItem(k) || 'null') : localStorage.setItem(k,JSON.stringify(v)));
+function toast(msg){ const w=$("#toast-wrap"), t=$("#toast"); t.textContent=msg; w.style.display="grid";
+  clearTimeout(toast._t); toast._t=setTimeout(()=>w.style.display="none",2200); }
 
-/* ---------- theme + compact ---------- */
-const applyTheme=()=>{
-  const night=localStorage.getItem("night")==="1";
-  document.documentElement.classList.toggle("night",night);
-  $("#themeBtn").textContent = night ? "Night Mode" : "Normal Mode";
-};
-$("#themeBtn").onclick=()=>{localStorage.setItem("night", localStorage.getItem("night")==="1"?"0":"1");applyTheme();toast("Theme updated");};
-const applyCompact=()=>{
-  const c=localStorage.getItem("compact")==="1";
-  document.body.classList.toggle("compact",c);
-  $("#compactBtn").textContent=c?"Compact On":"Compact Off";
-};
-$("#compactBtn").onclick=()=>{localStorage.setItem("compact", localStorage.getItem("compact")==="1"?"0":"1");applyCompact();};
+/* ========= CARD STATE (order per your spec) ========= */
+const CARD_IDS = { status:'card-status', cond:'card-conditions', quick:'card-quicksetup', rig:'card-rig', top5:'card-top5', catalog:'card-catalog', gng:'card-gng-settings' };
+function setCardOpen(id, open){
+  const card = document.getElementById(id); if(!card) return;
+  const body = card.querySelector('.card-body'); const btn = card.querySelector('.chev');
+  body.style.display = open ? '' : 'none';
+  btn.setAttribute('aria-expanded', String(open));
+}
+function initCardStates(){
+  setCardOpen(CARD_IDS.status,true);
+  setCardOpen(CARD_IDS.cond,true);
+  setCardOpen(CARD_IDS.quick,true);
+  setCardOpen(CARD_IDS.rig,true);
+  setCardOpen(CARD_IDS.top5,false);
+  setCardOpen(CARD_IDS.catalog,false);
+  setCardOpen(CARD_IDS.gng,false);
+}
+function onTop5Rendered(){ setCardOpen(CARD_IDS.top5,true); }
 
-applyTheme();applyCompact();
-
-/* ---------- collapsibles ---------- */
-$$(".chev").forEach(ch=>{
-  ch.addEventListener("click",()=> {
-    const tgt=ch.getAttribute("data-target");
-    const el=document.querySelector(tgt);
-    el.classList.toggle("collapse");
-    ch.textContent = el.classList.contains("collapse") ? "˄" : "⌄";
-  });
+/* toggle wiring */
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.chev'); if(!btn) return;
+  const id = btn.getAttribute('data-target') || btn.closest('.card').id;
+  const open = btn.getAttribute('aria-expanded') !== 'true';
+  setCardOpen(id, open);
 });
 
-/* ---------- settings (persist) ---------- */
-const settingsKeys=["setCloudW","setVisMin","setMoonTol","setRefresh"];
-settingsKeys.forEach(id=>{
-  const el=$("#"+id);
-  const s=localStorage.getItem(id);
-  if(s!=null) el.value=s;
-  el.addEventListener("input",()=>{localStorage.setItem(id, el.value); liveDecide();});
+/* ========= THEME / UI ========= */
+$("#btn-compact").addEventListener('click', ()=>{
+  document.body.classList.toggle('compact');
+  $("#btn-compact").textContent = document.body.classList.contains('compact')? "Compact Off":"Compact On";
+});
+$("#btn-night").addEventListener('click', ()=>{
+  document.body.classList.toggle('night');
+  $("#btn-night").textContent = document.body.classList.contains('night')? "Normal Mode":"Night Mode";
 });
 
-/* ---------- location ---------- */
-const getLatLon=()=>{
-  const lat=parseFloat($("#lat").value), lon=parseFloat($("#lon").value);
-  if(Number.isFinite(lat)&&Number.isFinite(lon)) return {lat,lon};
-  const ls=localStorage.getItem("latlon");
-  return ls?JSON.parse(ls):null;
+/* ========= DATA MODELS ========= */
+const DEFAULT_RIG = { name:"SV503_533_0.8x", fl:560, dia:80, reducer:0.8, cam:{sx:11.31, sy:11.31, px:3.76}, hooks:{bias:true,fov:true} };
+const state = {
+  lat: ls('lat') ?? null, lon: ls('lon') ?? null, windowH: ls('windowH') ?? 3,
+  rig: ls('rig') ?? DEFAULT_RIG,
+  thresholds: ls('gng') ?? {clouds:35, hum:90, vis:10},
+  catalog: [
+    {id:"M31", type:"GX", ra:"0.71h", dec:"41.3°", img:"https://upload.wikimedia.org/wikipedia/commons/5/5f/M31bobo11.jpg"},
+    {id:"M33", type:"GX", ra:"1.55h", dec:"30.7°", img:"https://upload.wikimedia.org/wikipedia/commons/9/94/Triangulum_Galaxy_Messier_33_from_the_Mount_Lemmon_SkyCenter_Schmidt-Camera.jpg"},
+    {id:"M27", type:"PN", ra:"19.89h", dec:"22.7°", img:"https://upload.wikimedia.org/wikipedia/commons/1/16/M27_Dumbbell_Nebula.jpg"},
+    {id:"M57", type:"PN", ra:"18.89h", dec:"33.0°", img:"https://upload.wikimedia.org/wikipedia/commons/8/8e/M57_The_Ring_Nebula.JPG"},
+    {id:"M13", type:"GC", ra:"16.70h", dec:"36.5°", img:"https://upload.wikimedia.org/wikipedia/commons/5/57/M13_-_The_Great_Globular_Cluster_in_Hercules.jpg"}
+  ],
+  wx: { clouds: null, vis: null, hum: null, aod: 0.12, pm25: 2.0, dT: 0.7, astroDark:true, sunAlt:-45, moonPct:7, moonAlt:-29, updated:null, transpText:"—" }
 };
-const setLatLon=(lat,lon)=>{ $("#lat").value=lat.toFixed(5); $("#lon").value=lon.toFixed(5); localStorage.setItem("latlon", JSON.stringify({lat,lon}));};
-$("#gpsBtn").onclick=()=>{
-  if(!navigator.geolocation){toast("Geolocation not available");return;}
-  navigator.geolocation.getCurrentPosition(p=>{
-    const {latitude:lat,longitude:lon}=p.coords;
-    setLatLon(lat,lon); toast("GPS location set");
-  }, _=> toast("GPS denied or failed"));
-};
-$("#calcBtn").onclick=()=>{fetchLive();};
 
-/* ---------- astronomy (Sun/Moon) – SunCalc mini ---------- */
-/* Minimal functions adapted from SunCalc principles */
-function toRad(d){return d*Math.PI/180;}
-function toDeg(r){return r*180/Math.PI;}
-function julian(date){return date/86400000-0.5+2440588;}
-function eclipticObliquity(){return toRad(23.4397);}
-function solarMeanAnomaly(d){return toRad(357.5291 + 0.98560028*d);}
-function eclipticLongitude(M){return toRad(280.1470 + 360.9856235*M/ (2*Math.PI))} // simple
-function sunDeclination(d){ // rough
-  const n=julian(d)-2451545;
-  const L = toRad((280.46 + 0.9856474*n)%360);
-  const g = toRad((357.528 + 0.9856003*n)%360);
-  const lam = L + toRad(1.915)*Math.sin(g) + toRad(0.02)*Math.sin(2*g);
-  return Math.asin(Math.sin(lam)*Math.sin(eclipticObliquity()));
+/* ========= RIG EDITOR ========= */
+function fNumber(fl,dia){ return (fl/dia).toFixed(1); }
+function computeRig(rig){
+  const effFL = Math.round(rig.fl * rig.reducer);
+  const fovX = 57.296 * rig.cam.sx / effFL;
+  const fovY = 57.296 * rig.cam.sy / effFL;
+  const scale = 206.265 * rig.cam.px / effFL;
+  return {effFL, fovX, fovY, scale};
 }
-function sunAltitude(date,lat,lon){
-  const d = date.getTime();
-  const dec = sunDeclination(d);
-  const lst = ((date.getUTCHours()+date.getUTCMinutes()/60 + lon/15)+24)%24;
-  const ha = toRad((lst*15) - 0); // crude hour angle
-  const alt = Math.asin(Math.sin(toRad(lat))*Math.sin(dec)+Math.cos(toRad(lat))*Math.cos(dec)*Math.cos(ha));
-  return toDeg(alt);
+function renderRigSummary(){
+  const r=state.rig, c=computeRig(r);
+  $("#rig-efffl").textContent = `Eff. FL ${c.effFL} mm (${r.reducer}×)`;
+  $("#rig-fov").textContent = `FOV ${c.fovX.toFixed(2)} × ${c.fovY.toFixed(2)}`;
+  $("#rig-scale").textContent = `Scale ${c.scale.toFixed(2)} "/px`;
+  $("#rig-scope").textContent = `${r.fl} × ${r.dia} mm (f/${fNumber(r.fl,r.dia)})`;
+  $("#rig-reducer").textContent = `Reducer ${r.reducer}×`;
+  $("#rig-preset-name").textContent = r.name || "custom";
 }
-// Simple moon illumination & altitude via SunCalc-like approximations:
-function moonIllumPct(date){ // 0..100
-  const d=(date - new Date("2001-01-01"))/86400000;
-  const syn=29.53058867;
-  const phase=((d % syn)+syn)%syn;
-  return Math.round((1 - Math.cos(2*Math.PI*phase/syn))*50);
+function openRigEditor(open){
+  $("#rig-editor").style.display = open? "block":"none";
+  $("#btn-edit-rig").style.display = open? "none":"inline-flex";
+  if(open){
+    $("#in-fl").value = state.rig.fl;
+    $("#in-dia").value = state.rig.dia;
+    $("#in-sx").value = state.rig.cam.sx;
+    $("#in-sy").value = state.rig.cam.sy;
+    $("#in-px").value = state.rig.cam.px;
+    // reducer buttons
+    $$("#seg-reducer .toggle").forEach(el=>{
+      el.classList.toggle('active', Number(el.dataset.mul)===state.rig.reducer);
+    });
+    $("#rig-efffl-editor").textContent = `${computeRig(state.rig).effFL} mm`;
+  }
 }
-function moonAltRough(date,lat,lon){
-  // crude: shift sun hour angle by ~12h (opposition)
-  const alt = sunAltitude(new Date(date.getTime()+12*3600*1000), lat, lon);
-  return alt;
+$("#btn-edit-rig").addEventListener('click', ()=>openRigEditor(true));
+$("#btn-close-rig").addEventListener('click', ()=>openRigEditor(false));
+$("#sel-scope").addEventListener('change', e=>{
+  const [name,fl,dia]= e.target.value.split('|');
+  $("#in-fl").value=fl; $("#in-dia").value=dia;
+});
+$("#sel-cam").addEventListener('change', e=>{
+  const [name,sx,sy,px]= e.target.value.split('|');
+  $("#in-sx").value=sx; $("#in-sy").value=sy; $("#in-px").value=px;
+});
+$("#seg-reducer").addEventListener('click', e=>{
+  const t=e.target.closest('.toggle'); if(!t) return;
+  $$("#seg-reducer .toggle").forEach(el=>el.classList.remove('active'));
+  t.classList.add('active');
+  state.rig.reducer = Number(t.dataset.mul);
+  $("#rig-efffl-editor").textContent = `${computeRig(state.rig).effFL} mm`;
+});
+$("#btn-save-rig").addEventListener('click', ()=>{
+  const r=state.rig;
+  r.fl=Number($("#in-fl").value||r.fl);
+  r.dia=Number($("#in-dia").value||r.dia);
+  r.cam.sx=Number($("#in-sx").value||r.cam.sx);
+  r.cam.sy=Number($("#in-sy").value||r.cam.sy);
+  r.cam.px=Number($("#in-px").value||r.cam.px);
+  r.name = `SV503_533_${r.reducer}x`;
+  ls('rig', r);
+  renderRigSummary();
+  renderCatalog(); // update FOV overlay sizing
+  toast("Rig saved");
+});
+$("#btn-del-rig").addEventListener('click', ()=>{
+  ls('rig', DEFAULT_RIG);
+  state.rig = JSON.parse(JSON.stringify(DEFAULT_RIG));
+  renderRigSummary(); openRigEditor(false);
+  renderCatalog();
+  toast("Preset reset to default");
+});
+$("#hook-fov").addEventListener('click', e=>{
+  e.currentTarget.classList.toggle('active');
+  state.rig.hooks.fov = e.currentTarget.classList.contains('active');
+  renderCatalog();
+});
+$("#hook-bias").addEventListener('click', e=>{
+  e.currentTarget.classList.toggle('active');
+  state.rig.hooks.bias = e.currentTarget.classList.contains('active');
+  toast(state.rig.hooks.bias? "Top-5 will bias to your FOV":"Top-5 bias disabled");
+});
+
+/* ========= QUICK SETUP / WEATHER ========= */
+function loadSavedBasics(){
+  if(state.lat!=null) $("#in-lat").value = state.lat;
+  if(state.lon!=null) $("#in-lon").value = state.lon;
+  $("#in-window").value = state.windowH;
+}
+$("#btn-gps").addEventListener('click', ()=>{
+  if(!navigator.geolocation){ toast("GPS not available"); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    state.lat = Number(pos.coords.latitude.toFixed(5));
+    state.lon = Number(pos.coords.longitude.toFixed(5));
+    $("#in-lat").value = state.lat; $("#in-lon").value=state.lon;
+    ls('lat',state.lat); ls('lon',state.lon);
+    toast("GPS location set");
+  }, ()=>toast("GPS failed"));
+});
+$("#btn-calc").addEventListener('click', ()=>{
+  state.lat = Number($("#in-lat").value||state.lat);
+  state.lon = Number($("#in-lon").value||state.lon);
+  state.windowH = Number($("#in-window").value||state.windowH);
+  ls('lat',state.lat); ls('lon',state.lon); ls('windowH',state.windowH);
+  recalcAll();
+});
+
+/* Open-Meteo (hourly) + simple transparency score */
+async function fetchWeather(){
+  if(state.lat==null || state.lon==null) return;
+  const hours = Math.max(1,Math.min(12,state.windowH));
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${state.lat}&longitude=${state.lon}&hourly=cloud_cover,relative_humidity_2m,visibility&forecast_days=1`;
+  try{
+    const r = await fetch(url); const j = await r.json();
+    const cc = j.hourly.cloud_cover.slice(0, hours);
+    const rh = j.hourly.relative_humidity_2m.slice(0, hours);
+    const vis = j.hourly.visibility.slice(0, hours).map(v=>Math.round(v/1000)); // m -> km
+    state.wx.clouds = Math.max(...cc);
+    state.wx.hum = Math.round(cc.length? rh.reduce((a,b)=>a+b)/rh.length : 0);
+    state.wx.vis = Math.min(...vis);
+    state.wx.updated = new Date();
+    // transparency heuristic (you can swap in your own)
+    const h=state.wx.hum, v=state.wx.vis;
+    let txt="Great"; if(h>90 || v<8) txt="Bad"; else if(h>80 || v<12) txt="Okay";
+    state.wx.transpText=txt;
+  }catch(e){ console.error(e); toast("Weather fetch failed"); }
 }
 
-/* ---------- weather via Open-Meteo ---------- */
-async function getOpenMeteo(lat,lon){
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloudcover,visibility,relativehumidity_2m,temperature_2m,dewpoint_2m&forecast_days=1`;
-  const aq = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm2_5,aerosol_optical_depth&forecast_days=1`;
-  const [wRes, aRes] = await Promise.all([fetch(url), fetch(aq)]);
-  if(!wRes.ok||!aRes.ok) throw new Error("Open-Meteo error");
-  const w=await wRes.json(), a=await aRes.json();
-  const idx=new Date().getHours(); // window start hour; we also peek 3h window
-  const hours=[idx, idx+1, idx+2].map(i=>Math.min(i, w.hourly.cloudcover.length-1));
-  const clouds = Math.max(...hours.map(i=>w.hourly.cloudcover[i])); // window max
-  const vis = Math.min(...hours.map(i=> (w.hourly.visibility[i]||20000)/1000 )); // km (min in window)
-  const rh = Math.max(...hours.map(i=> w.hourly.relativehumidity_2m[i]));
-  const t = w.hourly.temperature_2m[idx], td = w.hourly.dewpoint_2m[idx];
-  const dT = +(t-td).toFixed(1);
-  const pm = a.hourly.pm2_5[idx] ?? 0;
-  const aod = a.hourly.aerosol_optical_depth[idx] ?? 0;
-  return {clouds, vis, rh, dT, pm, aod};
+/* ========= TOP-5 (toy scoring + FOV bias) ========= */
+function messierWikiLink(id){ return `https://en.wikipedia.org/wiki/Messier_${id.replace('M','')}`; }
+function computeTop5(){
+  // naive score: prefer larger altitude gap from moon (not available here),
+  // so just prioritize by catalog order + FOV bias
+  const r=state.rig, c=computeRig(r), diagFov=Math.hypot(c.fovX,c.fovY);
+  const bias = r.hooks.bias? (m=>{ // galaxies like wider FOV
+    const want = (m.type==="GX"? 2.0 : m.type==="GC"? 1.0 : 1.5);
+    return Math.max(0, 1.5 - Math.abs(diagFov - want)); // closeness
+  }) : (()=>1);
+
+  const scored = state.catalog.map(m=>({m,score:Math.random()*0.8 + bias(m)}))
+                   .sort((a,b)=>b.score-a.score).slice(0,5).map(x=>x.m);
+  return scored;
 }
-
-/* ---------- decision engine ---------- */
-function transparencyRating({aod, pm, rh, dT}){
-  // quick heuristic score 0..100
-  let score = 100;
-  score -= clamp(aod*200,0,35); // higher AOD worse
-  score -= clamp(pm*1.2,0,35);
-  score -= clamp((rh-50)*0.6,0,15);
-  score -= clamp((1.5-dT)*18,0,15); // if dewpoint close to temp
-  const text = score>75?"Great": score>55?"Good": score>35?"Fair": score>20?"Poor":"Bad";
-  return {score, text};
-}
-
-function decide(status){
-  const set = {
-    cloudW: +$("#setCloudW").value, visMin:+$("#setVisMin").value,
-    moonTol:+$("#setMoonTol").value
-  };
-  // hard blocks
-  if(status.vis < set.visMin) return "NO-GO";
-  if(status.moonPct > set.moonTol && status.moonAlt > -5) return "NO-GO";
-  // weighted risk
-  const cloudPenalty = status.clouds * (set.cloudW/100);
-  const transPenalty = (100-status.transpScore) * (1 - set.cloudW/100);
-  const risk = cloudPenalty*0.7 + transPenalty*0.3 + (status.rh>90?5:0);
-  return risk<45 ? "GO" : (risk<65? "MAYBE" : "NO-GO");
-}
-
-/* ---------- catalog + images ---------- */
-const CATALOG = [
-  {id:"M31", type:"GX", ra:"0.71h", dec:"41.3°", wiki:"https://en.wikipedia.org/wiki/Andromeda_Galaxy",
-   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Andromeda_Galaxy_%28with_h-alpha%29.jpg/320px-Andromeda_Galaxy_%28with_h-alpha%29.jpg"},
-  {id:"M33", type:"GX", ra:"1.55h", dec:"30.7°", wiki:"https://en.wikipedia.org/wiki/Triangulum_Galaxy",
-   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/M33_-_Triangulum_Galaxy.jpg/320px-M33_-_Triangulum_Galaxy.jpg"},
-  {id:"M27", type:"PN", ra:"19.89h", dec:"22.7°", wiki:"https://en.wikipedia.org/wiki/Dumbbell_Nebula",
-   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/M27_Dumbbell_Nebula.jpg/320px-M27_Dumbbell_Nebula.jpg"},
-  {id:"M57", type:"PN", ra:"18.89h", dec:"33.0°", wiki:"https://en.wikipedia.org/wiki/Ring_Nebula",
-   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/M57_The_Ring_Nebula.JPG/320px-M57_The_Ring_Nebula.JPG"},
-  {id:"M13", type:"GC", ra:"16.70h", dec:"36.5°", wiki:"https://en.wikipedia.org/wiki/Great_Hercules_Cluster",
-   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/M13_-_Great_Hercules_Cluster.jpg/320px-M13_-_Great_Hercules_Cluster.jpg"}
-];
-
-function renderTop5(list){
-  const ol=$("#topList"); ol.innerHTML="";
-  list.forEach((o,i)=>{
-    const li=document.createElement("li");
-    li.style.margin="6px 0";
-    li.innerHTML = `<a href="${o.wiki}" target="_blank" rel="noopener">${o.id}</a> — `+
-      `${o.name??o.title??o.id} — alt ${o.alt??'—'} — ${o.sep??''}`;
+function renderTop5(items){
+  const ol=$("#top5-list"); ol.innerHTML="";
+  items.forEach((m,i)=>{
+    const li=document.createElement('li');
+    const link = document.createElement('a');
+    link.href = messierWikiLink(m.id); link.target="_blank"; link.textContent=m.id;
+    li.appendChild(link);
+    li.insertAdjacentText('beforeend', ` — ${m.id} — alt — —`);
     ol.appendChild(li);
   });
+  onTop5Rendered();
 }
 
-function renderCatalog(filter=""){
-  const tbody=$("#catRows"); tbody.innerHTML="";
-  const q=filter.trim().toLowerCase();
-  CATALOG.filter(o=>!q || o.id.toLowerCase().includes(q) || o.type.toLowerCase().includes(q))
-    .forEach(o=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td><a href="${o.wiki}" target="_blank" rel="noopener">${o.id}</a></td>
-        <td>${o.type}</td>
-        <td>${o.ra}</td>
-        <td>${o.dec}</td>
-        <td><a href="${o.wiki}" target="_blank" rel="noopener"><img class="thumb" loading="lazy" src="${o.img}" onerror="this.style.opacity=.25"></a></td>`;
-      tbody.appendChild(tr);
-    });
-}
-$("#search").addEventListener("input", e=> renderCatalog(e.target.value));
-$("#clearSearch").onclick=()=>{$("#search").value="";renderCatalog("");};
-
-/* ---------- rig ---------- */
-function rigLoad(){
-  const d=JSON.parse(localStorage.getItem("rig")||"{}");
-  const rig = {
-    fl: d.fl ?? 560, dia: d.dia ?? 80, red: d.red ?? 0.8,
-    camW:d.camW ?? 11.31, camH:d.camH ?? 11.31, pix:d.pix ?? 3.76,
-    name: d.name ?? "SV503_533_0.8x"
-  };
-  $("#scopeFL").value=rig.fl; $("#scopeDia").value=rig.dia;
-  $("#camW").value=rig.camW; $("#camH").value=rig.camH; $("#pix").value=rig.pix;
-  $("#presetName").value=rig.name;
-  updateRigSummary(rig);
-  return rig;
-}
-function updateRigSummary(r){
-  const eff = Math.round(r.fl * r.red);
-  const scale = (206.265 * r.pix / eff).toFixed(2);
-  // FOV (degrees) ~ 57.3 * sensor(mm) / eff(mm)
-  const fovX = (57.2958 * r.camW / eff).toFixed(2);
-  const fovY = (57.2958 * r.camH / eff).toFixed(2);
-  $("#rigSummary").innerHTML =
-    `<div class="chip">Eff. FL ${eff} mm (${r.red}×)</div>
-     <div class="chip">FOV ${fovX} × ${fovY}</div>
-     <div class="chip">Scale ${scale} "/px</div>
-     <div class="chip">${r.fl} × ${r.dia} mm (f/${(r.fl/r.dia).toFixed(1)})</div>
-     <div class="chip">Reducer ${r.red}×</div>`;
-  localStorage.setItem("rig", JSON.stringify(r));
-}
-let RIG = rigLoad();
-$("#editRigBtn").onclick=()=>{
-  const ed=$("#rigEditor"); ed.classList.toggle("collapse");
-  $("#editRigBtn").textContent = ed.classList.contains("collapse") ? "Edit rig" : "Close editor";
-};
-$$(".redBtn").forEach(b=>{
-  b.addEventListener("click",()=>{
-    RIG.red = parseFloat(b.dataset.red);
-    updateRigSummary(RIG);
-    toast(`Reducer set to ${RIG.red}×`);
+/* ========= CATALOG + SEARCH ========= */
+function renderCatalog(){
+  const body=$("#cat-body"); body.innerHTML="";
+  const q=($("#search").value||"").trim().toLowerCase();
+  const items = state.catalog.filter(x=>{
+    if(!q) return true;
+    return x.id.toLowerCase().includes(q) || x.type.toLowerCase().includes(q);
   });
-});
-["scopeFL","scopeDia","camW","camH","pix","presetName"].forEach(id=>{
-  $("#"+id).addEventListener("change",()=>{
-    RIG.fl=+$("#scopeFL").value; RIG.dia=+$("#scopeDia").value;
-    RIG.camW=+$("#camW").value; RIG.camH=+$("#camH").value; RIG.pix=+$("#pix").value;
-    RIG.name=$("#presetName").value || "SV503_533_0.8x";
-    updateRigSummary(RIG);
+  items.forEach(m=>{
+    const tr=document.createElement('tr');
+    const imgCell = `<div class="thumb${state.rig.hooks.fov?' fov':''}"><img loading="lazy" src="${m.img}" alt="${m.id}"></div>`;
+    tr.innerHTML = `<td><a href="${messierWikiLink(m.id)}" target="_blank">${m.id}</a></td>
+                    <td>${m.type}</td><td>${m.ra}</td><td>${m.dec}</td><td>${imgCell}</td>`;
+    body.appendChild(tr);
   });
+}
+$("#search").addEventListener('input', renderCatalog);
+$("#btn-clear-search").addEventListener('click', ()=>{ $("#search").value=""; renderCatalog(); });
+
+/* ========= GO/NO-GO DECISION ========= */
+function decideGoNoGo(){
+  const th = state.thresholds;
+  const clouds = state.wx.clouds ?? 100;
+  const vis = state.wx.vis ?? 0;
+  const hum = state.wx.hum ?? 100;
+
+  const go = (clouds <= th.clouds) && (vis >= th.vis);
+  $("#status-decision").textContent = go ? "GO" : "NO-GO";
+  $("#status-decision").className = `chip ${go?'ok':'bad'}`;
+  $("#status-clouds").textContent = `~${clouds ?? '—'}%`;
+  $("#status-vis").textContent = `Vis ${vis ?? '—'} km`;
+  $("#status-astro").textContent = state.wx.astroDark ? "Astro dark" : "Not astro dark";
+  $("#status-updated").textContent = state.wx.updated ? `Updated ${state.wx.updated.toLocaleTimeString()}` : "Updated —:—";
+  $("#status-sun").textContent = `Sun alt ${state.wx.sunAlt}°`;
+  $("#status-moon").textContent = `Moon ${state.wx.moonPct}%`;
+  $("#status-transp").textContent = `Transparency ${state.wx.transpText}`;
+
+  $("#cond-moon").textContent = `${state.wx.moonPct}%`;
+  $("#cond-moon-alt").textContent = `Alt ${state.wx.moonAlt}°`;
+  $("#cond-clouds").textContent = `${clouds ?? '—'}%`;
+  $("#cond-hum").textContent = `${hum ?? '—'}%`;
+  $("#cond-transp").textContent = state.wx.transpText;
+  $("#cond-transp-detail").textContent = `AOD ${state.wx.aod} · PM2.5 ${state.wx.pm25} · RH ${hum}% · Vis ${vis}km · ΔT ${state.wx.dT}°C · ${0}`;
+  $("#cond-updated").textContent = $("#status-updated").textContent;
+  $("#cond-sun").textContent = $("#status-sun").textContent;
+}
+$("#btn-save-gng").addEventListener('click', ()=>{
+  state.thresholds.clouds = Number($("#th-clouds").value||state.thresholds.clouds);
+  state.thresholds.hum = Number($("#th-hum").value||state.thresholds.hum);
+  state.thresholds.vis = Number($("#th-vis").value||state.thresholds.vis);
+  ls('gng', state.thresholds);
+  toast("Go/No-Go thresholds saved");
 });
-$("#savePreset").onclick=()=>{localStorage.setItem("rigPreset_"+(RIG.name||"SV503_533_0.8x"), JSON.stringify(RIG)); toast("Preset saved");}
-$("#delPreset").onclick=()=>{localStorage.removeItem("rigPreset_"+(RIG.name||"SV503_533_0.8x")); toast("Preset deleted");}
 
-/* ---------- live fetch + render ---------- */
-async function fetchLive(){
-  const ll=getLatLon();
-  if(!ll){toast("Set location (GPS or manual) first");return;}
-  const {lat,lon}=ll;
-
-  // astronomy
-  const now=new Date();
-  const sunA= sunAltitude(now,lat,lon);
-  const astro = sunA<-18 ? "Astro dark" : (sunA<-12?"Nautical":"—");
-  const moonPct= moonIllumPct(now);
-  const moonA = moonAltRough(now,lat,lon);
-
-  // weather
-  let wx;
-  try{
-    wx = await getOpenMeteo(lat,lon);
-  }catch(e){ toast("Weather fetch failed"); return; }
-
-  // transparency
-  const tr = transparencyRating(wx);
-
-  // update Conditions
-  $("#moonPct").textContent = fmtPct(moonPct);
-  $("#moonAlt").textContent = `Alt ${Math.round(moonA)}°`;
-  $("#clouds").textContent = fmtPct(wx.clouds);
-  $("#rh").textContent = fmtPct(wx.rh);
-  $("#transp").textContent = tr.text;
-  $("#transpInfo").textContent = `AOD ${wx.aod.toFixed(2)} · PM2.5 ${wx.pm?.toFixed?.(1)??wx.pm} · RH ${wx.rh}% · Vis ${wx.vis.toFixed(0)}km · ΔT ${wx.dT}°C`;
-  $("#updated").textContent = `Updated ${nowStr()}`;
-  $("#sunAlt").textContent = `Sun alt ${Math.round(sunA)}°`;
-  $("#astro").textContent = astro;
-
-  // decision
-  const status = {
-    clouds: wx.clouds, vis: wx.vis, rh: wx.rh, transpScore: tr.score,
-    moonPct, moonAlt: moonA
-  };
-  const decision = decide(status);
-  renderStatus(decision, wx, astro, moonPct, sunA);
-
-  // top 5 (placeholder order; can bias by FOV later)
-  renderTop5(CATALOG);
-  toast("Live data updated");
-}
-function renderStatus(decision, wx, astro, moonPct, sunAlt){
-  const chips=$("#statusChips"); chips.innerHTML="";
-  const tag=document.createElement("div");
-  tag.className="chip "+(decision==="GO"?"ok": decision==="NO-GO"?"bad":"");
-  tag.textContent=decision; chips.appendChild(tag);
-  [
-    `Clouds ~${Math.round(wx.clouds)}%`,
-    `Vis ${wx.vis.toFixed(0)} km`,
-    astro,
-    `Updated ${nowStr()}`,
-    `Sun alt ${Math.round(sunAlt)}°`,
-    `Moon ${moonPct}%`,
-    `Transparency ${transparencyRating(wx).text}`
-  ].forEach(t=>{const c=document.createElement("div");c.className="chip";c.textContent=t;chips.appendChild(c);});
+/* ========= RECALC PIPELINE ========= */
+async function recalcAll(){
+  toast("Calculating…");
+  await fetchWeather();
+  decideGoNoGo();
+  renderRigSummary();
+  renderCatalog();
+  const top = computeTop5(); renderTop5(top);
+  toast("Updated");
 }
 
-/* ---------- boot ---------- */
-(function boot(){
-  // initial lat/lon from LS or ask
-  const ll = getLatLon();
-  if(ll){ setLatLon(ll.lat,ll.lon); }
-  renderCatalog("");
-  renderTop5(CATALOG);
-  fetchLive();
-  // auto refresh
-  setInterval(()=>fetchLive(), (+$("#setRefresh").value||10)*60000);
-})();
+/* ========= BOOT ========= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // load saved basics
+  loadSavedBasics();
+  // apply saved thresholds
+  $("#th-clouds").value = state.thresholds.clouds;
+  $("#th-hum").value = state.thresholds.hum;
+  $("#th-vis").value = state.thresholds.vis;
+
+  initCardStates();
+  renderRigSummary();
+  renderCatalog();
+  decideGoNoGo();
+
+  // initial compute if we have coords
+  if(state.lat!=null && state.lon!=null){ recalcAll(); }
+});
 </script>
 </body>
 </html>
